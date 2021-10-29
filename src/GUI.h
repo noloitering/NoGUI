@@ -130,7 +130,7 @@ namespace NoGUI
 		}
 	};
 
-	class GUIManager : public Proclaim
+	class GUIManager : public Proclaim, public NoMVC::Model
 	{
 	private:
 		CompContainer components;
