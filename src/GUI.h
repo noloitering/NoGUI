@@ -8,6 +8,8 @@
 
 #include "Component.h"
 #include "Observer.h"
+#include "Model.h"
+
 namespace NoGUI
 {
 	// Classes
