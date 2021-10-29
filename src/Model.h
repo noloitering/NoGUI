@@ -1,4 +1,5 @@
-//#pragma once
+#ifndef MODEL_H
+#define MODEL_H
 
 namespace NoMVC
 {
@@ -9,3 +10,5 @@ namespace NoMVC
 		virtual void render() = 0;
 	};
 }
+
+#endif
