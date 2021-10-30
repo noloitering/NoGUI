@@ -9,6 +9,7 @@ namespace NoGUI
 	class Listener
 	{
 	public:
+		Listener() {}
 		virtual ~Listener() {}
 		virtual void onNotify(std::shared_ptr< Element > elem) = 0;
 	};
