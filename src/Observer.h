@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+
 namespace NoGUI
 {
 	class Element;
