@@ -276,21 +276,29 @@ void DrawGUIElement(Element* elem)
 	DrawGUIShape(shape);
 	if ( elem->hasComponent< CText >() )
 	{
-		CText txtFmt = elem->getComponent<CText>();
+		CText txtFmt = elem->getComponent< CText >();
 		if ( txtFmt.contents.empty() )
 		{
 			txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, elem->styling().radius.x * 2 - txtFmt.margin.x);
 		}
-		DrawGUITextWrapped(txtFmt.contents, elem->getComponent<CText>(), elem->styling());
+		DrawGUITextWrapped(txtFmt.contents, elem->getComponent< CText >(), elem->styling());
 	}
 	if ( elem->hasComponent< CImage >() )
 	{
-		CImage imgFmt = elem->getComponent<CImage>();
+		CImage imgFmt = elem->getComponent< CImage >();
 		DrawGUIImage(imgFmt, elem->styling());
 	}
 	if ( elem->hasComponent< CMultiStyle >() )
 	{
-		
+		std::vector< Style > children = elem->getComponent< CMultiStyle >().styles;
+		Vector2 origin = shape.pos;
+		for (auto child : children)
+		{
+			shape = child;
+			shape.pos.x = origin.x + shape.pos.x;
+			shape.pos.y = origin.y + shape.pos.y;
+			DrawGUIShape(shape);
+		}
 	}
 }
 
