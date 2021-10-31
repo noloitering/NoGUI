@@ -1,8 +1,9 @@
 #include "GUI.h"
-//#include "GameEngine.h"
+
+using namespace NoGUI;
 
 // Procedural functions
-Vector2 NoGUI::alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
+Vector2 alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	int leftPos = elem.pos.x - elem.radius.x;
@@ -15,7 +16,8 @@ Vector2 NoGUI::alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 	return result;
 }
 
-Vector2 NoGUI::alignTextCenter(const char* text, const CText& fmt, const Style& elem, int lineNum)
+// TODO: fix bugs
+Vector2 alignTextCenter(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -39,7 +41,7 @@ Vector2 NoGUI::alignTextCenter(const char* text, const CText& fmt, const Style& 
 	return result;
 }
 
-Vector2 NoGUI::alignTextTop(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 alignTextTop(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -63,7 +65,7 @@ Vector2 NoGUI::alignTextTop(const char* text, const CText& fmt, const Style& ele
 	return result;
 }
 
-Vector2 NoGUI::alignTextBottom(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 alignTextBottom(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -87,7 +89,7 @@ Vector2 NoGUI::alignTextBottom(const char* text, const CText& fmt, const Style& 
 	return result;
 }
 
-Vector2 NoGUI::alignTextBottomLeft(const char* text, const NoGUI::CText& fmt, const NoGUI::Style& elem, int lineNum)
+Vector2 alignTextBottomLeft(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -102,7 +104,7 @@ Vector2 NoGUI::alignTextBottomLeft(const char* text, const NoGUI::CText& fmt, co
 	return result;
 }
 
-Vector2 NoGUI::alignTextBottomRight(const char* text, const NoGUI::CText& fmt, const NoGUI::Style& elem, int lineNum)
+Vector2 alignTextBottomRight(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -126,7 +128,7 @@ Vector2 NoGUI::alignTextBottomRight(const char* text, const NoGUI::CText& fmt, c
 	return result;
 }
 
-Vector2 NoGUI::alignTextRight(const char* text, const NoGUI::CText& fmt, const NoGUI::Style& elem, int lineNum)
+Vector2 alignTextRight(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -150,7 +152,7 @@ Vector2 NoGUI::alignTextRight(const char* text, const NoGUI::CText& fmt, const N
 	return result;
 }
 
-Vector2 NoGUI::alignText(const char* text, const NoGUI::CText& fmt, const NoGUI::Style& elem, int lineNum)
+Vector2 alignText(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 
@@ -210,7 +212,7 @@ Vector2 NoGUI::alignText(const char* text, const NoGUI::CText& fmt, const NoGUI:
 }
 
 // TODO: refactor
-std::vector<std::string> NoGUI::wrapText(const char* text, const NoGUI::CText& fmt, int width)
+std::vector<std::string> wrapText(const char* text, const CText& fmt, int width)
 {
 	std::vector<std::string> result;
 	std::string line = std::string();
@@ -264,7 +266,7 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const NoGUI::CText& f
 	return result;
 }
 
-void NoGUI::DrawGUIElement(NoGUI::Element* elem)
+void DrawGUIElement(Element* elem)
 {
 	Style shape = elem->styling();
 	if ( elem->getHover() )
@@ -272,7 +274,7 @@ void NoGUI::DrawGUIElement(NoGUI::Element* elem)
 		shape.backCol = elem->getHoverCol();
 	}
 	DrawGUIShape(shape);
-	if ( elem->hasComponent<CText>() )
+	if ( elem->hasComponent< CText >() )
 	{
 		CText txtFmt = elem->getComponent<CText>();
 		if ( txtFmt.contents.empty() )
@@ -281,14 +283,15 @@ void NoGUI::DrawGUIElement(NoGUI::Element* elem)
 		}
 		DrawGUITextWrapped(txtFmt.contents, elem->getComponent<CText>(), elem->styling());
 	}
-	if ( elem->hasComponent<CImage>() )
+	if ( elem->hasComponent< CImage >() )
 	{
 		CImage imgFmt = elem->getComponent<CImage>();
 		DrawGUIImage(imgFmt, elem->styling());
 	}
+	if ( elem->hasComponent<  >
 }
 
-void NoGUI::DrawGUIShape(const NoGUI::Style& elem)
+void DrawGUIShape(const Style& elem)
 {
 	switch (elem.sides)
 	{
@@ -382,7 +385,7 @@ void NoGUI::DrawGUIShape(const NoGUI::Style& elem)
 }
 
 // TODO: rotate text around center
-void NoGUI::DrawGUITextV(const char* text, const NoGUI::CText& fmt, const Vector2& pos)
+void DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos)
 {
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
 	Vector2 origin = {0, 0};
@@ -398,7 +401,7 @@ void NoGUI::DrawGUITextV(const char* text, const NoGUI::CText& fmt, const Vector
 }
 
 // TODO: not aligning when there are 2 words
-void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, const Style& elem)
+void DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, const Style& elem)
 {
 	Vector2 textPos;
 	switch (fmt.align)
@@ -482,7 +485,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 	}
 }
 
-void NoGUI::DrawGUIText(const char * text, const NoGUI::CText& fmt, const Style& elem)
+void DrawGUIText(const char * text, const CText& fmt, const Style& elem)
 {
 	switch(fmt.wrap)
 	{
@@ -505,7 +508,7 @@ void NoGUI::DrawGUIText(const char * text, const NoGUI::CText& fmt, const Style&
 	}
 }
 
-void NoGUI::DrawGUIImage(const NoGUI::CImage& fmt, const Style& elem)
+void DrawGUIImage(const CImage& fmt, const Style& elem)
 {
 	if ( fmt.texture )
 	{
@@ -530,37 +533,37 @@ void NoGUI::DrawGUIImage(const NoGUI::CImage& fmt, const Style& elem)
 }
 
 // Element object
-bool NoGUI::Element::isFocus()
+bool Element::isFocus()
 {
 	
 	return getFocus();
 }
 
-bool NoGUI::Element::getFocus()
+bool Element::getFocus()
 {
 	
 	return focus;
 }
 
-bool NoGUI::Element::getHover()
+bool Element::getHover()
 {
 	
 	return hover;
 }
 
-bool NoGUI::Element::isActive()
+bool Element::isActive()
 {
 
 	return active;
 }
 
-bool NoGUI::Element::isAlive()
+bool Element::isAlive()
 {
 	
 	return alive;
 }
 
-bool NoGUI::Element::isHover()
+bool Element::isHover()
 {
 	Vector2 mousePos = GetMousePosition();
 	switch (style.sides)
@@ -626,24 +629,24 @@ bool NoGUI::Element::isHover()
 	return hover;
 }
 
-Color NoGUI::Element::getHoverCol()
+Color Element::getHoverCol()
 {
 	
 	return hoverCol;
 }
 
-void NoGUI::Element::setHoverCol(const Color& col)
+void Element::setHoverCol(const Color& col)
 {
 	hoverCol = col;
 }
 
-std::string NoGUI::Element::getInner()
+std::string Element::getInner()
 {
 
 	return inner;
 }
 
-void NoGUI::Element::setInner(const std::string& in)
+void Element::setInner(const std::string& in)
 {
 	inner = in;
 	if ( hasComponent< CText >() )
@@ -653,50 +656,50 @@ void NoGUI::Element::setInner(const std::string& in)
 	}
 }
 
-NoGUI::Style NoGUI::Element::styling()
+Style Element::styling()
 {
 	
 	return style;
 }
 
-void NoGUI::Element::draw()
+void Element::draw()
 {
 	DrawGUIElement(this);
 }
 
-void NoGUI::Element::kill()
+void Element::kill()
 {
 	alive = false;
 }
 
-void NoGUI::Element::repos(const Vector2& newPos)
+void Element::repos(const Vector2& newPos)
 {
 	style.pos = newPos;
 }
 
-void NoGUI::Element::resize(const Vector2& newRadi)
+void Element::resize(const Vector2& newRadi)
 {
 	style.radius = newRadi;
 }
 
-void NoGUI::Element::recol(const Color& newBack, const Color& newHover)
+void Element::recol(const Color& newBack, const Color& newHover)
 {
 	style.backCol = newBack;
 	hoverCol = newHover;
 }
 
-void NoGUI::Element::reshape(int newSides)
+void Element::reshape(int newSides)
 {
 	style.sides = newSides;
 }
 
 
-void NoGUI::Element::rotate(float rotation)
+void Element::rotate(float rotation)
 {
 	style.rotation = rotation;
 }
 
-bool NoGUI::Button::isFocus()
+bool Button::isFocus()
 {
 	focus = false;
 	if ( active )
@@ -711,24 +714,24 @@ bool NoGUI::Button::isFocus()
 }
 
 // Pages
-NoGUI::Page::Page(bool init)
+Page::Page(bool init)
 {
 	active = init;
 }
 
-bool NoGUI::Page::isActive()
+bool Page::isActive()
 {
 	
 	return active;
 }
 
-void NoGUI::Page::setActive(bool set)
+void Page::setActive(bool set)
 {
 	active = set;
 }
 
 // TODO: clean up your loops
-void NoGUI::Page::removeElement(size_t id)
+void Page::removeElement(size_t id)
 {
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
@@ -744,7 +747,7 @@ void NoGUI::Page::removeElement(size_t id)
 	}
 }
 
-void NoGUI::Page::clearElements()
+void Page::clearElements()
 {
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
@@ -755,7 +758,7 @@ void NoGUI::Page::clearElements()
 	}
 }
 
-std::shared_ptr< NoGUI::Element > NoGUI::Page::getElement(size_t id)
+std::shared_ptr< Element > Page::getElement(size_t id)
 {
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
@@ -772,19 +775,19 @@ std::shared_ptr< NoGUI::Element > NoGUI::Page::getElement(size_t id)
 	return nullptr;
 }
 
-std::vector< std::shared_ptr< NoGUI::Element > > NoGUI::Page::getElements(const std::string& tag)
+std::vector< std::shared_ptr< Element > > Page::getElements(const std::string& tag)
 {
 	
 	return elements[tag];
 }
 
-std::vector< std::shared_ptr< NoGUI::Element > > NoGUI::Page::getElements()
+std::vector< std::shared_ptr< Element > > Page::getElements()
 {
-	std::vector< std::shared_ptr< NoGUI::Element > > result;
+	std::vector< std::shared_ptr< Element > > result;
 	
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
-		for (std::shared_ptr< NoGUI::Element > e : it->second)
+		for (std::shared_ptr< Element > e : it->second)
 		{
 			result.push_back(e);
 		}
@@ -793,9 +796,9 @@ std::vector< std::shared_ptr< NoGUI::Element > > NoGUI::Page::getElements()
 	return result;
 }
 
-void NoGUI::Page::update()
+void Page::update()
 {
-	std::map< std::string, std::vector< std::shared_ptr< NoGUI::Element > > > new_map;
+	std::map< std::string, std::vector< std::shared_ptr< Element > > > new_map;
 	for (auto me : elements)
 	{
 		for (int elemIndex=0; elemIndex < me.second.size(); elemIndex++)
@@ -824,50 +827,50 @@ void NoGUI::Page::update()
 	elements = new_map;
 }
 
-size_t NoGUI::Page::size()
+size_t Page::size()
 {
 
 	return elements.size();
 }
 
 // GUI Manager
-NoGUI::GUIManager::GUIManager()
+GUIManager::GUIManager()
 {
 	addPage(true);
 }
 
-void NoGUI::GUIManager::removeElement(size_t id, int pageIndex)
+void GUIManager::removeElement(size_t id, int pageIndex)
 {
 	
 	return pages[pageIndex]->removeElement(id);
 }
 
-std::shared_ptr< NoGUI::Page > NoGUI::GUIManager::addPage(bool active)
+std::shared_ptr< Page > GUIManager::addPage(bool active)
 {
-	auto e = std::shared_ptr< NoGUI::Page >(new NoGUI::Page(active));
+	auto e = std::shared_ptr< Page >(new Page(active));
 	pages.push_back(e);
 	
 	return e;
 }
 
-std::shared_ptr< NoGUI::Page > NoGUI::GUIManager::getPage(int pageIndex)
+std::shared_ptr< Page > GUIManager::getPage(int pageIndex)
 {
 	
 	return pages[pageIndex];
 }
 
-size_t NoGUI::GUIManager::size()
+size_t GUIManager::size()
 {
 	
 	return pages.size();
 }
 
-void NoGUI::GUIManager::removePage(int pageIndex)
+void GUIManager::removePage(int pageIndex)
 {
 	pages.erase(pages.begin() + pageIndex - 1);
 }
 
-void NoGUI::GUIManager::update()
+void GUIManager::update()
 {
 	for (auto page : pages)
 	{
@@ -892,7 +895,7 @@ void NoGUI::GUIManager::update()
 	}
 }
 
-void NoGUI::GUIManager::render()
+void GUIManager::render()
 {
 	for (auto page : pages)
 	{
@@ -906,7 +909,7 @@ void NoGUI::GUIManager::render()
 	}	
 }
 
-void NoGUI::GUIManager::setActive(size_t index)
+void GUIManager::setActive(size_t index)
 {
 	for (auto page : pages)
 	{
