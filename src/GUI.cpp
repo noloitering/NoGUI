@@ -3,7 +3,7 @@
 using namespace NoGUI;
 
 // Procedural functions
-Vector2 alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	int leftPos = elem.pos.x - elem.radius.x;
@@ -17,7 +17,7 @@ Vector2 alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 }
 
 // TODO: fix bugs
-Vector2 alignTextCenter(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextCenter(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -41,7 +41,7 @@ Vector2 alignTextCenter(const char* text, const CText& fmt, const Style& elem, i
 	return result;
 }
 
-Vector2 alignTextTop(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextTop(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -65,7 +65,7 @@ Vector2 alignTextTop(const char* text, const CText& fmt, const Style& elem, int 
 	return result;
 }
 
-Vector2 alignTextBottom(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextBottom(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -89,7 +89,7 @@ Vector2 alignTextBottom(const char* text, const CText& fmt, const Style& elem, i
 	return result;
 }
 
-Vector2 alignTextBottomLeft(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextBottomLeft(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -104,7 +104,7 @@ Vector2 alignTextBottomLeft(const char* text, const CText& fmt, const Style& ele
 	return result;
 }
 
-Vector2 alignTextBottomRight(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextBottomRight(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -128,7 +128,7 @@ Vector2 alignTextBottomRight(const char* text, const CText& fmt, const Style& el
 	return result;
 }
 
-Vector2 alignTextRight(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignTextRight(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -152,7 +152,7 @@ Vector2 alignTextRight(const char* text, const CText& fmt, const Style& elem, in
 	return result;
 }
 
-Vector2 alignText(const char* text, const CText& fmt, const Style& elem, int lineNum)
+Vector2 NoGUI::alignText(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 
@@ -212,7 +212,7 @@ Vector2 alignText(const char* text, const CText& fmt, const Style& elem, int lin
 }
 
 // TODO: refactor
-std::vector<std::string> wrapText(const char* text, const CText& fmt, int width)
+std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int width)
 {
 	std::vector<std::string> result;
 	std::string line = std::string();
@@ -266,7 +266,7 @@ std::vector<std::string> wrapText(const char* text, const CText& fmt, int width)
 	return result;
 }
 
-void DrawGUIElement(Element* elem)
+void NoGUI::DrawGUIElement(Element* elem)
 {
 	Style shape = elem->styling();
 	if ( elem->getHover() )
@@ -302,7 +302,7 @@ void DrawGUIElement(Element* elem)
 	}
 }
 
-void DrawGUIShape(const Style& elem)
+void NoGUI::DrawGUIShape(const Style& elem)
 {
 	switch (elem.sides)
 	{
@@ -396,7 +396,7 @@ void DrawGUIShape(const Style& elem)
 }
 
 // TODO: rotate text around center
-void DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos)
+void NoGUI::DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos)
 {
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
 	Vector2 origin = {0, 0};
@@ -412,7 +412,7 @@ void DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos)
 }
 
 // TODO: not aligning when there are 2 words
-void DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, const Style& elem)
+void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, const Style& elem)
 {
 	Vector2 textPos;
 	switch (fmt.align)
@@ -496,7 +496,7 @@ void DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, 
 	}
 }
 
-void DrawGUIText(const char * text, const CText& fmt, const Style& elem)
+void NoGUI::DrawGUIText(const char * text, const CText& fmt, const Style& elem)
 {
 	switch(fmt.wrap)
 	{
@@ -519,7 +519,7 @@ void DrawGUIText(const char * text, const CText& fmt, const Style& elem)
 	}
 }
 
-void DrawGUIImage(const CImage& fmt, const Style& elem)
+void NoGUI::DrawGUIImage(const CImage& fmt, const Style& elem)
 {
 	if ( fmt.texture )
 	{
