@@ -4,7 +4,6 @@
 #include <string>
 #include <map>
 #include <tuple>
-#include <math.h> // TODO: this is only being imported for CheckCollisionPointLine()
 
 #include "Component.h"
 #include "Observer.h"

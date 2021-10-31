@@ -12,7 +12,6 @@ namespace NoGUI
 	enum class TextAlign {LEFT, CENTER, RIGHT, TOP, BOTTOM, BOTTOML, BOTTOMR};
 	enum class TextWrap {NONE = 0, DOWN = 1, UP = -1};
 
-	// TODO: outline
 	struct Style
 	{
 		Color backCol = GRAY;
