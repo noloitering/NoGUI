@@ -288,7 +288,10 @@ void DrawGUIElement(Element* elem)
 		CImage imgFmt = elem->getComponent<CImage>();
 		DrawGUIImage(imgFmt, elem->styling());
 	}
-	if ( elem->hasComponent<  >
+	if ( elem->hasComponent< CMultiStyle >() )
+	{
+		
+	}
 }
 
 void DrawGUIShape(const Style& elem)
