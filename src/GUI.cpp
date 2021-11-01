@@ -349,6 +349,7 @@ void NoGUI::DrawGUIShape(const Style& elem)
 			Vector2 ldx = left;
 			Vector2 tdx = top;
 			Vector2 rdx = right;
+			// TODO: fix outline
 			for (int i=0; i < elem.outlineThick; i++)
 			{
 				ldx.x--;
