@@ -51,7 +51,7 @@ namespace NoGUI
 		std::vector< std::string > contents;
 		float size = 20; // font size
 		float rotation = 0; // TODO: implement
-		Vector2 spacing = {0, 0};
+		Vector2 spacing = {4, 0};
 		Vector2 margin = {0, 0};
 		Color col = WHITE; // font colour (RGBA)
 		TextAlign align = TextAlign::LEFT;

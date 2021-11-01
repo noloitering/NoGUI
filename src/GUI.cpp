@@ -21,17 +21,12 @@ Vector2 NoGUI::alignTextCenter(const char* text, const CText& fmt, const Style& 
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-	Vector2 textSize = MeasureTextEx(font, text, fmt.size, fmt.spacing.x);
-	// weird bug
-	int leftPos;
-	if (elem.radius.x <= 25)
-	{
-		leftPos = elem.pos.x - textSize.x / 2 + 4;
-	}
-	else
-	{
-		leftPos = elem.pos.x - textSize.x / 2;
-	}
+//	float charSpace = (fmt.spacing.x > 4) ? fmt.spacing.x : fmt.spacing.x / 2;
+	float charSpace = fmt.spacing.x;
+	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
+//	textSize.x -= fmt.spacing.x;
+	int leftPos = elem.pos.x - textSize.x / 2;
+	leftPos += fmt.spacing.x;
 	int topPos = elem.pos.y - textSize.y / 2;
 	int newlineSpace = lineNum * (textSize.y + fmt.spacing.y) * static_cast< int >(fmt.wrap);
 
@@ -45,17 +40,13 @@ Vector2 NoGUI::alignTextTop(const char* text, const CText& fmt, const Style& ele
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-	Vector2 textSize = MeasureTextEx(font, text, fmt.size, fmt.spacing.x);
-	// weird bug
-	int leftPos;
-	if (elem.radius.x <= 25)
-	{
-		leftPos = elem.pos.x - textSize.x / 2 + 4;
-	}
-	else
-	{
-		leftPos = elem.pos.x - textSize.x / 2;
-	}
+//	float charSpace = (fmt.spacing.x > 4) ? fmt.spacing.x : fmt.spacing.x / 2;
+//	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
+	float charSpace = fmt.spacing.x;
+	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
+//	textSize.x -= fmt.spacing.x;
+	int leftPos = elem.pos.x - textSize.x / 2;
+	leftPos += fmt.spacing.x;
 	int topPos = elem.pos.y - elem.radius.y;
 	int newlineSpace = lineNum * (textSize.y + fmt.spacing.y) * static_cast< int >(fmt.wrap);
 
@@ -69,17 +60,14 @@ Vector2 NoGUI::alignTextBottom(const char* text, const CText& fmt, const Style& 
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-	Vector2 textSize = MeasureTextEx(font, text, fmt.size, fmt.spacing.x);
+//	float charSpace = (fmt.spacing.x > 4) ? fmt.spacing.x : fmt.spacing.x / 2;
+//	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
+	float charSpace = fmt.spacing.x;
+	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
+//	textSize.x -= fmt.spacing.x;
 	// weird bug
-	int leftPos;
-	if (elem.radius.x <= 25)
-	{
-		leftPos = elem.pos.x - textSize.x / 2 + 4;
-	}
-	else
-	{
-		leftPos = elem.pos.x - textSize.x / 2;
-	}
+	int leftPos = elem.pos.x - textSize.x / 2;
+	leftPos += fmt.spacing.x;
 	int topPos = elem.pos.y + elem.radius.y - textSize.y;
 	int newlineSpace = lineNum * (textSize.y + fmt.spacing.y) * static_cast< int >(fmt.wrap);
 

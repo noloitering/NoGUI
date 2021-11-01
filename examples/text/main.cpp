@@ -12,6 +12,7 @@ int main(int argc, char ** argv)
 	
 	NoGUI::GUIManager manager = NoGUI::GUIManager();
 	NoGUI::CText leftText = NoGUI::CText();
+//	leftText.spacing = (Vector2){6, 0};
 	NoGUI::CText leftWrapText = leftText;
 	leftWrapText.wrap = NoGUI::TextWrap::DOWN;
 	NoGUI::CText botLeftText = leftText;
