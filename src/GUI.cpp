@@ -16,15 +16,11 @@ Vector2 NoGUI::alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 	return result;
 }
 
-// TODO: fix bugs
 Vector2 NoGUI::alignTextCenter(const char* text, const CText& fmt, const Style& elem, int lineNum)
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-//	float charSpace = (fmt.spacing.x > 4) ? fmt.spacing.x : fmt.spacing.x / 2;
-	float charSpace = fmt.spacing.x;
-	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
-//	textSize.x -= fmt.spacing.x;
+	Vector2 textSize = MeasureTextEx(font, text, fmt.size, fmt.spacing.x);
 	int leftPos = elem.pos.x - textSize.x / 2;
 	leftPos += fmt.spacing.x;
 	int topPos = elem.pos.y - textSize.y / 2;
@@ -40,11 +36,7 @@ Vector2 NoGUI::alignTextTop(const char* text, const CText& fmt, const Style& ele
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-//	float charSpace = (fmt.spacing.x > 4) ? fmt.spacing.x : fmt.spacing.x / 2;
-//	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
-	float charSpace = fmt.spacing.x;
-	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
-//	textSize.x -= fmt.spacing.x;
+	Vector2 textSize = MeasureTextEx(font, text, fmt.size, fmt.spacing.x);
 	int leftPos = elem.pos.x - textSize.x / 2;
 	leftPos += fmt.spacing.x;
 	int topPos = elem.pos.y - elem.radius.y;
@@ -60,12 +52,7 @@ Vector2 NoGUI::alignTextBottom(const char* text, const CText& fmt, const Style& 
 {
 	Vector2 result;
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-//	float charSpace = (fmt.spacing.x > 4) ? fmt.spacing.x : fmt.spacing.x / 2;
-//	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
-	float charSpace = fmt.spacing.x;
-	Vector2 textSize = MeasureTextEx(font, text, fmt.size, charSpace);
-//	textSize.x -= fmt.spacing.x;
-	// weird bug
+	Vector2 textSize = MeasureTextEx(font, text, fmt.size, fmt.spacing.x);
 	int leftPos = elem.pos.x - textSize.x / 2;
 	leftPos += fmt.spacing.x;
 	int topPos = elem.pos.y + elem.radius.y - textSize.y;
