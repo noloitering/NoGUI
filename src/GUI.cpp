@@ -739,7 +739,23 @@ bool Button::isFocus()
 	{
 		if ( isHover() )
 		{
-			focus = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+			focus = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+		}
+	}
+	
+	return focus;
+}
+
+bool Toggle::isFocus()
+{
+	if ( active )
+	{
+		if ( isHover() )
+		{
+			if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+			{
+				focus = !focus;
+			}
 		}
 	}
 	

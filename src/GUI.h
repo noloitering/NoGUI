@@ -94,6 +94,16 @@ namespace NoGUI
 			: Element(num, look, hovCol, in) {}
 		bool isFocus();
 	};
+	
+	class Toggle : public Element
+	{
+	public:
+		Toggle(const size_t& num, const Style& look, const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
+		Toggle(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
+			: Element(num, look, hovCol, in) {}
+		bool isFocus();
+	};
 
 	// TODO: fix map so that elements are ordered by time of insertion
 	class Page

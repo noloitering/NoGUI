@@ -7,7 +7,7 @@ int fps = 60;
 
 int main(int argc, char ** argv)
 {
-	InitWindow(window.x, window.y, "Shapes");
+	InitWindow(window.x, window.y, "Types");
 	SetTargetFPS(fps);
 	
 	NoGUI::GUIManager manager = NoGUI::GUIManager();
