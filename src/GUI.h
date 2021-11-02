@@ -199,7 +199,7 @@ namespace NoGUI
 	void DrawGUIShape(const Style& elem);
 	void DrawGUIText(const char * text, const CText& fmt, const Style& elem);
 	void DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos);
-	void DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, const Style& elem);
+	void DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, const Style& elem);
 	void DrawGUIImage(const CImage& fmt, const Style& elem);
 }
 

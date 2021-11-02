@@ -387,14 +387,17 @@ void NoGUI::DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos)
 	DrawTextPro(font, text, pos, origin, fmt.rotation, fmt.size, fmt.spacing.x, fmt.col);
 }
 
-// TODO: not aligning when there are 2 words
-void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText& fmt, const Style& elem)
+void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, const Style& elem)
 {
 	Vector2 textPos;
 	switch (fmt.align)
 	{
 		case TextAlign::LEFT:
 		{
+			if ( fmt.wrap == TextWrap::AROUND )
+			{
+				fmt.wrap = TextWrap::DOWN;
+			}
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextLeft(fmt, elem, i);
@@ -406,10 +409,33 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 		
 		case TextAlign::CENTER:
 		{
-			for (unsigned int i = 0; i < text.size(); i++)
+			if ( fmt.wrap == TextWrap::AROUND )
 			{
-				textPos = alignTextCenter(text[i].c_str(), fmt, elem, i);
-				DrawGUITextV(text[i].c_str(), fmt, textPos);
+				std::vector< Vector2 > posVec(text.size());
+				Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
+				float totalSize = fmt.size * text.size() + fmt.spacing.y * text.size();
+				Vector2 elemSize = {elem.radius.x * 2, elem.radius.y * 2};
+				float leftPos;
+				float topPos = elem.pos.y - totalSize / 2 + fmt.margin.y;
+				float increment = totalSize / text.size();
+				
+				for (unsigned int i = 0; i < text.size(); i++)
+				{
+					Vector2 textSize = MeasureTextEx(font, text[i].c_str(), fmt.size, fmt.spacing.x);
+					leftPos = elem.pos.x - textSize.x / 2;
+					leftPos += fmt.spacing.x;
+					posVec[i] = {leftPos + fmt.margin.x, topPos};
+					DrawGUITextV(text[i].c_str(), fmt, posVec[i]);
+					topPos += increment;
+				}
+			}
+			else
+			{
+				for (unsigned int i = 0; i < text.size(); i++)
+				{
+					textPos = alignTextCenter(text[i].c_str(), fmt, elem, i);
+					DrawGUITextV(text[i].c_str(), fmt, textPos);
+				}
 			}
 			
 			break;
@@ -417,6 +443,10 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 		
 		case TextAlign::RIGHT:
 		{
+			if ( fmt.wrap == TextWrap::AROUND )
+			{
+				fmt.wrap = TextWrap::DOWN;
+			}
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextRight(text[i].c_str(), fmt, elem, i);
@@ -428,6 +458,10 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 		
 		case TextAlign::TOP:
 		{
+			if ( fmt.wrap == TextWrap::AROUND )
+			{
+				fmt.wrap = TextWrap::DOWN;
+			}
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextTop(text[i].c_str(), fmt, elem, i);
@@ -439,6 +473,10 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 		
 		case TextAlign::BOTTOM:
 		{
+			if ( fmt.wrap == TextWrap::AROUND )
+			{
+				fmt.wrap = TextWrap::UP;
+			}
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextBottom(text[i].c_str(), fmt, elem, i);
@@ -450,6 +488,10 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 		
 		case TextAlign::BOTTOML:
 		{
+			if ( fmt.wrap == TextWrap::AROUND )
+			{
+				fmt.wrap = TextWrap::UP;
+			}
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextBottomLeft(text[i].c_str(), fmt, elem, i);
@@ -461,6 +503,10 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 		
 		case TextAlign::BOTTOMR:
 		{
+			if ( fmt.wrap == TextWrap::AROUND )
+			{
+				fmt.wrap = TextWrap::UP;
+			}
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextBottomRight(text[i].c_str(), fmt, elem, i);
