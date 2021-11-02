@@ -53,10 +53,10 @@ int main(int argc, char ** argv)
 	top->addComponent< NoGUI::CText >(topText);
 	right->addComponent< NoGUI::CText >(rightText);
 	leftWrap->addComponent< NoGUI::CText >(leftText);
-	leftWrap->addComponent< NoGUI::CText >(centerText);
+//	leftWrap->addComponent< NoGUI::CText >(centerText);
 	center->addComponent< NoGUI::CText >(centerText);
 	rightWrap->addComponent< NoGUI::CText >(rightText);
-	rightWrap->addComponent< NoGUI::CText >(centerText);
+//	rightWrap->addComponent< NoGUI::CText >(centerText);
 	bottomLeft->addComponent< NoGUI::CText >(botLeftText);
 	bottom->addComponent< NoGUI::CText >(bottomText);
 	bottomRight->addComponent< NoGUI::CText >(botRightText);
