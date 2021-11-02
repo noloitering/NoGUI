@@ -9,6 +9,7 @@ Vector2 NoGUI::alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 	int leftPos = elem.pos.x - elem.radius.x;
 	int topPos = elem.pos.y - elem.radius.y;
 	int newlineSpace = lineNum * (fmt.size + fmt.spacing.y) * static_cast< int >(fmt.wrap);
+//	std::cout << newlineSpace << std::endl;
 	
 	result.x = leftPos + fmt.margin.x;
 	result.y = topPos + fmt.margin.y + newlineSpace;
@@ -186,33 +187,36 @@ Vector2 NoGUI::alignText(const char* text, const CText& fmt, const Style& elem, 
 	return result;
 }
 
-// TODO: refactor
 std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int width)
 {
 	std::vector<std::string> result;
 	std::string line = std::string();
 	std::string copy = std::string();
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
-	int numWords = 0;
-	int lineIndex = 0;
+	int numWords = 0; // total number of words
+	int lineIndex = 0; // current word
 	const char **words = TextSplit(text, ' ', &numWords); // changes numWords
+//	std::cout << numWords << std::endl;
 	for (int i=0; i < numWords; i++)
 	{
 		line.append(words[i]);
-		line.append(" ");
+		line.append(" "); // TODO: add this after measuring the text
 		if ( MeasureTextEx(font, line.c_str(), fmt.size, fmt.spacing.x).x > width )
 		{
 			if ( i != lineIndex ) // check to see if it's a single word that's too big
 			{
-//				result.push_back(line.substr(0, line.rfind(" ")));
+				// append words up to i-1 to result and decrement i
 				int lineEnd = --i;
-				for (; lineIndex < lineEnd; lineIndex++)
+				for (; lineIndex <= lineEnd; lineIndex++)
 				{
+					std::cout << "copying" << words[lineIndex] << std::endl;
 					copy.append(words[lineIndex]);
 					copy.append(" ");
-					words[lineIndex] = "";
+					words[lineIndex] = ""; // don't repeat words
 				}
+				std::cout << copy << std::endl;
 				result.push_back(copy);
+				// clear line and repeat
 				line = std::string();
 				copy = std::string();
 			}
@@ -251,7 +255,7 @@ void NoGUI::DrawGUIElement(Element* elem)
 	DrawGUIShape(shape);
 	if ( elem->hasComponent< CText >() )
 	{
-		CText txtFmt = elem->getComponent< CText >();
+		CText& txtFmt = elem->getComponent< CText >();
 		if ( txtFmt.contents.empty() )
 		{
 			txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, elem->styling().radius.x * 2 - txtFmt.margin.x);
@@ -398,6 +402,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextLeft(fmt, elem, i);
+				std::cout << i << ": " << text[i].c_str() << std::endl;
 				DrawGUITextV(text[i].c_str(), fmt, textPos);
 			}
 			
