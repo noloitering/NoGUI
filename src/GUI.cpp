@@ -9,7 +9,6 @@ Vector2 NoGUI::alignTextLeft(const CText& fmt, const Style& elem, int lineNum)
 	int leftPos = elem.pos.x - elem.radius.x;
 	int topPos = elem.pos.y - elem.radius.y;
 	int newlineSpace = lineNum * (fmt.size + fmt.spacing.y) * static_cast< int >(fmt.wrap);
-//	std::cout << newlineSpace << std::endl;
 	
 	result.x = leftPos + fmt.margin.x;
 	result.y = topPos + fmt.margin.y + newlineSpace;
@@ -196,7 +195,6 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 	int numWords = 0; // total number of words
 	int lineIndex = 0; // current word
 	const char **words = TextSplit(text, ' ', &numWords); // changes numWords
-//	std::cout << numWords << std::endl;
 	for (int i=0; i < numWords; i++)
 	{
 		line.append(words[i]);
@@ -209,12 +207,10 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 				int lineEnd = --i;
 				for (; lineIndex <= lineEnd; lineIndex++)
 				{
-					std::cout << "copying" << words[lineIndex] << std::endl;
 					copy.append(words[lineIndex]);
 					copy.append(" ");
 					words[lineIndex] = ""; // don't repeat words
 				}
-				std::cout << copy << std::endl;
 				result.push_back(copy);
 				// clear line and repeat
 				line = std::string();
@@ -402,7 +398,6 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, const CText
 			for (unsigned int i = 0; i < text.size(); i++)
 			{
 				textPos = alignTextLeft(fmt, elem, i);
-				std::cout << i << ": " << text[i].c_str() << std::endl;
 				DrawGUITextV(text[i].c_str(), fmt, textPos);
 			}
 			
