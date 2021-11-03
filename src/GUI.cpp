@@ -249,12 +249,7 @@ void NoGUI::DrawGUIElement(Element* elem)
 		shape.backCol = elem->getHoverCol();
 		if ( elem->hasComponent< CInput >() )
 		{
-//			std::cout << "hovering input" << std::endl;
 			int key = GetCharPressed();
-			if ( key )
-			{
-				std::cout << key << std::endl;
-			}
 			CInput& input = elem->getComponent< CInput >();
 			// Check if more characters have been pressed on the same frame
 			while ( key > 0 )
@@ -264,7 +259,6 @@ void NoGUI::DrawGUIElement(Element* elem)
 				{
 					std::string inner = elem->getInner();
 					inner.push_back((char)key);
-					std::cout << inner << std::endl;
 					elem->setInner(inner);
 					input.i++;
 				}
