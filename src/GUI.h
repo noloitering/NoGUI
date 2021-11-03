@@ -36,6 +36,7 @@ namespace NoGUI
 		const size_t id = 0;
 		bool isActive();
 		bool isAlive();
+		bool isVisible();
 		bool isHover();
 		bool getHover();
 		bool getFocus();

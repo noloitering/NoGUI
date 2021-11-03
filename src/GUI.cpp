@@ -278,35 +278,37 @@ void NoGUI::DrawGUIElement(Element* elem)
 					input.i = 0;
 				}
 			}
-			
 		}
 	}
-	DrawGUIShape(shape);
-	if ( elem->hasComponent< CText >() )
+	if ( elem->isVisible() )
 	{
-		CText& txtFmt = elem->getComponent< CText >();
-		if ( txtFmt.contents.empty() )
+		DrawGUIShape(shape);
+		if ( elem->hasComponent< CText >() )
 		{
-			txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, elem->styling().radius.x * 2 - txtFmt.margin.x);
-		}
+			CText& txtFmt = elem->getComponent< CText >();
+			if ( txtFmt.contents.empty() )
+			{
+				txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, elem->styling().radius.x * 2 - txtFmt.margin.x);
+			}
 		
-		DrawGUITextWrapped(txtFmt.contents, elem->getComponent< CText >(), elem->styling());
-	}
-	if ( elem->hasComponent< CImage >() )
-	{
-		CImage imgFmt = elem->getComponent< CImage >();
-		DrawGUIImage(imgFmt, elem->styling());
-	}
-	if ( elem->hasComponent< CMultiStyle >() )
-	{
-		std::vector< Style > children = elem->getComponent< CMultiStyle >().styles;
-		Vector2 origin = shape.pos;
-		for (auto child : children)
+			DrawGUITextWrapped(txtFmt.contents, elem->getComponent< CText >(), elem->styling());
+		}
+		if ( elem->hasComponent< CImage >() )
 		{
-			shape = child;
-			shape.pos.x = origin.x + shape.pos.x;
-			shape.pos.y = origin.y + shape.pos.y;
-			DrawGUIShape(shape);
+			CImage imgFmt = elem->getComponent< CImage >();
+			DrawGUIImage(imgFmt, elem->styling());
+		}
+		if ( elem->hasComponent< CMultiStyle >() )
+		{
+			std::vector< Style > children = elem->getComponent< CMultiStyle >().styles;
+			Vector2 origin = shape.pos;
+			for (auto child : children)
+			{
+				shape = child;
+				shape.pos.x = origin.x + shape.pos.x;
+				shape.pos.y = origin.y + shape.pos.y;
+				DrawGUIShape(shape);
+			}
 		}
 	}
 }
@@ -696,6 +698,12 @@ bool Element::isHover()
 	return hover;
 }
 
+bool Element::isVisible()
+{
+	
+	return visible;
+}
+
 Color Element::getHoverCol()
 {
 	
@@ -812,6 +820,11 @@ bool Input::isFocus()
 	}
 	
 	return false;
+}
+
+void CheckBox::draw()
+{
+	
 }
 
 // Pages
