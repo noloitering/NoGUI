@@ -755,11 +755,29 @@ bool Toggle::isFocus()
 			if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 			{
 				focus = !focus;
+				
+				return true;
 			}
 		}
 	}
 	
-	return focus;
+	return false;
+}
+
+bool Input::isFocus()
+{
+	if ( active )
+	{
+		isHover();
+		if ( hover != focus )
+		{
+			focus = hover;
+			
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 // Pages
@@ -932,13 +950,13 @@ void GUIManager::update()
 				{
 					notify(elem);
 				}
-				if ( elem->hasComponent< CInput >() )
-				{
-					if ( elem->isHover() )
-					{
-						notify(elem);
-					}
-				}
+//				if ( elem->hasComponent< CInput >() )
+//				{
+//					if ( elem->isHover() )
+//					{
+//						notify(elem);
+//					}
+//				}
 			}
 		}
 	}
