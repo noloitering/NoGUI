@@ -247,6 +247,45 @@ void NoGUI::DrawGUIElement(Element* elem)
 	if ( elem->getHover() )
 	{
 		shape.backCol = elem->getHoverCol();
+		if ( elem->hasComponent< CInput >() )
+		{
+//			std::cout << "hovering input" << std::endl;
+			int key = GetCharPressed();
+			if ( key )
+			{
+				std::cout << key << std::endl;
+			}
+			CInput& input = elem->getComponent< CInput >();
+			// Check if more characters have been pressed on the same frame
+			while ( key > 0 )
+			{
+				// NOTE: Only allow keys in range [32..125]
+				if ( (key >= 32) && (key <= 125) && (input.i < input.cap) )
+				{
+					std::string inner = elem->getInner();
+					inner.push_back((char)key);
+					std::cout << inner << std::endl;
+					elem->setInner(inner);
+					input.i++;
+				}
+				key = GetCharPressed();  // Check next character in the queue
+			}
+			if ( IsKeyPressed(KEY_BACKSPACE) )
+			{
+				if ( input.i > 0 )
+				{
+					input.i--;
+					std::string inner = elem->getInner();
+					inner.pop_back();
+					elem->setInner(inner);
+				}
+				else
+				{
+					input.i = 0;
+				}
+			}
+			
+		}
 	}
 	DrawGUIShape(shape);
 	if ( elem->hasComponent< CText >() )
@@ -256,6 +295,7 @@ void NoGUI::DrawGUIElement(Element* elem)
 		{
 			txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, elem->styling().radius.x * 2 - txtFmt.margin.x);
 		}
+		
 		DrawGUITextWrapped(txtFmt.contents, elem->getComponent< CText >(), elem->styling());
 	}
 	if ( elem->hasComponent< CImage >() )
@@ -684,7 +724,7 @@ void Element::setInner(const std::string& in)
 	inner = in;
 	if ( hasComponent< CText >() )
 	{
-		CText txtFmt = getComponent< CText >();
+		CText& txtFmt = getComponent< CText >();
 		txtFmt.contents = wrapText(inner.c_str(), txtFmt, style.radius.x * 2 - txtFmt.margin.x);
 	}
 }
