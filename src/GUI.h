@@ -97,22 +97,32 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
-	class Toggle : public Element
-	{
-	public:
-		Toggle(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
-		Toggle(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
-		bool isFocus();
-	};
-	
 	class Input : public Element
 	{
 		public:
 		Input(const size_t& num, const Style& look, const std::string& in="")
 			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
 		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
+			: Element(num, look, hovCol, in) {}
+		bool isFocus();
+	};
+	
+	class InputButton : public Element
+	{
+	public:
+		InputButton(const size_t& num, const Style& look, const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
+		InputButton(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
+			: Element(num, look, hovCol, in) {}
+		bool isFocus();
+	};
+	
+	class Toggle : public Element
+	{
+	public:
+		Toggle(const size_t& num, const Style& look, const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
+		Toggle(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
 			: Element(num, look, hovCol, in) {}
 		bool isFocus();
 	};
