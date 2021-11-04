@@ -1,6 +1,6 @@
 #include "../../src/GUI.h"
 
-Vector2 window = {470, 720};
+Vector2 window = {470, 1080};
 Vector2 center = {window.x / 2, window.y / 2};
 int spacing = 100;
 int fps = 60;
@@ -26,6 +26,8 @@ int main(int argc, char ** argv)
 	NoGUI::Style buttonText = {INVISIBLE, BLACK, (Vector2){center.x, buttonStyle.pos.y + buttonStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
 	NoGUI::Style inputStyle = {BLACK, RAYWHITE, (Vector2){center.x, buttonText.pos.y + spacing}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style inputText = {INVISIBLE, BLACK, (Vector2){center.x, inputStyle.pos.y + buttonStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
+	NoGUI::Style boxStyle = {BLACK, RAYWHITE, (Vector2){center.x, inputText.pos.y + spacing}, (Vector2){75, 35}, 4, 4, 0};
+	NoGUI::Style boxText = {INVISIBLE, BLACK, (Vector2){center.x, boxStyle.pos.y + inputStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
 	
 	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Base", "Base");
 	std::shared_ptr< NoGUI::Element > elemLabel = manager.addElement< NoGUI::Element >(elemText, "Base Class to Inherit from. Focus has to be manually set.", "Label");
@@ -33,13 +35,17 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > buttonLabel = manager.addElement< NoGUI::Element >(buttonText, "Focused when pressed (not held).", "Label");
 	std::shared_ptr< NoGUI::Element > input = manager.addElement< NoGUI::Input >(inputStyle, "Input", "Input");
 	std::shared_ptr< NoGUI::Element > inputLabel = manager.addElement< NoGUI::Element >(inputText, "Focus when hovered. Notify on and off hover", "Label");
+	std::shared_ptr< NoGUI::Element > box = manager.addElement< NoGUI::CheckBox >(boxStyle, "Toggle", "Input");
+	std::shared_ptr< NoGUI::Element > boxLabel = manager.addElement< NoGUI::Element >(boxText, "Focus toggles on/off when pressed. Notify on press", "Label");
 	
 	elemLabel->addComponent< NoGUI::CText >(labelText);
 	buttonLabel->addComponent< NoGUI::CText >(labelText);
 	inputLabel->addComponent< NoGUI::CText >(labelText);
+	boxLabel->addComponent< NoGUI::CText >(labelText);
 	element->addComponent< NoGUI::CText >(textStyle);
 	button->addComponent< NoGUI::CText >(textStyle);
 	input->addComponent< NoGUI::CText >(textStyle);
+	box->addComponent< NoGUI::CText >(textStyle);
 	
 	while ( !WindowShouldClose() )
 	{

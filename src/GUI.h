@@ -48,8 +48,9 @@ namespace NoGUI
 		void recol (const Color& newBack, const Color& newHover);
 		void reshape(int newSides);
 		void rotate(float rotation);
-		void setInner(const std::string& in);
+		void setFocus(bool set);
 		void setHoverCol(const Color& col);
+		void setInner(const std::string& in);
 	
 		template <class C>
 		C& getComponent()
@@ -109,11 +110,21 @@ namespace NoGUI
 	class Input : public Element
 	{
 		public:
-		Input(const size_t& num, const Style& look, const std::string& in="", const size_t& max=NoGUI::BUFFER) 
+		Input(const size_t& num, const Style& look, const std::string& in="", const size_t& max=NoGUI::BUFFER)
 			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {addComponent< NoGUI::CInput >(max);}
 		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="", const size_t& max=NoGUI::BUFFER) 
 			: Element(num, look, hovCol, in) {addComponent< NoGUI::CInput >(max);}
 		bool isFocus();
+	};
+	
+	class CheckBox : public Toggle
+	{
+		public:
+		CheckBox(const size_t& num, const Style& look, const std::string& in="") 
+			: Toggle(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
+		CheckBox(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
+			: Toggle(num, look, hovCol, in) {}
+		void draw();
 	};
 
 	// TODO: fix map so that elements are ordered by time of insertion

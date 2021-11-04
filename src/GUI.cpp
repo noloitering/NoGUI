@@ -721,6 +721,11 @@ std::string Element::getInner()
 	return inner;
 }
 
+void Element::setFocus(bool set)
+{
+	focus = set;
+}
+
 void Element::setInner(const std::string& in)
 {
 	inner = in;
@@ -824,7 +829,13 @@ bool Input::isFocus()
 
 void CheckBox::draw()
 {
-	
+	std::string copy = std::string(inner);
+	if ( getFocus() == false )
+	{
+		setInner("");
+	}
+	DrawGUIElement(this);
+	setInner(copy);
 }
 
 // Pages
