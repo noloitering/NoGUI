@@ -830,18 +830,37 @@ bool InputButton::isFocus()
 	return focus;
 }
 
+bool InputToggle::isFocus()
+{
+	if ( active )
+	{
+		bool prevState = hover;
+		isHover();
+		if ( hover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+		{
+			focus = !focus;
+			
+			return true;
+		}
+		if ( hover != prevState )
+		{
+			
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 bool Toggle::isFocus()
 {
 	if ( active )
 	{
-		if ( isHover() )
+		if ( isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 		{
-			if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
-			{
-				focus = !focus;
+			focus = !focus;
 				
-				return true;
-			}
+			return true;
 		}
 	}
 	

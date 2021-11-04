@@ -117,7 +117,17 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
-	class Toggle : public Element // Toggles Focus on/off on press; Notify on press;
+	class InputToggle : public Element // Toggle Focus on/off on press; Notify on hover, off hover, and on press;
+	{
+	public:
+		InputToggle(const size_t& num, const Style& look, const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
+		InputToggle(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
+			: Element(num, look, hovCol, in) {}
+		bool isFocus();
+	};
+	
+	class Toggle : public Element // Toggle Focus on/off on press; Notify on press;
 	{
 	public:
 		Toggle(const size_t& num, const Style& look, const std::string& in="") 
