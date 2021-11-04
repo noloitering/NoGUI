@@ -110,10 +110,10 @@ namespace NoGUI
 	class Input : public Element
 	{
 		public:
-		Input(const size_t& num, const Style& look, const std::string& in="", const size_t& max=NoGUI::BUFFER)
-			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {addComponent< NoGUI::CInput >(max);}
-		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="", const size_t& max=NoGUI::BUFFER) 
-			: Element(num, look, hovCol, in) {addComponent< NoGUI::CInput >(max);}
+		Input(const size_t& num, const Style& look, const std::string& in="")
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
+		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
+			: Element(num, look, hovCol, in) {}
 		bool isFocus();
 	};
 	

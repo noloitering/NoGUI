@@ -46,6 +46,7 @@ int main(int argc, char ** argv)
 	button->addComponent< NoGUI::CText >(textStyle);
 	input->addComponent< NoGUI::CText >(textStyle);
 	box->addComponent< NoGUI::CText >(textStyle);
+	input->addComponent< NoGUI::CInput >();
 	
 	while ( !WindowShouldClose() )
 	{
