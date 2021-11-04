@@ -12,7 +12,7 @@
 namespace NoGUI
 {
 	// Classes
-	class Element
+	class Element // Base Element to inherit from; Focus is manually set;
 	{
 	protected:
 		Style style;
@@ -87,7 +87,7 @@ namespace NoGUI
 		}
 	};
 
-	class Button : public Element
+	class Button : public Element // Focus on press; Notify on press;
 	{
 	public:
 		Button(const size_t& num, const Style& look, const std::string& in="") 
@@ -97,7 +97,7 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
-	class Input : public Element
+	class Input : public Element // Focus on hover; Notify on hover, and off hover;
 	{
 		public:
 		Input(const size_t& num, const Style& look, const std::string& in="")
@@ -107,7 +107,7 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
-	class InputButton : public Element
+	class InputButton : public Element // Focus on press; Notify on hover, off hover, and on press;
 	{
 	public:
 		InputButton(const size_t& num, const Style& look, const std::string& in="") 
@@ -117,7 +117,7 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
-	class Toggle : public Element
+	class Toggle : public Element // Toggles Focus on/off on press; Notify on press;
 	{
 	public:
 		Toggle(const size_t& num, const Style& look, const std::string& in="") 
@@ -127,7 +127,7 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
-	class CheckBox : public Toggle
+	class CheckBox : public Toggle // Draw inner on Focus
 	{
 		public:
 		CheckBox(const size_t& num, const Style& look, const std::string& in="") 
@@ -138,7 +138,7 @@ namespace NoGUI
 	};
 
 	// TODO: fix map so that elements are ordered by time of insertion
-	class Page
+	class Page // Container for Elements
 	{
 	private:
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > elements;
@@ -173,7 +173,7 @@ namespace NoGUI
 		}
 	};
 
-	class GUIManager : public Proclaim, public NoMVC::Model
+	class GUIManager : public Proclaim, public NoMVC::Model // handles Pages and Notifications
 	{
 	private:
 		CompContainer components;
