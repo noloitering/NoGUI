@@ -893,13 +893,53 @@ bool Toggle::isFocus()
 
 void CheckBox::draw()
 {
-	std::string copy = std::string(inner);
-	if ( getFocus() == false )
+	Style shape = styling();
+	if ( getHover() )
 	{
-		setInner("");
+		shape.backCol = getHoverCol();
 	}
-	DrawGUIElement(this);
-	setInner(copy);
+	if ( isVisible() )
+	{
+		DrawGUIShape(style);
+		if ( getFocus() )
+		{
+			if ( hasComponent< CText >() )
+			{
+				CText& txtFmt = getComponent< CText >();
+//				DrawGUIText(elem->getInner().c_str(), txtFmt, elem->styling());
+				if ( txtFmt.contents.empty() )
+				{
+					int maxWidth;
+					if ( txtFmt.wrap == TextWrap::NONE )
+					{
+						maxWidth = std::numeric_limits<int>::max();
+					}
+					else
+					{
+						maxWidth = style.radius.x * 2 - txtFmt.margin.x;
+					}
+					txtFmt.contents = wrapText(getInner().c_str(), txtFmt, maxWidth);
+				}
+				DrawGUITextWrapped(txtFmt.contents, txtFmt, style);
+			}
+			if ( hasComponent< CImage >() )
+			{
+				CImage imgFmt = getComponent< CImage >();
+				DrawGUIImage(imgFmt, style);
+			}
+		}
+		if ( hasComponent< CMultiStyle >() )
+		{
+			std::vector< Style > children = getComponent< CMultiStyle >().styles;
+			Vector2 origin = style.pos;
+			for (auto child : children)
+			{
+				shape.pos.x = origin.x + shape.pos.x;
+				shape.pos.y = origin.y + shape.pos.y;
+				DrawGUIShape(shape);
+			}
+		}
+	}
 }
 
 // Pages
