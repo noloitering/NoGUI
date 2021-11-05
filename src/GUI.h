@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <tuple>
+#include <limits>
 
 #include "Component.h"
 #include "Observer.h"
@@ -246,7 +247,7 @@ namespace NoGUI
 	Vector2 alignTextBottomRight(const char* text, const CText& fmt, const Style& elem, int lineNum = 0);
 	Vector2 alignTextRight(const char* text, const CText& fmt, const Style& elem, int lineNum = 0);
 	Vector2 alignText(const char* text, const CText& fmt, const Style& elem, int lineNum = 0);
-	std::vector< std::string > wrapText(const char* text, const CText& fmt, int width);
+	std::vector< std::string > wrapText(const char* text, const CText& fmt, int width = std::numeric_limits<int>::max());
 	void DrawGUIElement(Element* elem);
 	void DrawGUIShape(const Style& elem);
 	void DrawGUIText(const char * text, const CText& fmt, const Style& elem);

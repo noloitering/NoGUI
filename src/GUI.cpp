@@ -186,56 +186,71 @@ Vector2 NoGUI::alignText(const char* text, const CText& fmt, const Style& elem, 
 	return result;
 }
 
+// TODO: cleanup
 std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int width)
 {
-	std::vector<std::string> result;
+	std::vector< std::string > result;
 	std::string line = std::string();
 	std::string copy = std::string();
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
+	int numLines = 0; // number of lines
 	int numWords = 0; // total number of words
 	int lineIndex = 0; // current word
-	const char **words = TextSplit(text, ' ', &numWords); // changes numWords
-	for (int i=0; i < numWords; i++)
+	const char **lines = TextSplit(text, '\n', &numLines); // changes numLines
+	const char **words;
+	std::vector< std::string > linesCopy;
+	for (int li=0; li < numLines; li++)
 	{
-		line.append(words[i]);
-		line.append(" "); // TODO: add this after measuring the text
-		if ( MeasureTextEx(font, line.c_str(), fmt.size, fmt.spacing.x).x > width )
+		linesCopy.push_back(lines[li]);
+	}
+	for (int li=0; li < numLines; li++)
+	{
+		words = TextSplit(linesCopy[li].c_str(), ' ', &numWords); // changes numWords
+		for (int i=0; i < numWords; i++)
 		{
-			if ( i != lineIndex ) // check to see if it's a single word that's too big
+			line.append(words[i]);
+			line.append(" "); // TODO: add this after measuring the text
+			if ( MeasureTextEx(font, line.c_str(), fmt.size, fmt.spacing.x).x > width )
 			{
-				// append words up to i-1 to result and decrement i
-				int lineEnd = --i;
-				for (; lineIndex <= lineEnd; lineIndex++)
+				if ( i != lineIndex ) // check to see if it's a single word that's too big
+				{
+					// append words up to i-1 to result and decrement i
+					int lineEnd = --i;
+					for (; lineIndex <= lineEnd; lineIndex++)
+					{
+						copy.append(words[lineIndex]);
+						copy.append(" ");
+						words[lineIndex] = ""; // don't repeat words
+					}
+					result.push_back(copy);
+					// clear line and repeat
+					line = std::string();
+					copy = std::string();
+				}
+				else
 				{
 					copy.append(words[lineIndex]);
-					copy.append(" ");
-					words[lineIndex] = ""; // don't repeat words
+					words[lineIndex] = "";
+					result.push_back(copy);
+					copy = std::string();
+					line = std::string();
+					lineIndex++;
 				}
-				result.push_back(copy);
-				// clear line and repeat
-				line = std::string();
-				copy = std::string();
 			}
-			else
+		}
+		if ( !line.empty() )
+		{
+			for (; lineIndex < numWords; lineIndex++)
 			{
 				copy.append(words[lineIndex]);
+				copy.append(" ");
 				words[lineIndex] = "";
-				result.push_back(copy);
-				copy = std::string();
-				line = std::string();
-				lineIndex++;
 			}
+			result.push_back(copy);
+			line = std::string();
+			copy = std::string();
 		}
-	}
-	// get the last line
-	if ( lineIndex < numWords)
-	{
-		for (; lineIndex < numWords; lineIndex++)
-		{
-			copy.append(words[lineIndex]);
-			copy.append(" ");
-		}
-		result.push_back(copy);
+		lineIndex = 0;
 	}
 	
 	return result;
@@ -286,12 +301,21 @@ void NoGUI::DrawGUIElement(Element* elem)
 		if ( elem->hasComponent< CText >() )
 		{
 			CText& txtFmt = elem->getComponent< CText >();
+//			DrawGUIText(elem->getInner().c_str(), txtFmt, elem->styling());
 			if ( txtFmt.contents.empty() )
 			{
-				txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, elem->styling().radius.x * 2 - txtFmt.margin.x);
+				int maxWidth;
+				if ( txtFmt.wrap == TextWrap::NONE )
+				{
+					maxWidth = std::numeric_limits<int>::max();
+				}
+				else
+				{
+					maxWidth = elem->styling().radius.x * 2 - txtFmt.margin.x;
+				}
+				txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, maxWidth);
 			}
-		
-			DrawGUITextWrapped(txtFmt.contents, elem->getComponent< CText >(), elem->styling());
+			DrawGUITextWrapped(txtFmt.contents, txtFmt, elem->styling());
 		}
 		if ( elem->hasComponent< CImage >() )
 		{
@@ -430,7 +454,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 	{
 		case TextAlign::LEFT:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				fmt.wrap = TextWrap::DOWN;
 			}
@@ -445,7 +469,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 		
 		case TextAlign::CENTER:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				std::vector< Vector2 > posVec(text.size());
 				Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
@@ -479,7 +503,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 		
 		case TextAlign::RIGHT:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				fmt.wrap = TextWrap::DOWN;
 			}
@@ -494,7 +518,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 		
 		case TextAlign::TOP:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				fmt.wrap = TextWrap::DOWN;
 			}
@@ -509,7 +533,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 		
 		case TextAlign::BOTTOM:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				fmt.wrap = TextWrap::UP;
 			}
@@ -524,7 +548,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 		
 		case TextAlign::BOTTOML:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				fmt.wrap = TextWrap::UP;
 			}
@@ -539,7 +563,7 @@ void NoGUI::DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, 
 		
 		case TextAlign::BOTTOMR:
 		{
-			if ( fmt.wrap == TextWrap::AROUND )
+			if ( fmt.wrap == TextWrap::AROUND || fmt.wrap == TextWrap::NONE )
 			{
 				fmt.wrap = TextWrap::UP;
 			}
