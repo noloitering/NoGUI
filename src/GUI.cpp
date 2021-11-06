@@ -259,13 +259,17 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 void NoGUI::DrawGUIElement(Element* elem)
 {
 	Style shape = elem->styling();
+	CInput& input = elem->getComponent< CInput >();
+	CText& txtFmt = elem->getComponent< CText >();
+	CImage imgFmt = elem->getComponent< CImage >();
+	CMultiStyle children = elem->getComponent< CMultiStyle >();
+	CDropDown options = elem->getComponent< CDropDown >();
 	if ( elem->getHover() )
 	{
 		shape.backCol = elem->getHoverCol();
-		if ( elem->hasComponent< CInput >() )
+		if ( input.owned && elem->isActive() )
 		{
 			int key = GetCharPressed();
-			CInput& input = elem->getComponent< CInput >();
 			// Check if more characters have been pressed on the same frame
 			while ( key > 0 )
 			{
@@ -298,9 +302,51 @@ void NoGUI::DrawGUIElement(Element* elem)
 	if ( elem->isVisible() )
 	{
 		DrawGUIShape(shape);
-		if ( elem->hasComponent< CText >() )
+		if ( children.owned )
 		{
-			CText& txtFmt = elem->getComponent< CText >();
+			std::vector< Style > childStyles = children.styles;
+			Vector2 origin = shape.pos;
+			for (auto child : childStyles)
+			{
+				shape = child;
+				shape.pos.x = origin.x + shape.pos.x;
+				shape.pos.y = origin.y + shape.pos.y;
+				DrawGUIShape(shape);
+			}
+		}
+		if ( options.owned )
+		{
+			bool set = false;
+			if ( options.options->isActive() )
+			{
+//				set = elem->getHover();
+				for (auto e : options.options->getElements())
+				{
+					if ( e->getFocus() )
+					{
+//						std::string copy = elem->getInner();
+						elem->setInner(e->getInner());
+//						e->setInner(copy);
+						set = false;
+						
+						break;
+					}
+					if ( e->isHover() )
+					{
+						set = e->isHover();
+						
+						break;
+					}
+				}
+			}
+			options.options->setActive(set || elem->getFocus());
+		}
+		if ( imgFmt.owned )
+		{
+			DrawGUIImage(imgFmt, elem->styling());
+		}
+		if ( txtFmt.owned )
+		{
 //			DrawGUIText(elem->getInner().c_str(), txtFmt, elem->styling());
 			if ( txtFmt.contents.empty() )
 			{
@@ -317,23 +363,14 @@ void NoGUI::DrawGUIElement(Element* elem)
 			}
 			DrawGUITextWrapped(txtFmt.contents, txtFmt, elem->styling());
 		}
-		if ( elem->hasComponent< CImage >() )
-		{
-			CImage imgFmt = elem->getComponent< CImage >();
-			DrawGUIImage(imgFmt, elem->styling());
-		}
-		if ( elem->hasComponent< CMultiStyle >() )
-		{
-			std::vector< Style > children = elem->getComponent< CMultiStyle >().styles;
-			Vector2 origin = shape.pos;
-			for (auto child : children)
-			{
-				shape = child;
-				shape.pos.x = origin.x + shape.pos.x;
-				shape.pos.y = origin.y + shape.pos.y;
-				DrawGUIShape(shape);
-			}
-		}
+	}
+}
+
+void NoGUI::DrawGUIChildren(std::vector< std::shared_ptr< Element > > children)
+{
+	for (auto child : children)
+	{
+		child->draw();
 	}
 }
 
@@ -1112,13 +1149,6 @@ void GUIManager::update()
 				{
 					notify(elem);
 				}
-//				if ( elem->hasComponent< CInput >() )
-//				{
-//					if ( elem->isHover() )
-//					{
-//						notify(elem);
-//					}
-//				}
 			}
 		}
 	}

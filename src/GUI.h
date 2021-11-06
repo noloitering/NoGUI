@@ -18,6 +18,7 @@ namespace NoGUI
 	protected:
 		Style style;
 		std::string inner;
+		std::vector< std::shared_ptr< Element > > children;
 		bool active = true;
 		bool alive = true;
 		bool focus = false;
@@ -31,6 +32,7 @@ namespace NoGUI
 			: id(num), style(look), inner(in), hoverCol(look.backCol) {}
 		Element(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="")
 			: id(num), style(look), inner(in), hoverCol(hovCol) {}
+		
 		virtual bool isFocus();
 		virtual void draw();
 		Color getHoverCol();
@@ -57,7 +59,7 @@ namespace NoGUI
 		C& getComponent()
 		{
 			
-			return std::get<C>(components);
+			return std::get< C >(components);
 		}
 	
 		template <class C, typename... Args>
@@ -73,7 +75,7 @@ namespace NoGUI
 		template <class C>
 		C& addComponent(C& newComponent)
 		{
-			auto& component = getComponent<C>();
+			auto& component = getComponent< C >();
 			component = newComponent;
 			component.owned = true;
 		
@@ -84,7 +86,16 @@ namespace NoGUI
 		bool hasComponent()
 		{
 		
-			return getComponent<C>().owned;
+			return getComponent< C >().owned;
+		}
+		
+		template <class C>
+		std::shared_ptr< Element > addChild(const Style& style, const std::string& inner="")
+		{
+			auto e = std::shared_ptr< Element >(new C(children.size(), style, inner));
+			children.push_back(e);
+			
+			return e;
 		}
 	};
 
@@ -249,6 +260,7 @@ namespace NoGUI
 	Vector2 alignText(const char* text, const CText& fmt, const Style& elem, int lineNum = 0);
 	std::vector< std::string > wrapText(const char* text, const CText& fmt, int width = std::numeric_limits<int>::max());
 	void DrawGUIElement(Element* elem);
+	void DrawGUIChildren(std::vector< std::shared_ptr< Element > > children);
 	void DrawGUIShape(const Style& elem);
 	void DrawGUIText(const char * text, const CText& fmt, const Style& elem);
 	void DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos);

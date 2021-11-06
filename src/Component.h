@@ -11,6 +11,7 @@ namespace NoGUI
 	enum class Crop {NONE, FIT, SCROLL};
 	enum class TextAlign {LEFT, CENTER, RIGHT, TOP, BOTTOM, BOTTOML, BOTTOMR};
 	enum class TextWrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
+	class Page;
 
 	struct Style
 	{
@@ -90,8 +91,20 @@ namespace NoGUI
 		CMultiStyle(const Style& s) {styles.push_back(s);}
 		std::vector< Style > styles;
 	};
+	
+	class CDropDown : public CInterface
+	{
+	public:
+		CDropDown() {}
+		CDropDown(const std::shared_ptr< Page > o)
+			: options(o) {}
+		TextWrap wrap = TextWrap::DOWN;
+		TextAlign align;
+		float spacing;
+		std::shared_ptr< Page > options;
+	};
 
-	typedef std::tuple< CText, CImage, CInput, CMultiStyle > Components;
-	typedef std::tuple< std::vector < CText >, std::vector < CImage >, std::vector < CInput >, std::vector< CMultiStyle > > CompContainer;
-	typedef std::variant< CText, CImage, CInput, CMultiStyle > Component;
+	typedef std::tuple< CText, CImage, CInput, CMultiStyle, CDropDown > Components;
+	typedef std::tuple< std::vector < CText >, std::vector < CImage >, std::vector < CInput >, std::vector< CMultiStyle >, std::vector< CDropDown > > CompContainer;
+	typedef std::variant< CText, CImage, CInput, CMultiStyle, CDropDown > Component;
 }
