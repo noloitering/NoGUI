@@ -16,9 +16,9 @@ namespace NoGUI
 	class Element // Base Element to inherit from; Focus is manually set;
 	{
 	protected:
+	friend class Page;
 		Style style;
 		std::string inner;
-		std::vector< std::shared_ptr< Element > > children;
 		bool active = true;
 		bool alive = true;
 		bool focus = false;
@@ -88,15 +88,6 @@ namespace NoGUI
 		
 			return getComponent< C >().owned;
 		}
-		
-		template <class C>
-		std::shared_ptr< Element > addChild(const Style& style, const std::string& inner="")
-		{
-			auto e = std::shared_ptr< Element >(new C(children.size(), style, inner));
-			children.push_back(e);
-			
-			return e;
-		}
 	};
 
 	class Button : public Element // Focus on press; Notify on press;
@@ -163,6 +154,7 @@ namespace NoGUI
 	class Page // Container for Elements
 	{
 	private:
+		Components components;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > elements;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > toAdd;
 		std::map< std::string, size_t > ids;
@@ -185,6 +177,7 @@ namespace NoGUI
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="", const std::string& id="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
+			e->components = components;
 			toAdd[tag].push_back(e);
 			if ( !id.empty() )
 			{
@@ -193,12 +186,45 @@ namespace NoGUI
 			
 			return e;
 		}
+		
+		template <class C>
+		C& getComponent()
+		{
+			
+			return std::get< C >(components);
+		}
+	
+		template <class C, typename... Args>
+		C& addComponent(Args&&... CArgs)
+		{
+			auto& component = getComponent<C>();
+			component = C(std::forward<Args>(CArgs)...);
+			component.owned = true;
+		
+			return component;
+		}
+	
+		template <class C>
+		C& addComponent(C& newComponent)
+		{
+			auto& component = getComponent< C >();
+			component = newComponent;
+			component.owned = true;
+		
+			return component;
+		}
+	
+		template <class C>
+		bool hasComponent()
+		{
+		
+			return getComponent< C >().owned;
+		}
 	};
 
 	class GUIManager : public Proclaim, public NoMVC::Model // handles Pages and Notifications
 	{
 	private:
-		CompContainer components;
 		std::vector< std::shared_ptr< Page > > pages;
 	public:
 		GUIManager();
@@ -218,34 +244,6 @@ namespace NoGUI
 		{
 		
 			return pages[pageIndex]->addElement< C >(style, inner, tag);
-		}
-
-		template <class C>
-		C& getComponent(size_t index)
-		{
-		
-			return std::get< std::vector< C > >(components).at(index);
-		}
-	
-		template <class C, typename... Args>
-		size_t addComponent(Args&&... CArgs)
-		{
-			std::vector< CText > compVec = std::get< std::vector< C > >(components);
-			Component var;
-			compVec.emplace_back(C(std::forward<Args>(CArgs)...));
-			std::get< std::vector< C > >(components) = compVec;
-		
-			return compVec.size() - 1;
-		}
-
-		template <class C>
-		size_t addComponent(C& newComponent)
-		{
-			std::vector< CText > compVec = std::get< std::vector< C > >(components);
-			compVec.push_back(newComponent);
-			std::get< std::vector< C > >(components) = compVec;
-		
-			return compVec.size() - 1;
 		}
 	};
 

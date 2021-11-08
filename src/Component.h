@@ -78,7 +78,7 @@ namespace NoGUI
 	public:
 		CInput(size_t max=BUFFER, size_t current=0)
 			: cap(max), i(current) {}
-		size_t cap;
+		size_t cap = BUFFER;
 		size_t i = 0;
 	};
 

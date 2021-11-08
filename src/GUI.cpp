@@ -295,7 +295,6 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 void NoGUI::DrawGUIElement(Element* elem)
 {
 	Style shape = elem->styling();
-//	CInput& input = elem->getComponent< CInput >();
 	CText& txtFmt = elem->getComponent< CText >();
 	CImage imgFmt = elem->getComponent< CImage >();
 	CMultiStyle children = elem->getComponent< CMultiStyle >();
@@ -303,10 +302,6 @@ void NoGUI::DrawGUIElement(Element* elem)
 	if ( elem->getHover() )
 	{
 		shape.backCol = elem->getHoverCol();
-		if ( elem->hasComponent< CInput >() && elem->isActive() )
-		{
-			collectInput(elem);
-		}
 	}
 	if ( elem->isVisible() )
 	{
@@ -765,7 +760,11 @@ bool Element::isHover()
 			break;
 		}
 	}
-
+	if ( hasComponent< CInput >() && hover && isActive() )
+	{
+		collectInput(this);
+	}
+	
 	return hover;
 }
 
