@@ -186,6 +186,42 @@ Vector2 NoGUI::alignText(const char* text, const CText& fmt, const Style& elem, 
 	return result;
 }
 
+std::string NoGUI::collectInput(Element* elem)
+{
+	CInput& input = elem->getComponent< CInput >();
+	std::string inner = elem->getInner();
+	int key = GetCharPressed();
+	// Check if more characters have been pressed on the same frame
+	while ( key > 0 )
+	{
+		// NOTE: Only allow keys in range [32..125]
+		if ( (key >= 32) && (key <= 125) && (input.i < input.cap) )
+		{
+			inner.push_back((char)key);
+			elem->setInner(inner);
+			input.i++;
+		}
+		key = GetCharPressed();  // Check next character in the queue
+	}
+	// TODO: allow user to hold down backspace (but not at too high of an fps)
+	if ( IsKeyPressed(KEY_BACKSPACE) )
+	{
+		if ( input.i > 0 )
+		{
+			input.i--;
+			std::string inner = elem->getInner();
+			inner.pop_back();
+			elem->setInner(inner);
+		}
+		else
+		{
+			input.i = 0;
+		}
+	}
+	
+	return inner;
+}
+
 // TODO: cleanup
 std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int width)
 {
@@ -259,7 +295,7 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 void NoGUI::DrawGUIElement(Element* elem)
 {
 	Style shape = elem->styling();
-	CInput& input = elem->getComponent< CInput >();
+//	CInput& input = elem->getComponent< CInput >();
 	CText& txtFmt = elem->getComponent< CText >();
 	CImage imgFmt = elem->getComponent< CImage >();
 	CMultiStyle children = elem->getComponent< CMultiStyle >();
@@ -267,59 +303,19 @@ void NoGUI::DrawGUIElement(Element* elem)
 	if ( elem->getHover() )
 	{
 		shape.backCol = elem->getHoverCol();
-		if ( input.owned && elem->isActive() )
+		if ( elem->hasComponent< CInput >() && elem->isActive() )
 		{
-			int key = GetCharPressed();
-			// Check if more characters have been pressed on the same frame
-			while ( key > 0 )
-			{
-				// NOTE: Only allow keys in range [32..125]
-				if ( (key >= 32) && (key <= 125) && (input.i < input.cap) )
-				{
-					std::string inner = elem->getInner();
-					inner.push_back((char)key);
-					elem->setInner(inner);
-					input.i++;
-				}
-				key = GetCharPressed();  // Check next character in the queue
-			}
-			if ( IsKeyPressed(KEY_BACKSPACE) )
-			{
-				if ( input.i > 0 )
-				{
-					input.i--;
-					std::string inner = elem->getInner();
-					inner.pop_back();
-					elem->setInner(inner);
-				}
-				else
-				{
-					input.i = 0;
-				}
-			}
+			collectInput(elem);
 		}
 	}
 	if ( elem->isVisible() )
 	{
-		DrawGUIShape(shape);
-		if ( children.owned )
-		{
-			std::vector< Style > childStyles = children.styles;
-			Vector2 origin = shape.pos;
-			for (auto child : childStyles)
-			{
-				shape = child;
-				shape.pos.x = origin.x + shape.pos.x;
-				shape.pos.y = origin.y + shape.pos.y;
-				DrawGUIShape(shape);
-			}
-		}
+		DrawGUIStyles(shape, children);
 		if ( options.owned )
 		{
 			bool set = false;
 			if ( options.options->isActive() )
 			{
-//				set = elem->getHover();
 				for (auto e : options.options->getElements())
 				{
 					if ( e->getFocus() )
@@ -333,7 +329,7 @@ void NoGUI::DrawGUIElement(Element* elem)
 					}
 					if ( e->isHover() )
 					{
-						set = e->isHover();
+						set = true;
 						
 						break;
 					}
@@ -347,7 +343,6 @@ void NoGUI::DrawGUIElement(Element* elem)
 		}
 		if ( txtFmt.owned )
 		{
-//			DrawGUIText(elem->getInner().c_str(), txtFmt, elem->styling());
 			if ( txtFmt.contents.empty() )
 			{
 				int maxWidth;
@@ -374,7 +369,7 @@ void NoGUI::DrawGUIChildren(std::vector< std::shared_ptr< Element > > children)
 	}
 }
 
-void NoGUI::DrawGUIShape(const Style& elem)
+void NoGUI::DrawGUIStyle(const Style& elem)
 {
 	switch (elem.sides)
 	{
@@ -464,6 +459,21 @@ void NoGUI::DrawGUIShape(const Style& elem)
 			
 			
 			break;
+		}
+	}
+}
+
+void NoGUI::DrawGUIStyles(const Style& elem, const CMultiStyle& children)
+{
+	DrawGUIStyle(elem);
+	if ( children.owned )
+	{
+		Vector2 origin = elem.pos;
+		for (auto child : children.styles)
+		{
+			child.pos.x = origin.x + child.pos.x;
+			child.pos.y = origin.y + child.pos.y;
+			DrawGUIStyle(child);
 		}
 	}
 }
@@ -930,52 +940,18 @@ bool Toggle::isFocus()
 
 void CheckBox::draw()
 {
-	Style shape = styling();
-	if ( getHover() )
+	if ( getFocus() )
 	{
-		shape.backCol = getHoverCol();
+		DrawGUIElement(this);
 	}
-	if ( isVisible() )
+	else
 	{
-		DrawGUIShape(style);
-		if ( getFocus() )
+		Style shape = style;
+		if ( getHover() )
 		{
-			if ( hasComponent< CText >() )
-			{
-				CText& txtFmt = getComponent< CText >();
-//				DrawGUIText(elem->getInner().c_str(), txtFmt, elem->styling());
-				if ( txtFmt.contents.empty() )
-				{
-					int maxWidth;
-					if ( txtFmt.wrap == TextWrap::NONE )
-					{
-						maxWidth = std::numeric_limits<int>::max();
-					}
-					else
-					{
-						maxWidth = style.radius.x * 2 - txtFmt.margin.x;
-					}
-					txtFmt.contents = wrapText(getInner().c_str(), txtFmt, maxWidth);
-				}
-				DrawGUITextWrapped(txtFmt.contents, txtFmt, style);
-			}
-			if ( hasComponent< CImage >() )
-			{
-				CImage imgFmt = getComponent< CImage >();
-				DrawGUIImage(imgFmt, style);
-			}
+			shape.backCol = hoverCol;
 		}
-		if ( hasComponent< CMultiStyle >() )
-		{
-			std::vector< Style > children = getComponent< CMultiStyle >().styles;
-			Vector2 origin = style.pos;
-			for (auto child : children)
-			{
-				shape.pos.x = origin.x + shape.pos.x;
-				shape.pos.y = origin.y + shape.pos.y;
-				DrawGUIShape(shape);
-			}
-		}
+		DrawGUIStyles(shape, getComponent< CMultiStyle >());
 	}
 }
 

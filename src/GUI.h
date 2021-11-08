@@ -237,7 +237,7 @@ namespace NoGUI
 		
 			return compVec.size() - 1;
 		}
-	
+
 		template <class C>
 		size_t addComponent(C& newComponent)
 		{
@@ -259,9 +259,11 @@ namespace NoGUI
 	Vector2 alignTextRight(const char* text, const CText& fmt, const Style& elem, int lineNum = 0);
 	Vector2 alignText(const char* text, const CText& fmt, const Style& elem, int lineNum = 0);
 	std::vector< std::string > wrapText(const char* text, const CText& fmt, int width = std::numeric_limits<int>::max());
+	std::string collectInput(Element* elem);
 	void DrawGUIElement(Element* elem);
 	void DrawGUIChildren(std::vector< std::shared_ptr< Element > > children);
-	void DrawGUIShape(const Style& elem);
+	void DrawGUIStyle(const Style& elem);
+	void DrawGUIStyles(const Style& elem, const CMultiStyle& children);
 	void DrawGUIText(const char * text, const CText& fmt, const Style& elem);
 	void DrawGUITextV(const char* text, const CText& fmt, const Vector2& pos);
 	void DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, const Style& elem);
