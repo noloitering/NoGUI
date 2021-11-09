@@ -17,6 +17,7 @@ namespace NoGUI
 	{
 	protected:
 	friend class Page;
+	friend class DropDown;
 		Style style;
 		std::string inner;
 		bool active = true;
@@ -46,6 +47,7 @@ namespace NoGUI
 		std::string getInner();
 		Style styling();
 		void kill();
+		size_t lifetime();
 		void repos(const Vector2& newPos);
 		void resize(const Vector2& newRadi);
 		void recol (const Color& newBack, const Color& newHover);
@@ -153,7 +155,7 @@ namespace NoGUI
 	// TODO: fix map so that elements are ordered by time of insertion
 	class Page // Container for Elements
 	{
-	private:
+	protected:
 		Components components;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > elements;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > toAdd;
@@ -221,6 +223,88 @@ namespace NoGUI
 			return getComponent< C >().owned;
 		}
 	};
+	
+	class DropDown : public Page
+	{
+	private:
+		std::shared_ptr< Element > parent;
+		TextWrap wrap = TextWrap::NONE;
+	public:
+		DropDown(std::shared_ptr< Element > p, const TextWrap& w=TextWrap::NONE, bool init=false)
+		: Page(init), parent(p), wrap(w) {}
+		std::shared_ptr< Element > getParent();
+		void setParent(std::shared_ptr< Element > elem);
+		void wrapElements(const TextWrap& wrapStyle);
+		
+		template <class C>
+		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option", const std::string& id="")
+		{
+			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
+			e->components = components;
+			toAdd[tag].push_back(e);
+			if ( !id.empty() )
+			{
+				ids[id] = e->id;
+			}
+			
+			return e;
+		}
+		
+		template <class C>
+		std::shared_ptr< Element > addElement(const std::string& inner="", const std::string& tag="Option", const std::string& id="")
+		{
+			Style style = parent->styling();
+			switch (wrap)
+			{
+				case TextWrap::NONE:
+				{
+					
+					break;
+				}
+				
+				case TextWrap::DOWN:
+				{
+					style.pos.y += style.radius.y * 2 * (total + 1) + style.outlineThick;
+					
+					break;
+				}
+				
+				case TextWrap::UP:
+				{
+					style.pos.y -= style.radius.y * 2 * (total + 1) + style.outlineThick;
+					
+					break;
+				}
+				
+				case TextWrap::AROUND:
+				{
+					if ( total == 0 )
+					{
+						style.pos.y -= style.radius.y * 2 * (total + 1) + style.outlineThick;
+					}
+					else if ( total % 2 == 0 )
+					{
+						style.pos.y -= style.radius.y * 2 * ((total + 2) / 2) + style.outlineThick;
+					}
+					else
+					{
+						style.pos.y += style.radius.y * 2 * ((total + 2) / 2) + style.outlineThick;
+					}
+					
+					break;
+				}
+			}
+			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
+			e->components = components;
+			toAdd[tag].push_back(e);
+			if ( !id.empty() )
+			{
+				ids[id] = e->id;
+			}
+			
+			return e;
+		}
+	};
 
 	class GUIManager : public Proclaim, public NoMVC::Model // handles Pages and Notifications
 	{
@@ -230,6 +314,7 @@ namespace NoGUI
 		GUIManager();
 	
 		std::shared_ptr< Page > addPage(bool active=false);
+		std::shared_ptr< Page > addPage(std::shared_ptr< Page > page);
 		std::shared_ptr< Page > getPage(int pageIndex=0);
 		size_t size();
 		void removeElement(size_t id, int pageIndex=0);

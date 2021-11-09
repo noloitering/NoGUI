@@ -22,7 +22,6 @@ int main(int argc, char ** argv)
 	
 	std::shared_ptr< Texture > texture = std::make_shared< Texture >(LoadTexture("../imgs/ImageText.png"));
 	std::vector< NoGUI::Style > styles;
-//	std::vector< std::shared_ptr< NoGUI::Element > > options;
 	
 	NoGUI::Style elemStyle = {BLACK, RAYWHITE, (Vector2){center.x, 40}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style elemText = {INVISIBLE, BLACK, (Vector2){center.x, elemStyle.pos.y + elemStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
@@ -40,8 +39,6 @@ int main(int argc, char ** argv)
 	styles.push_back(boxSquareStyle);
 	NoGUI::Style comboStyle = {BLACK, RAYWHITE, (Vector2){center.x, boxText.pos.y + spacing}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style comboText = {INVISIBLE, BLACK, (Vector2){center.x, comboStyle.pos.y + boxStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
-	NoGUI::Style option1Style = {BLACK, RAYWHITE, (Vector2){center.x, comboStyle.pos.y + comboStyle.radius.y * 2}, comboStyle.radius, 4, 4, 0};
-	NoGUI::Style option2Style = {BLACK, RAYWHITE, (Vector2){center.x, option1Style.pos.y + option1Style.radius.y * 2}, comboStyle.radius, 4, 4, 0};
 	
 	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Text", "Base");
 	std::shared_ptr< NoGUI::Element > elemLabel = manager.addElement< NoGUI::Element >(elemText, "draws Element::inner relative to Element's position", "Label");
@@ -53,9 +50,11 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > boxLabel = manager.addElement< NoGUI::Element >(boxText, "Draws multiple shapes relative to Element's position", "Label");
 	std::shared_ptr< NoGUI::Element > combo = manager.addElement< NoGUI::Input >(comboStyle, "Drop Down", "ZInput");
 	std::shared_ptr< NoGUI::Element > comboLabel = manager.addElement< NoGUI::Element >(comboText, "Draws multiple elements relative to Element's position on focus", "Label");
-	std::shared_ptr< NoGUI::Page > dropdown = manager.addPage();
-	std::shared_ptr< NoGUI::Element > option1 = dropdown->addElement< NoGUI::Button >(option1Style, "Option 1", "Option");
-	std::shared_ptr< NoGUI::Element > option2 = dropdown->addElement< NoGUI::Button >(option2Style, "Option 2", "Option");
+	std::shared_ptr< NoGUI::DropDown > dropdown = std::make_shared< NoGUI::DropDown >(combo, NoGUI::TextWrap::DOWN);
+	dropdown->addComponent< NoGUI::CText >(textStyle);
+	std::shared_ptr< NoGUI::Element > option1 = dropdown->addElement< NoGUI::Button >("Option 1");
+	std::shared_ptr< NoGUI::Element > option2 = dropdown->addElement< NoGUI::Button >("Option 2");
+	manager.addPage(dropdown);
 	
 	elemLabel->addComponent< NoGUI::CText >(labelText);
 	imageLabel->addComponent< NoGUI::CText >(labelText);
@@ -69,8 +68,6 @@ int main(int argc, char ** argv)
 	box->addComponent< NoGUI::CMultiStyle >(styles);
 	box->addComponent< NoGUI::CText >(textStyle);
 	combo->addComponent< NoGUI::CText >(textStyle);
-	option1->addComponent< NoGUI::CText >(textStyle);
-	option2->addComponent< NoGUI::CText >(textStyle);
 	combo->addComponent< NoGUI::CDropDown >(dropdown);
 	
 	while ( !WindowShouldClose() )

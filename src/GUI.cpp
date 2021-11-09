@@ -329,6 +329,14 @@ void NoGUI::DrawGUIElement(Element* elem)
 						break;
 					}
 				}
+				if ( !set )
+				{
+					Vector2 mousePos = GetMousePosition();
+					Vector2 topLeftCorner = {shape.pos.x - shape.radius.x - shape.outlineThick, shape.pos.y - shape.radius.y - shape.outlineThick};
+					Vector2 length = {shape.radius.x * 2 + shape.outlineThick + 20, shape.radius.y * 2 + shape.outlineThick + 20};
+					Rectangle bbox = {topLeftCorner.x, topLeftCorner.y, length.x, length.y};
+					set = CheckCollisionPointRec(mousePos, bbox);
+				}
 			}
 			options.options->setActive(set || elem->getFocus());
 		}
@@ -815,11 +823,18 @@ Style Element::styling()
 void Element::draw()
 {
 	DrawGUIElement(this);
+	frames++;
 }
 
 void Element::kill()
 {
 	alive = false;
+}
+
+size_t Element::lifetime()
+{
+	
+	return frames;
 }
 
 void Element::repos(const Vector2& newPos)
@@ -952,6 +967,7 @@ void CheckBox::draw()
 		}
 		DrawGUIStyles(shape, getComponent< CMultiStyle >());
 	}
+	frames++;
 }
 
 // Pages
@@ -1074,6 +1090,68 @@ size_t Page::size()
 	return elements.size();
 }
 
+std::shared_ptr< Element > DropDown::getParent()
+{
+	
+	return parent;
+}
+
+void DropDown::setParent(std::shared_ptr< Element > elem)
+{
+	parent = elem;
+}
+
+void DropDown::wrapElements(const TextWrap& wrapStyle)
+{
+	Style reference = parent->styling();
+	int index = 1;
+	for (auto entry : elements)
+	{
+		for (auto elem : entry.second)
+		{
+			std::cout << index << std::endl;
+			switch (wrapStyle)
+			{
+				case TextWrap::NONE:
+				{
+				
+					break;
+				}
+			
+				case TextWrap::DOWN:
+				{
+					elem->repos((Vector2){reference.pos.x, reference.pos.y + reference.radius.y * 2 * index + reference.outlineThick});
+				
+					break;
+				}
+			
+				case TextWrap::UP:
+				{
+					elem->repos((Vector2){reference.pos.x, reference.pos.y - reference.radius.y * 2 * index - reference.outlineThick});
+				
+					break;
+				}
+			
+				case TextWrap::AROUND:
+				{
+					if (index % 2 == 0)
+					{
+						elem->repos((Vector2){reference.pos.x, reference.pos.y - reference.radius.y * 2 * ((index + 1) / 2)  - reference.outlineThick});
+					}
+					else
+					{
+						elem->repos((Vector2){reference.pos.x, reference.pos.y + reference.radius.y * 2 * ((index + 1) / 2) + reference.outlineThick});
+					}
+				
+					break;
+				}
+			}
+			index++;
+		}
+	}
+	wrap = wrapStyle;
+}
+
 // GUI Manager
 GUIManager::GUIManager()
 {
@@ -1092,6 +1170,13 @@ std::shared_ptr< Page > GUIManager::addPage(bool active)
 	pages.push_back(e);
 	
 	return e;
+}
+
+std::shared_ptr< Page > GUIManager::addPage(std::shared_ptr< Page > page)
+{
+	pages.push_back(page);
+	
+	return pages.back();
 }
 
 std::shared_ptr< Page > GUIManager::getPage(int pageIndex)
