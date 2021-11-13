@@ -678,8 +678,14 @@ void NoGUI::DrawGUIImage(const CImage& fmt, const Style& elem)
 // Element object
 bool Element::isFocus()
 {
-	
-	return getFocus();
+	if ( active && changed )
+	{
+		changed = false;
+		
+		return true;
+	}
+
+	return false;
 }
 
 bool Element::getFocus()
@@ -801,6 +807,7 @@ std::string Element::getInner()
 
 void Element::setFocus(bool set)
 {
+	changed = true;
 	focus = set;
 }
 
@@ -866,90 +873,131 @@ void Element::rotate(float rotation)
 
 bool Button::isFocus()
 {
-	focus = false;
-	if ( active )
+	if ( !changed )
 	{
-		if ( isHover() )
+		bool prevState = focus;
+		focus = false;
+		if ( active )
 		{
-			focus = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+			if ( isHover() )
+			{
+				focus = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+			}
+			
+			return focus != prevState;
 		}
+		
+		return false;
 	}
-	
-	return focus;
+	else
+	{
+
+		return Element::isFocus();
+	}
 }
 
 bool Input::isFocus()
 {
-	if ( active )
+	if ( !changed )
 	{
-		isHover();
-		if ( hover != focus )
+		if ( active )
 		{
-			focus = hover;
+			isHover();
+			if ( hover != focus )
+			{
+				focus = hover;
 			
-			return true;
+				return true;
+			}
 		}
+		
+		return false;
 	}
-	
-	return false;
+	else
+	{
+		
+		return Element::isFocus();
+	}
 }
 
 bool InputButton::isFocus()
 {
-	focus = false;
-	if ( active )
+	if ( !changed )
 	{
-		bool prevState = hover;
-		isHover();
-		if ( hover )
+		bool prevState = focus;
+		focus = false;
+		if ( active )
 		{
-			focus = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
-		}
-		if ( hover != prevState )
-		{
+			bool prevHover = hover;
+			isHover();
+			if ( hover )
+			{
+				focus = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+			}
 			
-			return true;
+			return (hover != prevHover || focus != prevState);
 		}
+		
+		return false;
 	}
-	
-	return focus;
+	else
+	{
+		
+		return Element::isFocus();
+	}
 }
 
 bool InputToggle::isFocus()
 {
-	if ( active )
+	if ( !changed )
 	{
-		bool prevState = hover;
-		isHover();
-		if ( hover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+		if ( active )
 		{
-			focus = !focus;
+			bool prevState = hover;
+			isHover();
+			if ( hover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+			{
+				focus = !focus;
 			
-			return true;
-		}
-		if ( hover != prevState )
-		{
+				return true;
+			}
+			if ( hover != prevState )
+			{
 			
-			return true;
+				return true;
+			}
 		}
+		
+		return false;
 	}
-	
-	return false;
+	else
+	{
+		
+		return Element::isFocus();
+	}
 }
 
 bool Toggle::isFocus()
 {
-	if ( active )
+	if ( !changed )
 	{
-		if ( isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+		if ( active )
 		{
-			focus = !focus;
+			if ( isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+			{
+				focus = !focus;
 				
-			return true;
+				return true;
+			}
 		}
+		
+		return false;
 	}
-	
-	return false;
+	else
+	{
+		
+		return Element::isFocus();
+	}
 }
 
 void CheckBox::draw()

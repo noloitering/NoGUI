@@ -22,6 +22,7 @@ namespace NoGUI
 		std::string inner;
 		bool active = true;
 		bool alive = true;
+		bool changed = false;
 		bool focus = false;
 		bool hover = false;
 		bool visible = true;
@@ -34,8 +35,9 @@ namespace NoGUI
 		Element(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="")
 			: id(num), style(look), inner(in), hoverCol(hovCol) {}
 		
-		virtual bool isFocus();
 		virtual void draw();
+		virtual bool isFocus();
+		virtual void setFocus(bool set);
 		Color getHoverCol();
 		const size_t id = 0;
 		bool isActive();
@@ -53,7 +55,6 @@ namespace NoGUI
 		void recol (const Color& newBack, const Color& newHover);
 		void reshape(int newSides);
 		void rotate(float rotation);
-		void setFocus(bool set);
 		void setHoverCol(const Color& col);
 		void setInner(const std::string& in);
 	
