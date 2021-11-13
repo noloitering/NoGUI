@@ -139,7 +139,7 @@ namespace NoGUI
 			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
 		InputTrigger(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
 			: Element(num, look, hovCol, in) {}
-//		bool isFocus();
+		bool isFocus();
 	};
 	
 	class Toggle : public Element // Toggle Focus on/off on press; Notify on press;
