@@ -977,6 +977,33 @@ bool InputToggle::isFocus()
 	}
 }
 
+bool InputTrigger::isFocus()
+{
+	if ( !changed )
+	{
+		bool prevState = focus;
+		focus = false;
+		if ( active )
+		{
+			bool prevHover = hover;
+			isHover();
+			if ( hover )
+			{
+				focus = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+			}
+			
+			return (hover != prevHover || focus != prevState);
+		}
+		
+		return false;
+	}
+	else
+	{
+		
+		return Element::isFocus();
+	}
+}
+
 bool Toggle::isFocus()
 {
 	if ( !changed )
@@ -996,6 +1023,31 @@ bool Toggle::isFocus()
 	else
 	{
 		
+		return Element::isFocus();
+	}
+}
+
+bool Trigger::isFocus()
+{
+	if ( !changed )
+	{
+		bool prevState = focus;
+		focus = false;
+		if ( active )
+		{
+			if ( isHover() )
+			{
+				focus = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+			}
+			
+			return focus != prevState;
+		}
+		
+		return false;
+	}
+	else
+	{
+
 		return Element::isFocus();
 	}
 }
