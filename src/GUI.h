@@ -326,7 +326,7 @@ namespace NoGUI
 		}
 	};
 
-	class GUIManager : public Proclaim, public NoMVC::Model // handles Pages and Notifications
+	class GUIManager : public Notifier, public NoMVC::Model // handles Pages and Notifications
 	{
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
@@ -364,7 +364,6 @@ namespace NoGUI
 	std::vector< std::string > wrapText(const char* text, const CText& fmt, int width = std::numeric_limits<int>::max());
 	std::string collectInput(Element* elem);
 	void DrawGUIElement(Element* elem);
-	void DrawGUIChildren(std::vector< std::shared_ptr< Element > > children);
 	void DrawGUIStyle(const Style& elem);
 	void DrawGUIStyles(const Style& elem, const CMultiStyle& children);
 	void DrawGUIText(const char * text, const CText& fmt, const Style& elem);

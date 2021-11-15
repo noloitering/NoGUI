@@ -12,8 +12,6 @@ class EventHandler : public NoGUI::Listener
 {
 	void onNotify(std::shared_ptr< NoGUI::Element > elem)
 	{
-//		std::vector< std::string > notification;
-//		notification.push_back("Notify!");
 		NoGUI::CText& elemText = elem->getComponent< NoGUI::CText >();
 		if ( elemText.owned )
 		{
@@ -39,8 +37,8 @@ int main(int argc, char ** argv)
 	EventHandler handler;
 	NoGUI::GUIManager manager = NoGUI::GUIManager();
 	manager.addListener(std::make_shared< EventHandler >(handler));
-	Color INVISIBLE = (Color){0, 0, 0, 1};
 	
+	Color INVISIBLE = (Color){0, 0, 0, 1};
 	NoGUI::CText textStyle = NoGUI::CText();
 	textStyle.align = NoGUI::TextAlign::CENTER;
 	NoGUI::CText labelText = NoGUI::CText();

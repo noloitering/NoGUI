@@ -16,7 +16,7 @@ namespace NoGUI
 	};
 
 	// TODO: handle dynamic allocation better
-	class Proclaim
+	class Notifier
 	{
 	private:
 		std::vector< std::shared_ptr< Listener > > listeners;

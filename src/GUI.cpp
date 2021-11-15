@@ -364,14 +364,6 @@ void NoGUI::DrawGUIElement(Element* elem)
 	}
 }
 
-void NoGUI::DrawGUIChildren(std::vector< std::shared_ptr< Element > > children)
-{
-	for (auto child : children)
-	{
-		child->draw();
-	}
-}
-
 void NoGUI::DrawGUIStyle(const Style& elem)
 {
 	switch (elem.sides)
@@ -423,9 +415,7 @@ void NoGUI::DrawGUIStyle(const Style& elem)
 			for (int i=0; i < elem.outlineThick; i++)
 			{
 				ldx.x--;
-//				ldx.y += i;
 				tdx.y--;
-//				rdx.y += i;
 				rdx.x++;
 				DrawTriangleLines(tdx, ldx, rdx, elem.outlineCol);
 			}
