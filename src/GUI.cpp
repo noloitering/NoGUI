@@ -1105,6 +1105,12 @@ void Page::clearElements()
 	}
 }
 
+Components Page::getComponents()
+{
+	
+	return components;
+}
+
 std::shared_ptr< Element > Page::getElement(size_t id)
 {
 	for (auto it=elements.begin(); it != elements.end(); it++)

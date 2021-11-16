@@ -8,6 +8,7 @@
 namespace NoGUI
 {
 	const size_t BUFFER = 256;
+	const size_t NUMCOMPONENTS = 5;
 	enum class Crop {NONE, FIT, SCROLL};
 	enum class TextAlign {LEFT, CENTER, RIGHT, TOP, BOTTOM, BOTTOML, BOTTOMR};
 	enum class TextWrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
