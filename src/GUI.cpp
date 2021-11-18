@@ -1184,17 +1184,16 @@ std::map< std::string, size_t > Page::getIds()
 
 bool Page::hasId(size_t id)
 {
-	try
+	for (auto entry : ids)
 	{
-		getId(id);
-	}
-	catch (const std::out_of_range& e)
-	{
-		
-		return false;
+		if ( entry.second == id )
+		{
+			
+			return true;
+		}
 	}
 	
-	return true;
+	return false;
 }
 
 void Page::update()
