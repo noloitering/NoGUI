@@ -39,6 +39,7 @@ namespace NoGUI
 		virtual void setFocus(bool set);
 		Color getHoverCol();
 		const size_t id = 0;
+		const size_t getId();
 		bool isActive();
 		bool isAlive();
 		bool isVisible();
@@ -189,6 +190,7 @@ namespace NoGUI
 		std::vector< std::shared_ptr< Element > > getElements();
 		Components getComponents();
 		size_t size();
+		std::string getId(size_t id);
 		bool isActive();
 		void clearElements();
 		void removeElement(size_t id);
