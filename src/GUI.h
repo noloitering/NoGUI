@@ -34,7 +34,6 @@ namespace NoGUI
 			: id(num), style(look), inner(in), hoverCol(look.backCol) {}
 		Element(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="")
 			: id(num), style(look), inner(in), hoverCol(hovCol) {}
-		
 		virtual void draw();
 		virtual bool isFocus();
 		virtual void setFocus(bool set);
@@ -184,6 +183,7 @@ namespace NoGUI
 		bool active = true;
 	public:
 		Page(bool init=true);
+		std::map< std::string, std::vector< std::shared_ptr< Element > > > getBody();
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const std::string& tag);
 		std::vector< std::shared_ptr< Element > > getElements();

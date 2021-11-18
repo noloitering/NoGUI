@@ -1066,6 +1066,12 @@ Page::Page(bool init)
 	active = init;
 }
 
+std::map< std::string, std::vector< std::shared_ptr< Element > > > Page::getBody()
+{
+	
+	return elements;
+}
+
 bool Page::isActive()
 {
 	
