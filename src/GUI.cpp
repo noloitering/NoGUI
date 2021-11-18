@@ -1176,6 +1176,27 @@ std::string Page::getId(size_t id)
 	throw std::out_of_range(errMsg);
 }
 
+std::map< std::string, size_t > Page::getIds()
+{
+	
+	return ids;
+}
+
+bool Page::hasId(size_t id)
+{
+	try
+	{
+		getId(id);
+	}
+	catch (const std::out_of_range& e)
+	{
+		
+		return false;
+	}
+	
+	return true;
+}
+
 void Page::update()
 {
 	std::map< std::string, std::vector< std::shared_ptr< Element > > > new_map;

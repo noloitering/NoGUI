@@ -185,12 +185,14 @@ namespace NoGUI
 	public:
 		Page(bool init=true);
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > getBody();
+		std::map< std::string, size_t > getIds();
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const std::string& tag);
 		std::vector< std::shared_ptr< Element > > getElements();
 		Components getComponents();
 		size_t size();
 		std::string getId(size_t id);
+		bool hasId(size_t id);
 		bool isActive();
 		void clearElements();
 		void removeElement(size_t id);
