@@ -99,9 +99,9 @@ namespace NoGUI
 		CDropDown() {}
 		CDropDown(const std::shared_ptr< Page > o)
 			: options(o) {}
-		TextWrap wrap = TextWrap::NONE;
-		TextAlign align;
-		float spacing;
+		TextWrap wrap = TextWrap::DOWN;
+		TextAlign align = TextAlign::BOTTOM;
+		float spacing = 0;
 		std::shared_ptr< Page > options;
 	};
 
