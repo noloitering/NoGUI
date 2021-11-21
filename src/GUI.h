@@ -105,7 +105,7 @@ namespace NoGUI
 	
 	class Input : public Element // Focus on hover; Notify on hover, and off hover;
 	{
-		public:
+	public:
 		Input(const size_t& num, const Style& look, const std::string& in="")
 			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
 		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
@@ -135,6 +135,7 @@ namespace NoGUI
 	
 	class InputTrigger : public Element // Focus while held; Notify on press, on release, on hover, and off hover;
 	{
+	public:
 		InputTrigger(const size_t& num, const Style& look, const std::string& in="") 
 			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
 		InputTrigger(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
@@ -164,7 +165,7 @@ namespace NoGUI
 	
 	class CheckBox : public Toggle // Draw inner on Focus
 	{
-		public:
+	public:
 		CheckBox(const size_t& num, const Style& look, const std::string& in="") 
 			: Toggle(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
 		CheckBox(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
