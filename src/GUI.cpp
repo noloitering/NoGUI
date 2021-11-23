@@ -309,15 +309,13 @@ void NoGUI::DrawGUIElement(Element* elem)
 		if ( options.owned )
 		{
 			bool set = false;
-			if ( options.options->isActive() )
+			if ( options.options->isActive() ) // determine whether or not dropdown should remain active
 			{
-				for (auto e : options.options->getElements())
+				for (auto e : options.options->getElements()) 
 				{
 					if ( e->getFocus() )
 					{
-//						std::string copy = elem->getInner();
 						elem->setInner(e->getInner());
-//						e->setInner(copy);
 						set = false;
 						
 						break;
@@ -329,7 +327,7 @@ void NoGUI::DrawGUIElement(Element* elem)
 						break;
 					}
 				}
-				if ( !set )
+				if ( !set ) // check if hovering over elem
 				{
 					Vector2 mousePos = GetMousePosition();
 					Vector2 topLeftCorner = {shape.pos.x - shape.radius.x - shape.outlineThick, shape.pos.y - shape.radius.y - shape.outlineThick};
@@ -1305,6 +1303,15 @@ void GUIManager::removeElement(size_t id, int pageIndex)
 {
 	
 	return pages[pageIndex]->removeElement(id);
+}
+
+std::shared_ptr< DropDown > GUIManager::addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap, bool init)
+{
+	std::shared_ptr< DropDown > e = std::make_shared< DropDown >(parent, wrap, init);
+	parent->addComponent< CDropDown >(e);
+	pages.push_back(e);
+	
+	return e;
 }
 
 std::shared_ptr< Page > GUIManager::addPage(bool active)

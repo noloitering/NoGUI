@@ -249,7 +249,7 @@ namespace NoGUI
 			return getComponent< C >().owned;
 		}
 	};
-	
+	// TODO: implement spacing and alignment
 	class DropDown : public Page
 	{
 	private:
@@ -339,6 +339,7 @@ namespace NoGUI
 	public:
 		GUIManager();
 	
+		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap=TextWrap::NONE, bool init=false);
 		std::shared_ptr< Page > addPage(bool active=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > page);
 		std::shared_ptr< Page > getPage(int pageIndex=0);

@@ -11,6 +11,7 @@ namespace NoGUI
 	const size_t NUMCOMPONENTS = 5;
 	enum class Crop {NONE, FIT, SCROLL};
 	enum class TextAlign {LEFT, CENTER, RIGHT, TOP, BOTTOM, BOTTOML, BOTTOMR};
+	enum class Align {NONE, LEFT, CENTER, RIGHT, TOP, BOTTOM};
 	enum class TextWrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
 	class Page;
 
@@ -99,9 +100,13 @@ namespace NoGUI
 		CDropDown() {}
 		CDropDown(const std::shared_ptr< Page > o)
 			: options(o) {}
-		TextWrap wrap = TextWrap::DOWN;
-		TextAlign align = TextAlign::BOTTOM;
-		float spacing = 0;
+		
+//		template <typename... Args>
+//		CDropDown(Args&&... CArgs)
+//		{
+//			options = std::make_shared< DropDown >(std::forward<Args>(CArgs)...);
+//		}
+		
 		std::shared_ptr< Page > options;
 	};
 

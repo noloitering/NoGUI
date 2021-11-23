@@ -50,11 +50,10 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > boxLabel = manager.addElement< NoGUI::Element >(boxText, "Draws multiple shapes relative to Element's position", "Label");
 	std::shared_ptr< NoGUI::Element > combo = manager.addElement< NoGUI::Input >(comboStyle, "Drop Down", "ZInput");
 	std::shared_ptr< NoGUI::Element > comboLabel = manager.addElement< NoGUI::Element >(comboText, "Draws multiple elements relative to Element's position on focus", "Label");
-	std::shared_ptr< NoGUI::DropDown > dropdown = std::make_shared< NoGUI::DropDown >(combo, NoGUI::TextWrap::DOWN);
+	std::shared_ptr< NoGUI::DropDown > dropdown = manager.addDropDown(combo, NoGUI::TextWrap::DOWN);
 	dropdown->addComponent< NoGUI::CText >(textStyle);
 	std::shared_ptr< NoGUI::Element > option1 = dropdown->addElement< NoGUI::Button >("Option 1");
 	std::shared_ptr< NoGUI::Element > option2 = dropdown->addElement< NoGUI::Button >("Option 2");
-	manager.addPage(dropdown);
 	
 	elemLabel->addComponent< NoGUI::CText >(labelText);
 	imageLabel->addComponent< NoGUI::CText >(labelText);
@@ -68,7 +67,6 @@ int main(int argc, char ** argv)
 	box->addComponent< NoGUI::CMultiStyle >(styles);
 	box->addComponent< NoGUI::CText >(textStyle);
 	combo->addComponent< NoGUI::CText >(textStyle);
-	combo->addComponent< NoGUI::CDropDown >(dropdown);
 	
 	while ( !WindowShouldClose() )
 	{
