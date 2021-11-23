@@ -101,12 +101,6 @@ namespace NoGUI
 		CDropDown(const std::shared_ptr< Page > o)
 			: options(o) {}
 		
-//		template <typename... Args>
-//		CDropDown(Args&&... CArgs)
-//		{
-//			options = std::make_shared< DropDown >(std::forward<Args>(CArgs)...);
-//		}
-		
 		std::shared_ptr< Page > options;
 	};
 
