@@ -13,7 +13,7 @@ namespace NoGUI
 	enum class TextAlign {LEFT, CENTER, RIGHT, TOP, BOTTOM, BOTTOML, BOTTOMR};
 	enum class Align {NONE, LEFT, CENTER, RIGHT, TOP, BOTTOM};
 	enum class TextWrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
-	class Page;
+	class DropDown;
 
 	struct Style
 	{
@@ -98,10 +98,10 @@ namespace NoGUI
 	{
 	public:
 		CDropDown() {}
-		CDropDown(const std::shared_ptr< Page > o)
+		CDropDown(const std::shared_ptr< DropDown > o)
 			: options(o) {}
 		
-		std::shared_ptr< Page > options;
+		std::shared_ptr< DropDown > options;
 	};
 
 	typedef std::tuple< CText, CImage, CInput, CMultiStyle, CDropDown > Components;

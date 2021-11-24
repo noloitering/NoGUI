@@ -155,7 +155,7 @@ namespace NoGUI
 		std::vector< std::shared_ptr< Element > > getElements(const std::string& tag);
 		std::vector< std::shared_ptr< Element > > getElements();
 		size_t size();
-		std::string getId(size_t id);
+		std::string getId(size_t id, bool strict=true);
 		bool hasId(size_t id);
 		bool isActive();
 		void clearElements();

@@ -1153,7 +1153,7 @@ std::vector< std::shared_ptr< Element > > Page::getElements()
 	return result;
 }
 
-std::string Page::getId(size_t id)
+std::string Page::getId(size_t id, bool strict)
 {
 	std::string errMsg = "no unique identifier associated with id num: " + std::to_string(id);
 	for (auto entry : ids)
@@ -1164,8 +1164,15 @@ std::string Page::getId(size_t id)
 			return entry.first;
 		}
 	}
-	
-	throw std::out_of_range(errMsg);
+	if (strict)
+	{
+		throw std::out_of_range(errMsg);
+	}
+	else
+	{
+		
+		return std::to_string(id);
+	}
 }
 
 std::map< std::string, size_t > Page::getIds()
