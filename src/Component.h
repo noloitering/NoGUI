@@ -107,4 +107,50 @@ namespace NoGUI
 	typedef std::tuple< CText, CImage, CInput, CMultiStyle, CDropDown > Components;
 	typedef std::tuple< std::vector < CText >, std::vector < CImage >, std::vector < CInput >, std::vector< CMultiStyle >, std::vector< CDropDown > > CompContainer;
 	typedef std::variant< CText, CImage, CInput, CMultiStyle, CDropDown > Component;
+	
+	class CContainer // to be inherited from
+	{
+	protected:
+		Components components;
+	public:
+		Components getComponents()
+		{
+			
+			return components;
+		}
+		
+		template <class C>
+		C& getComponent()
+		{
+			
+			return std::get< C >(components);
+		}
+	
+		template <class C, typename... Args>
+		C& addComponent(Args&&... CArgs)
+		{
+			auto& component = getComponent<C>();
+			component = C(std::forward<Args>(CArgs)...);
+			component.owned = true;
+		
+			return component;
+		}
+	
+		template <class C>
+		C& addComponent(C& newComponent)
+		{
+			auto& component = getComponent< C >();
+			component = newComponent;
+			component.owned = true;
+		
+			return component;
+		}
+	
+		template <class C>
+		bool hasComponent()
+		{
+		
+			return getComponent< C >().owned;
+		}
+	};
 }

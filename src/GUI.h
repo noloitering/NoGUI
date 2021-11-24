@@ -13,7 +13,7 @@
 namespace NoGUI
 {
 	// Classes
-	class Element // Base Element to inherit from; Focus is manually set;
+	class Element : public CContainer // Base Element to inherit from; Focus is manually set;
 	{
 	protected:
 	friend class Page;
@@ -27,7 +27,6 @@ namespace NoGUI
 		bool hover = false;
 		bool visible = true;
 		size_t frames = 0;
-		Components components;
 		Color hoverCol;
 	public:
 		Element(const size_t& num, const Style& look, const std::string& in="")
@@ -37,6 +36,7 @@ namespace NoGUI
 		virtual void draw();
 		virtual bool isFocus();
 		virtual void setFocus(bool set);
+		NoGUI::Components getComponents();
 		Color getHoverCol();
 		const size_t id = 0;
 		const size_t getId();
@@ -57,40 +57,6 @@ namespace NoGUI
 		void rotate(float rotation);
 		void setHoverCol(const Color& col);
 		void setInner(const std::string& in);
-	
-		template <class C>
-		C& getComponent()
-		{
-			
-			return std::get< C >(components);
-		}
-	
-		template <class C, typename... Args>
-		C& addComponent(Args&&... CArgs)
-		{
-			auto& component = getComponent<C>();
-			component = C(std::forward<Args>(CArgs)...);
-			component.owned = true;
-		
-			return component;
-		}
-	
-		template <class C>
-		C& addComponent(C& newComponent)
-		{
-			auto& component = getComponent< C >();
-			component = newComponent;
-			component.owned = true;
-		
-			return component;
-		}
-	
-		template <class C>
-		bool hasComponent()
-		{
-		
-			return getComponent< C >().owned;
-		}
 	};
 
 	class Button : public Element // Focus on press; Notify on press;
@@ -174,10 +140,9 @@ namespace NoGUI
 	};
 
 	// TODO: fix map so that elements are ordered by time of insertion
-	class Page // Container for Elements
+	class Page : public CContainer// Container for Elements
 	{
 	protected:
-		Components components;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > elements;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > toAdd;
 		std::map< std::string, size_t > ids;
@@ -190,7 +155,6 @@ namespace NoGUI
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const std::string& tag);
 		std::vector< std::shared_ptr< Element > > getElements();
-		Components getComponents();
 		size_t size();
 		std::string getId(size_t id);
 		bool hasId(size_t id);
@@ -213,40 +177,6 @@ namespace NoGUI
 			}
 			
 			return e;
-		}
-		
-		template <class C>
-		C& getComponent()
-		{
-			
-			return std::get< C >(components);
-		}
-	
-		template <class C, typename... Args>
-		C& addComponent(Args&&... CArgs)
-		{
-			auto& component = getComponent<C>();
-			component = C(std::forward<Args>(CArgs)...);
-			component.owned = true;
-		
-			return component;
-		}
-	
-		template <class C>
-		C& addComponent(C& newComponent)
-		{
-			auto& component = getComponent< C >();
-			component = newComponent;
-			component.owned = true;
-		
-			return component;
-		}
-	
-		template <class C>
-		bool hasComponent()
-		{
-		
-			return getComponent< C >().owned;
 		}
 	};
 	// TODO: implement spacing and alignment
@@ -378,5 +308,3 @@ namespace NoGUI
 	void DrawGUITextWrapped(const std::vector<std::string>& text, CText fmt, const Style& elem);
 	void DrawGUIImage(const CImage& fmt, const Style& elem);
 }
-
-
