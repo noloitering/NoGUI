@@ -113,6 +113,11 @@ namespace NoGUI
 	protected:
 		Components components;
 	public:
+		CContainer() {}
+		CContainer(Components c)
+			: components(c) {}
+		virtual ~CContainer() {}
+		
 		Components getComponents()
 		{
 			

@@ -36,7 +36,6 @@ namespace NoGUI
 		virtual void draw();
 		virtual bool isFocus();
 		virtual void setFocus(bool set);
-		NoGUI::Components getComponents();
 		Color getHoverCol();
 		const size_t id = 0;
 		const size_t getId();
