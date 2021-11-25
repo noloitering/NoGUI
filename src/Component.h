@@ -124,6 +124,11 @@ namespace NoGUI
 			return components;
 		}
 		
+		void setComponents(Components& c)
+		{
+			components = c;
+		}
+		
 		template <class C>
 		C& getComponent()
 		{
