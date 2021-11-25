@@ -124,7 +124,7 @@ namespace NoGUI
 			return components;
 		}
 		
-		void setComponents(Components& c)
+		void setComponents(Components c)
 		{
 			components = c;
 		}
