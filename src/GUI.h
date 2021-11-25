@@ -169,6 +169,14 @@ namespace NoGUI
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
 			e->components = components;
+			CDropDown& dropdown = e->getComponent< CDropDown >();
+			if ( dropdown.owned  )
+			{
+				if ( !dropdown.options->getParent() )
+				{
+					dropdown.options->setParent(e);
+				}
+			}
 			toAdd[tag].push_back(e);
 			if ( !id.empty() )
 			{
@@ -188,6 +196,7 @@ namespace NoGUI
 		DropDown(std::shared_ptr< Element > p, const TextWrap& w=TextWrap::NONE, bool init=false)
 		: Page(init), parent(p), wrap(w) {}
 		std::shared_ptr< Element > getParent();
+		TextWrap getWrap();
 		void setParent(std::shared_ptr< Element > elem);
 		void wrapElements(const TextWrap& wrapStyle);
 		
@@ -196,6 +205,14 @@ namespace NoGUI
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
 			e->components = components;
+			CDropDown& dropdown = e->getComponent< CDropDown >();
+			if ( dropdown.owned  )
+			{
+				if ( !dropdown.options->getParent() )
+				{
+					dropdown.options->setParent(e);
+				}
+			}
 			toAdd[tag].push_back(e);
 			if ( !id.empty() )
 			{

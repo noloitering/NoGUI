@@ -1238,6 +1238,12 @@ std::shared_ptr< Element > DropDown::getParent()
 	return parent;
 }
 
+TextWrap DropDown::getWrap()
+{
+	
+	return wrap;
+}
+
 void DropDown::setParent(std::shared_ptr< Element > elem)
 {
 	parent = elem;
