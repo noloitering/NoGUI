@@ -1301,9 +1301,17 @@ void DropDown::wrapElements(const TextWrap& wrapStyle)
 }
 
 // GUI Manager
-GUIManager::GUIManager()
+GUIManager::GUIManager(bool withPg)
 {
-	addPage(true);
+	if ( withPg )
+	{
+		addPage(true);
+	}
+}
+
+GUIManager::GUIManager(std::shared_ptr< Page > pg)
+{
+	addPage(pg);
 }
 
 void GUIManager::removeElement(size_t id, int pageIndex)

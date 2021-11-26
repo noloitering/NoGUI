@@ -283,8 +283,10 @@ namespace NoGUI
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
 	public:
-		GUIManager();
-	
+		GUIManager(bool withPg=true);
+		GUIManager(std::shared_ptr< Page > pg);
+		GUIManager(std::vector< std::shared_ptr< Page > > pgs)
+			: pages(pgs) {}
 		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap=TextWrap::NONE, bool init=false);
 		std::shared_ptr< Page > addPage(bool active=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > page);
