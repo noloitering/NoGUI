@@ -1228,8 +1228,13 @@ void Page::update()
 
 size_t Page::size()
 {
-
-	return elements.size();
+	size_t total = 0;
+	for (auto classGroup : elements)
+	{
+		total += classGroup.second.size();
+	}
+	
+	return total;
 }
 
 std::shared_ptr< Element > DropDown::getParent()
