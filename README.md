@@ -1,2 +1,2 @@
 # NoGUI
- GUI library for NoMAD game engine
+ GUI library for NoMAD Game Engine
