@@ -81,4 +81,4 @@ public:
 	}
 };
 ```
-Objects that are intended to recieve events inherit from the Listener class and are then added to a Notifier object. Whenever the Notifier calls `void notify(std::shared_ptr< Element >)` the Listener's `void onNotify(std::shared_ptr< Element >)` function is called. The Elements hover and focus states can then be used to contextualize what event occured. To help understand this concept, the GUI Manager Class inherits from Notifier and an examples can be viewed here: https://github.com/noloitering/NoGUI/blob/main/examples/types/main.cpp 
+Objects that are intended to recieve events inherit from the Listener class and are then added to a Notifier object. Whenever the Notifier calls `void notify(std::shared_ptr< Element >)` the Listener's `void onNotify(std::shared_ptr< Element >)` function is called. The Elements hover and focus states can then be used to contextualize what event occured. To help understand this concept, the GUI Manager Class inherits from Notifier in the code example provided here: https://github.com/noloitering/NoGUI/blob/main/examples/types/main.cpp 
