@@ -94,6 +94,7 @@ namespace NoGUI
 		std::vector< Style > styles;
 	};
 	
+	// TODO: This component does not hold pure data
 	class CDropDown : public CInterface
 	{
 	public:

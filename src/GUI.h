@@ -278,6 +278,7 @@ namespace NoGUI
 		}
 	};
 
+	// TODO: decouple event system
 	class GUIManager : public Notifier, public NoMVC::Model // handles Pages and Notifications
 	{
 	private:

@@ -1366,6 +1366,7 @@ void GUIManager::removePage(int pageIndex)
 	pages.erase(pages.begin() + pageIndex - 1);
 }
 
+// TODO: fix so that events are executed in order.
 void GUIManager::update()
 {
 	for (auto page : pages)
