@@ -46,9 +46,12 @@ int main(int argc, char ** argv)
 	labelText.wrap = NoGUI::TextWrap::DOWN;
 	labelText.margin.y = 2;
 	
-	manager.getPage(0)->addComponent< NoGUI::CText >(textStyle);
+	manager.getPage(0)->addComponent< NoGUI::CText >("Base", textStyle);
+	manager.getPage(0)->addComponent< NoGUI::CText >("Button", textStyle);
+	manager.getPage(0)->addComponent< NoGUI::CText >("Trigger", textStyle);
+	manager.getPage(0)->addComponent< NoGUI::CText >("Input", textStyle);
 	std::shared_ptr< NoGUI::Page > labels = manager.addPage(true);
-	labels->addComponent< NoGUI::CText >(labelText);
+	labels->addComponent< NoGUI::CText >("Label", labelText);
 	
 	NoGUI::Style elemStyle = {BLACK, RAYWHITE, (Vector2){center.x, 40}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style elemText = {INVISIBLE, BLACK, (Vector2){center.x, elemStyle.pos.y + elemStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};

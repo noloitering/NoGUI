@@ -40,6 +40,9 @@ int main(int argc, char ** argv)
 	NoGUI::Style comboStyle = {BLACK, RAYWHITE, (Vector2){center.x, boxText.pos.y + spacing}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style comboText = {INVISIBLE, BLACK, (Vector2){center.x, comboStyle.pos.y + boxStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
 	
+	std::map< std::string, NoGUI::CContainer > comps;
+	comps["Option"].addComponent< NoGUI::CText >(textStyle);
+	
 	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Text", "Base");
 	std::shared_ptr< NoGUI::Element > elemLabel = manager.addElement< NoGUI::Element >(elemText, "draws Element::inner relative to Element's position", "Label");
 	std::shared_ptr< NoGUI::Element > image = manager.addElement< NoGUI::Element >(imageStyle, "Image", "Image");
@@ -50,8 +53,8 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > boxLabel = manager.addElement< NoGUI::Element >(boxText, "Draws multiple shapes relative to Element's position", "Label");
 	std::shared_ptr< NoGUI::Element > combo = manager.addElement< NoGUI::Input >(comboStyle, "Drop Down", "ZInput");
 	std::shared_ptr< NoGUI::Element > comboLabel = manager.addElement< NoGUI::Element >(comboText, "Draws multiple elements relative to Element's position on focus", "Label");
-	std::shared_ptr< NoGUI::DropDown > dropdown = manager.addDropDown(combo, NoGUI::TextWrap::DOWN);
-	dropdown->addComponent< NoGUI::CText >(textStyle);
+	std::shared_ptr< NoGUI::DropDown > dropdown = manager.addDropDown(combo, comps, NoGUI::TextWrap::DOWN);
+//	dropdown->addComponent< NoGUI::CText >(textStyle);
 	std::shared_ptr< NoGUI::Element > option1 = dropdown->addElement< NoGUI::Button >("Option 1");
 	std::shared_ptr< NoGUI::Element > option2 = dropdown->addElement< NoGUI::Button >("Option 2");
 	

@@ -36,9 +36,9 @@ namespace NoGUI
 		virtual void draw();
 		virtual bool isFocus();
 		virtual void setFocus(bool set);
-		Color getHoverCol();
 		const size_t id = 0;
 		const size_t getId();
+		Color getHoverCol();
 		bool isActive();
 		bool isAlive();
 		bool isVisible();
@@ -139,24 +139,23 @@ namespace NoGUI
 	};
 
 	// TODO: fix map so that elements are ordered by time of insertion
-	class Page : public CContainer// Container for Elements
+	class Page : public CMap // Container for Elements
 	{
 	protected:
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > elements;
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > toAdd;
-		std::map< std::string, size_t > ids;
 		size_t total = 0;
 		bool active = true;
 	public:
-		Page(bool init=true);
+		Page(bool init=true)
+			: active(init) {}
+		Page(std::map< std::string, CContainer > comps, bool init=true)
+			: CMap(comps), active(init) {}
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > getBody();
-		std::map< std::string, size_t > getIds();
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const std::string& tag);
 		std::vector< std::shared_ptr< Element > > getElements();
 		size_t size();
-		std::string getId(size_t id, bool strict=true);
-		bool hasId(size_t id);
 		bool isActive();
 		void clearElements();
 		void removeElement(size_t id);
@@ -168,7 +167,7 @@ namespace NoGUI
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="", const std::string& id="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
-			e->components = components;
+			e->components = cmap[tag].getComponents();
 			CDropDown& dropdown = e->getComponent< CDropDown >();
 			if ( dropdown.owned  )
 			{
@@ -178,14 +177,11 @@ namespace NoGUI
 				}
 			}
 			toAdd[tag].push_back(e);
-			if ( !id.empty() )
-			{
-				ids[id] = e->id;
-			}
 			
 			return e;
 		}
 	};
+	
 	// TODO: implement spacing and alignment
 	class DropDown : public Page
 	{
@@ -193,8 +189,10 @@ namespace NoGUI
 		std::shared_ptr< Element > parent;
 		TextWrap wrap = TextWrap::NONE;
 	public:
+		DropDown(std::shared_ptr< Element > p, std::map< std::string, CContainer > comps, const TextWrap& w=TextWrap::NONE, bool init=false)
+			: Page(comps, init), parent(p), wrap(w) {}
 		DropDown(std::shared_ptr< Element > p, const TextWrap& w=TextWrap::NONE, bool init=false)
-		: Page(init), parent(p), wrap(w) {}
+			: Page(init), parent(p), wrap(w) {}
 		std::shared_ptr< Element > getParent();
 		TextWrap getWrap();
 		void setParent(std::shared_ptr< Element > elem);
@@ -204,7 +202,7 @@ namespace NoGUI
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option", const std::string& id="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
-			e->components = components;
+			e->components = cmap[tag].getComponents();
 			CDropDown& dropdown = e->getComponent< CDropDown >();
 			if ( dropdown.owned  )
 			{
@@ -214,10 +212,6 @@ namespace NoGUI
 				}
 			}
 			toAdd[tag].push_back(e);
-			if ( !id.empty() )
-			{
-				ids[id] = e->id;
-			}
 			
 			return e;
 		}
@@ -267,12 +261,8 @@ namespace NoGUI
 				}
 			}
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
-			e->components = components;
+			e->components = cmap[tag].getComponents();
 			toAdd[tag].push_back(e);
-			if ( !id.empty() )
-			{
-				ids[id] = e->id;
-			}
 			
 			return e;
 		}
@@ -288,7 +278,9 @@ namespace NoGUI
 		GUIManager(std::shared_ptr< Page > pg);
 		GUIManager(std::vector< std::shared_ptr< Page > > pgs)
 			: pages(pgs) {}
+		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, std::map< std::string, CContainer > comps, const TextWrap& wrap=TextWrap::NONE, bool init=false);
 		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap=TextWrap::NONE, bool init=false);
+		std::shared_ptr< Page > addPage(std::map< std::string, CContainer > comps, bool active=false);
 		std::shared_ptr< Page > addPage(bool active=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > page);
 		std::shared_ptr< Page > getPage(int pageIndex=0);

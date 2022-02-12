@@ -1065,11 +1065,6 @@ void CheckBox::draw()
 }
 
 // Pages
-Page::Page(bool init)
-{
-	active = init;
-}
-
 std::map< std::string, std::vector< std::shared_ptr< Element > > > Page::getBody()
 {
 	
@@ -1151,48 +1146,6 @@ std::vector< std::shared_ptr< Element > > Page::getElements()
 	}
 	
 	return result;
-}
-
-std::string Page::getId(size_t id, bool strict)
-{
-	std::string errMsg = "no unique identifier associated with id num: " + std::to_string(id);
-	for (auto entry : ids)
-	{
-		if ( entry.second == id )
-		{
-			
-			return entry.first;
-		}
-	}
-	if (strict)
-	{
-		throw std::out_of_range(errMsg);
-	}
-	else
-	{
-		
-		return std::to_string(id);
-	}
-}
-
-std::map< std::string, size_t > Page::getIds()
-{
-	
-	return ids;
-}
-
-bool Page::hasId(size_t id)
-{
-	for (auto entry : ids)
-	{
-		if ( entry.second == id )
-		{
-			
-			return true;
-		}
-	}
-	
-	return false;
 }
 
 void Page::update()
@@ -1310,7 +1263,8 @@ GUIManager::GUIManager(bool withPg)
 {
 	if ( withPg )
 	{
-		addPage(true);
+		std::map< std::string, CContainer > comps;
+		addPage(comps, true);
 	}
 }
 
@@ -1325,10 +1279,27 @@ void GUIManager::removeElement(size_t id, int pageIndex)
 	return pages[pageIndex]->removeElement(id);
 }
 
+std::shared_ptr< DropDown > GUIManager::addDropDown(std::shared_ptr< Element > parent, std::map< std::string, CContainer > comps, const TextWrap& wrap, bool init)
+{
+	std::shared_ptr< DropDown > e = std::make_shared< DropDown >(parent, comps, wrap, init);
+	parent->addComponent< CDropDown >(e);
+	pages.push_back(e);
+	
+	return e;
+}
+
 std::shared_ptr< DropDown > GUIManager::addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap, bool init)
 {
 	std::shared_ptr< DropDown > e = std::make_shared< DropDown >(parent, wrap, init);
 	parent->addComponent< CDropDown >(e);
+	pages.push_back(e);
+	
+	return e;
+}
+
+std::shared_ptr< Page > GUIManager::addPage(std::map< std::string, CContainer > comps, bool active)
+{
+	auto e = std::shared_ptr< Page >(new Page(comps, active));
 	pages.push_back(e);
 	
 	return e;

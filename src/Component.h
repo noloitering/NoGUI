@@ -109,7 +109,7 @@ namespace NoGUI
 	typedef std::tuple< std::vector < CText >, std::vector < CImage >, std::vector < CInput >, std::vector< CMultiStyle >, std::vector< CDropDown > > CompContainer;
 	typedef std::variant< CText, CImage, CInput, CMultiStyle, CDropDown > Component;
 	
-	class CContainer // to be inherited from
+	class CContainer
 	{
 	protected:
 		Components components;
@@ -162,6 +162,62 @@ namespace NoGUI
 		{
 		
 			return getComponent< C >().owned;
+		}
+	};
+	
+	class CMap
+	{
+	protected:
+		std::map< std::string, CContainer > cmap;
+	public:
+		CMap() {}
+		CMap(std::map< std::string, CContainer > compMap)
+			: cmap(compMap) {}
+		virtual ~CMap() {}
+	
+		Components getComponents(const std::string& tag)
+		{
+			
+			return cmap[tag].getComponents();
+		}
+		
+		void setComponents(const std::string& tag, Components c)
+		{
+			cmap[tag].setComponents(c);
+		}
+		
+		template <class C>
+		C& getComponent(const std::string& tag)
+		{
+			
+			return std::get< C >(cmap[tag].getComponents());
+		}
+	
+		template <class C, typename... Args>
+		C& addComponent(const std::string& tag, Args&&... CArgs)
+		{
+			auto& component = cmap[tag].getComponent<C>();
+			component = C(std::forward<Args>(CArgs)...);
+			component.owned = true;
+		
+			return component;
+		}
+	
+		template <class C>
+		C& addComponent(const std::string& tag, C& newComponent)
+		{
+			auto& component = cmap[tag].getComponent< C >();
+			component = newComponent;
+			component.owned = true;
+		
+			return component;
+		}
+	
+		template <class C>
+		bool hasComponent(const std::string& tag)
+		{
+		
+			return cmap[tag].getComponent< C >().owned;
 		}
 	};
 }
