@@ -49,17 +49,17 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > bottom = manager.addElement< NoGUI::Element >(bottomStyle, "Bottom", "Label");
 	std::shared_ptr< NoGUI::Element > bottomRight = manager.addElement< NoGUI::Element >(botRightStyle, "Bottom Right wrap up", "Label");
 	
-	left->addComponent< NoGUI::CText >(leftText);
-	top->addComponent< NoGUI::CText >(topText);
-	right->addComponent< NoGUI::CText >(rightText);
-	leftWrap->addComponent< NoGUI::CText >(leftText);
+	left->components->addComponent< NoGUI::CText >(leftText);
+	top->components->addComponent< NoGUI::CText >(topText);
+	right->components->addComponent< NoGUI::CText >(rightText);
+	leftWrap->components->addComponent< NoGUI::CText >(leftText);
 //	leftWrap->addComponent< NoGUI::CText >(centerText);
-	center->addComponent< NoGUI::CText >(centerText);
-	rightWrap->addComponent< NoGUI::CText >(rightText);
+	center->components->addComponent< NoGUI::CText >(centerText);
+	rightWrap->components->addComponent< NoGUI::CText >(rightText);
 //	rightWrap->addComponent< NoGUI::CText >(centerText);
-	bottomLeft->addComponent< NoGUI::CText >(botLeftText);
-	bottom->addComponent< NoGUI::CText >(bottomText);
-	bottomRight->addComponent< NoGUI::CText >(botRightText);
+	bottomLeft->components->addComponent< NoGUI::CText >(botLeftText);
+	bottom->components->addComponent< NoGUI::CText >(bottomText);
+	bottomRight->components->addComponent< NoGUI::CText >(botRightText);
 	
 	manager.update();
 	

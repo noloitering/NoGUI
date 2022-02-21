@@ -5,6 +5,7 @@
 #include <map>
 #include <tuple>
 #include <limits>
+#include <cstring>
 
 #include "Component.h"
 #include "Observer.h"
@@ -13,12 +14,13 @@
 namespace NoGUI
 {
 	// Classes
-	class Element : public CContainer // Base Element to inherit from; Focus is manually set;
+	class Element // Base Element to inherit from; Focus is manually set;
 	{
 	protected:
 	friend class Page;
 	friend class DropDown;
 		Style style;
+		std::vector< std::string > innerWrap;
 		std::string inner;
 		bool active = true;
 		bool alive = true;
@@ -36,6 +38,7 @@ namespace NoGUI
 		virtual void draw();
 		virtual bool isFocus();
 		virtual void setFocus(bool set);
+		std::shared_ptr< CContainer > components;
 		const size_t id = 0;
 		const size_t getId();
 		Color getHoverCol();
@@ -46,6 +49,7 @@ namespace NoGUI
 		bool getHover();
 		bool getFocus();
 		std::string getInner();
+		std::vector< std::string > getInnerWrap();
 		Style styling();
 		void kill();
 		size_t lifetime();
@@ -56,6 +60,7 @@ namespace NoGUI
 		void rotate(float rotation);
 		void setHoverCol(const Color& col);
 		void setInner(const std::string& in);
+		void setInnerWrap(std::vector< std::string > in);
 	};
 
 	class Button : public Element // Focus on press; Notify on press;
@@ -149,7 +154,7 @@ namespace NoGUI
 	public:
 		Page(bool init=true)
 			: active(init) {}
-		Page(std::map< std::string, CContainer > comps, bool init=true)
+		Page(std::map< std::string, std::shared_ptr< CContainer > > comps, bool init=true)
 			: CMap(comps), active(init) {}
 		std::map< std::string, std::vector< std::shared_ptr< Element > > > getBody();
 		std::shared_ptr< Element > getElement(size_t id);
@@ -167,8 +172,21 @@ namespace NoGUI
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="", const std::string& id="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
-			e->components = cmap[tag].getComponents();
-			CDropDown& dropdown = e->getComponent< CDropDown >();
+			std::shared_ptr< CContainer > components = cmap[tag];
+			if ( components )
+			{
+				e->components = components;
+			}
+			else if ( e->components )
+			{
+				components = e->components;
+			}
+			else
+			{
+				components = std::make_shared< CContainer >();
+				e->components = components;
+			}
+			CDropDown& dropdown = e->components->getComponent< CDropDown >();
 			if ( dropdown.owned  )
 			{
 				if ( !dropdown.options->getParent() )
@@ -189,7 +207,7 @@ namespace NoGUI
 		std::shared_ptr< Element > parent;
 		TextWrap wrap = TextWrap::NONE;
 	public:
-		DropDown(std::shared_ptr< Element > p, std::map< std::string, CContainer > comps, const TextWrap& w=TextWrap::NONE, bool init=false)
+		DropDown(std::shared_ptr< Element > p, std::map< std::string, std::shared_ptr< CContainer > > comps, const TextWrap& w=TextWrap::NONE, bool init=false)
 			: Page(comps, init), parent(p), wrap(w) {}
 		DropDown(std::shared_ptr< Element > p, const TextWrap& w=TextWrap::NONE, bool init=false)
 			: Page(init), parent(p), wrap(w) {}
@@ -202,8 +220,21 @@ namespace NoGUI
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option", const std::string& id="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
-			e->components = cmap[tag].getComponents();
-			CDropDown& dropdown = e->getComponent< CDropDown >();
+			std::shared_ptr< CContainer > components = cmap[tag];
+			if ( components )
+			{
+				e->components = components;
+			}
+			else if ( e->components )
+			{
+				components = e->components;
+			}
+			else
+			{
+				components = std::make_shared< CContainer >();
+				e->components = components;
+			}
+			CDropDown& dropdown = e->components->getComponent< CDropDown >();
 			if ( dropdown.owned  )
 			{
 				if ( !dropdown.options->getParent() )
@@ -261,7 +292,20 @@ namespace NoGUI
 				}
 			}
 			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
-			e->components = cmap[tag].getComponents();
+			std::shared_ptr< CContainer > components = cmap[tag];
+			if ( components )
+			{
+				e->components = components;
+			}
+			else if ( e->components )
+			{
+				components = e->components;
+			}
+			else
+			{
+				components = std::make_shared< CContainer >();
+				e->components = components;
+			}
 			toAdd[tag].push_back(e);
 			
 			return e;
@@ -278,9 +322,9 @@ namespace NoGUI
 		GUIManager(std::shared_ptr< Page > pg);
 		GUIManager(std::vector< std::shared_ptr< Page > > pgs)
 			: pages(pgs) {}
-		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, std::map< std::string, CContainer > comps, const TextWrap& wrap=TextWrap::NONE, bool init=false);
+		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, std::map< std::string, std::shared_ptr< CContainer > > comps, const TextWrap& wrap=TextWrap::NONE, bool init=false);
 		std::shared_ptr< DropDown > addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap=TextWrap::NONE, bool init=false);
-		std::shared_ptr< Page > addPage(std::map< std::string, CContainer > comps, bool active=false);
+		std::shared_ptr< Page > addPage(std::map< std::string, std::shared_ptr< CContainer > > comps, bool active=false);
 		std::shared_ptr< Page > addPage(bool active=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > page);
 		std::shared_ptr< Page > getPage(int pageIndex=0);

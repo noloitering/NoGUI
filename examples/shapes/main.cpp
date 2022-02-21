@@ -21,6 +21,16 @@ int main(int argc, char ** argv)
 	NoGUI::Style pentaStyle = {BLACK, GRAY, (Vector2){center.x, rectStyle.pos.y + spacing}, (Vector2){75, 35}, 5, 4, 0};
 	NoGUI::Style octaStyle = {BLACK, GRAY, (Vector2){center.x, pentaStyle.pos.y + spacing}, (Vector2){75, 35}, 8, 4, 0};
 	
+	std::shared_ptr< NoGUI::Page > page = manager.getPage();
+	if ( page )
+	{
+		std::cout << "we have a page!" << std::endl; 
+	}
+	else
+	{
+		std::cout << "null page" << std::endl;
+	}
+	
 	std::shared_ptr< NoGUI::Element > elipse = manager.addElement< NoGUI::Element >(elipseStyle, "Elipse", "Shape");
 	std::shared_ptr< NoGUI::Element > point = manager.addElement< NoGUI::Element >(pointStyle, "Point", "Shape");
 	std::shared_ptr< NoGUI::Element > line = manager.addElement< NoGUI::Element >(lineStyle, "Line", "Shape");
@@ -29,13 +39,13 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > pentagon = manager.addElement< NoGUI::Element >(pentaStyle, "Pentagon", "Shape");
 	std::shared_ptr< NoGUI::Element > octagon = manager.addElement< NoGUI::Element >(octaStyle, "Octagon", "Shape");
 	
-	elipse->addComponent< NoGUI::CText >(textStyle);
-	point->addComponent< NoGUI::CText >(textStyle);
-	line->addComponent< NoGUI::CText >(textStyle);
-	triangle->addComponent< NoGUI::CText >(textStyle);
-	rectangle->addComponent< NoGUI::CText >(textStyle);
-	pentagon->addComponent< NoGUI::CText >(textStyle);
-	octagon->addComponent< NoGUI::CText >(textStyle);
+	elipse->components->addComponent< NoGUI::CText >(textStyle);
+	point->components->addComponent< NoGUI::CText >(textStyle);
+	line->components->addComponent< NoGUI::CText >(textStyle);
+	triangle->components->addComponent< NoGUI::CText >(textStyle);
+	rectangle->components->addComponent< NoGUI::CText >(textStyle);
+	pentagon->components->addComponent< NoGUI::CText >(textStyle);
+	octagon->components->addComponent< NoGUI::CText >(textStyle);
 	
 	while ( !WindowShouldClose() )
 	{

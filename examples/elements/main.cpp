@@ -12,10 +12,10 @@ class EventHandler : public NoGUI::Listener
 {
 	void onNotify(std::shared_ptr< NoGUI::Element > elem)
 	{
-		NoGUI::CText& elemText = elem->getComponent< NoGUI::CText >();
+		NoGUI::CText& elemText = elem->components->getComponent< NoGUI::CText >();
 		if ( elemText.owned )
 		{
-			elemText.contents = notification;
+			elem->setInnerWrap(notification);
 		}
 		if ( elem->getFocus() )
 		{
@@ -46,12 +46,17 @@ int main(int argc, char ** argv)
 	labelText.wrap = NoGUI::TextWrap::DOWN;
 	labelText.margin.y = 2;
 	
-	manager.getPage(0)->addComponent< NoGUI::CText >("Base", textStyle);
-	manager.getPage(0)->addComponent< NoGUI::CText >("Button", textStyle);
-	manager.getPage(0)->addComponent< NoGUI::CText >("Trigger", textStyle);
-	manager.getPage(0)->addComponent< NoGUI::CText >("Input", textStyle);
+	manager.getPage()->addComponents("Base", std::make_shared< NoGUI::CContainer >());
+	manager.getPage()->getComponents("Base")->addComponent< NoGUI::CText >(textStyle);
+	manager.getPage()->addComponents("Button", std::make_shared< NoGUI::CContainer >());
+	manager.getPage()->getComponents("Button")->addComponent< NoGUI::CText >(textStyle);
+	manager.getPage()->addComponents("Trigger", std::make_shared< NoGUI::CContainer >());
+	manager.getPage()->getComponents("Trigger")->addComponent< NoGUI::CText >(textStyle);
+	manager.getPage()->addComponents("Input", std::make_shared< NoGUI::CContainer >());
+	manager.getPage()->getComponents("Input")->addComponent< NoGUI::CText >(textStyle);
 	std::shared_ptr< NoGUI::Page > labels = manager.addPage(true);
-	labels->addComponent< NoGUI::CText >("Label", labelText);
+	labels->addComponents("Label", std::make_shared< NoGUI::CContainer >());
+	labels->getComponents("Label")->addComponent< NoGUI::CText >(labelText);
 	
 	NoGUI::Style elemStyle = {BLACK, RAYWHITE, (Vector2){center.x, 40}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style elemText = {INVISIBLE, BLACK, (Vector2){center.x, elemStyle.pos.y + elemStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
@@ -87,10 +92,10 @@ int main(int argc, char ** argv)
 		// reset to inner
 		for (auto elem : manager.getPage(0)->getElements())
 		{
-			NoGUI::CText& elemText = elem->getComponent< NoGUI::CText >();
+			NoGUI::CText& elemText = elem->components->getComponent< NoGUI::CText >();
 			if ( elemText.owned )
 			{
-				elemText.contents.clear();
+				elem->setInnerWrap(std::vector< std::string >());
 			}
 		}
 	}

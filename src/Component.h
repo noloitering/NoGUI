@@ -51,7 +51,6 @@ namespace NoGUI
 		Shadow shadow;
 		Crop cropping = Crop::NONE; // TODO: implement
 		std::shared_ptr< Font > font; // TTF, XNA fonts, AngelCode fonts
-		std::vector< std::string > contents;
 		float size = 20; // font size
 		float rotation = 0; // TODO: implement
 		Vector2 spacing = {4, 0};
@@ -168,56 +167,36 @@ namespace NoGUI
 	class CMap
 	{
 	protected:
-		std::map< std::string, CContainer > cmap;
+		std::map< std::string, std::shared_ptr< CContainer > > cmap;
 	public:
 		CMap() {}
-		CMap(std::map< std::string, CContainer > compMap)
+		CMap(std::map< std::string, std::shared_ptr< CContainer > > compMap)
 			: cmap(compMap) {}
 		virtual ~CMap() {}
-	
-		Components getComponents(const std::string& tag)
+		
+		std::shared_ptr< CContainer > getComponents(const std::string& key)
 		{
 			
-			return cmap[tag].getComponents();
+			return cmap[key];
 		}
 		
-		void setComponents(const std::string& tag, Components c)
+		void addComponents(const std::string& key, std::shared_ptr< CContainer > comps)
 		{
-			cmap[tag].setComponents(c);
+			cmap[key] = comps;
 		}
 		
-		template <class C>
-		C& getComponent(const std::string& tag)
+		std::shared_ptr< CContainer > addComponents(const std::string& key, CContainer comps)
 		{
+			cmap[key] = std::make_shared< CContainer >(comps);
 			
-			return std::get< C >(cmap[tag].getComponents());
+			return cmap[key];
 		}
-	
-		template <class C, typename... Args>
-		C& addComponent(const std::string& tag, Args&&... CArgs)
-		{
-			auto& component = cmap[tag].getComponent<C>();
-			component = C(std::forward<Args>(CArgs)...);
-			component.owned = true;
 		
-			return component;
-		}
-	
-		template <class C>
-		C& addComponent(const std::string& tag, C& newComponent)
+		std::shared_ptr< CContainer > addComponents(const std::string& key, Components comps)
 		{
-			auto& component = cmap[tag].getComponent< C >();
-			component = newComponent;
-			component.owned = true;
-		
-			return component;
-		}
-	
-		template <class C>
-		bool hasComponent(const std::string& tag)
-		{
-		
-			return cmap[tag].getComponent< C >().owned;
+			cmap[key] = std::make_shared< CContainer >(comps);
+			
+			return cmap[key];
 		}
 	};
 }
