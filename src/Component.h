@@ -174,6 +174,12 @@ namespace NoGUI
 			: cmap(compMap) {}
 		virtual ~CMap() {}
 		
+		std::map< std::string, std::shared_ptr< CContainer > > getCMap
+		{
+			
+			return cmap;
+		}
+		
 		std::shared_ptr< CContainer > getComponents(const std::string& key)
 		{
 			
