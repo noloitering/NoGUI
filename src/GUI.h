@@ -20,8 +20,10 @@ namespace NoGUI
 	friend class Page;
 	friend class DropDown;
 		Style style;
-		std::vector< std::string > innerWrap;
+		const size_t id = 0;
+		std::string tag = "Default";
 		std::string inner;
+		std::vector< std::string > innerWrap;
 		bool active = true;
 		bool alive = true;
 		bool changed = false;
@@ -31,16 +33,16 @@ namespace NoGUI
 		size_t frames = 0;
 		Color hoverCol;
 	public:
-		Element(const size_t& num, const Style& look, const std::string& in="")
-			: id(num), style(look), inner(in), hoverCol(look.backCol) {}
-		Element(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="")
-			: id(num), style(look), inner(in), hoverCol(hovCol) {}
+		Element(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="")
+			: id(num), style(look), tag(t), inner(in), hoverCol(look.backCol) {}
+		Element(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="")
+			: id(num), style(look), tag(t), inner(in), hoverCol(hovCol) {}
 		virtual void draw();
 		virtual bool isFocus();
 		virtual void setFocus(bool set);
 		std::shared_ptr< CContainer > components;
-		const size_t id = 0;
 		const size_t getId();
+		std::string getTag();
 		Color getHoverCol();
 		bool isActive();
 		bool isAlive();
@@ -61,85 +63,86 @@ namespace NoGUI
 		void setHoverCol(const Color& col);
 		void setInner(const std::string& in);
 		void setInnerWrap(std::vector< std::string > in);
+		void setTag(const std::string& t, std::shared_ptr< CContainer > comps);
 	};
 
 	class Button : public Element // Focus on press; Notify on press;
 	{
 	public:
-		Button(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
-		Button(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		Button(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, t, in) {}
+		Button(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class Input : public Element // Focus on hover; Notify on hover, and off hover;
 	{
 	public:
-		Input(const size_t& num, const Style& look, const std::string& in="")
-			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
-		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		Input(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="")
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, t, in) {}
+		Input(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class InputButton : public Element // Focus on press; Notify on hover, off hover, and on press;
 	{
 	public:
-		InputButton(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
-		InputButton(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		InputButton(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, t, in) {}
+		InputButton(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class InputToggle : public Element // Toggle Focus on/off on press; Notify on hover, off hover, and on press;
 	{
 	public:
-		InputToggle(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
-		InputToggle(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		InputToggle(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, t, in) {}
+		InputToggle(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class InputTrigger : public Element // Focus while held; Notify on press, on release, on hover, and off hover;
 	{
 	public:
-		InputTrigger(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
-		InputTrigger(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		InputTrigger(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, t, in) {}
+		InputTrigger(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class Toggle : public Element // Toggle Focus on/off on press; Notify on press;
 	{
 	public:
-		Toggle(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
-		Toggle(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		Toggle(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, t, in) {}
+		Toggle(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class Trigger : public Element // Focus while held; Notify on press, and on release;
 	{
 	public:
-		Trigger(const size_t& num, const Style& look, const std::string& in="") 
-			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, in) {}
-		Trigger(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Element(num, look, hovCol, in) {}
+		Trigger(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, (Color){look.backCol.r - 10, look.backCol.g - 10, look.backCol.b - 10, look.backCol.a}, t, in) {}
+		Trigger(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Element(num, look, hovCol, t, in) {}
 		bool isFocus();
 	};
 	
 	class CheckBox : public Toggle // Draw inner on Focus
 	{
 	public:
-		CheckBox(const size_t& num, const Style& look, const std::string& in="") 
-			: Toggle(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, in) {}
-		CheckBox(const size_t& num, const Style& look, const Color& hovCol, const std::string& in="") 
-			: Toggle(num, look, hovCol, in) {}
+		CheckBox(const size_t& num, const Style& look, const std::string t="Default", const std::string& in="") 
+			: Toggle(num, look, (Color){look.backCol.r, look.backCol.g, look.backCol.b, look.backCol.a}, t, in) {}
+		CheckBox(const size_t& num, const Style& look, const Color& hovCol, const std::string t="Default", const std::string& in="") 
+			: Toggle(num, look, hovCol, t, in) {}
 		void draw();
 	};
 
@@ -171,7 +174,7 @@ namespace NoGUI
 		template <class C>
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="", const std::string& id="")
 		{
-			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
+			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
 			if ( components )
 			{
@@ -219,7 +222,7 @@ namespace NoGUI
 		template <class C>
 		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option", const std::string& id="")
 		{
-			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
+			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
 			if ( components )
 			{
@@ -291,7 +294,7 @@ namespace NoGUI
 					break;
 				}
 			}
-			auto e = std::shared_ptr< Element >(new C(total++, style, inner));
+			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
 			if ( components )
 			{

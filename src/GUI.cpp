@@ -819,6 +819,12 @@ const size_t Element::getId()
 	return id;
 }
 
+std::string Element::getTag()
+{
+	
+	return tag;
+}
+
 void Element::setFocus(bool set)
 {
 	changed = true;
@@ -841,6 +847,12 @@ void Element::setInner(const std::string& in)
 void Element::setInnerWrap(std::vector< std::string > in)
 {
 	innerWrap = in;
+}
+
+void Element::setTag(const std::string& t, std::shared_ptr< CContainer > comps)
+{
+	tag = t;
+	components = comps;
 }
 
 Style Element::styling()
