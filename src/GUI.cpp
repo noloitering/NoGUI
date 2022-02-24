@@ -1182,13 +1182,13 @@ std::vector< std::shared_ptr< Element > > Page::getElements(const std::string& t
 
 std::vector< std::shared_ptr< Element > > Page::getElements()
 {
-	std::vector< std::shared_ptr< Element > > result;
+	std::vector< std::shared_ptr< Element > > result(total);
 	
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
 		for (std::shared_ptr< Element > e : it->second)
 		{
-			result.push_back(e);
+			result.at(e->getId()) = e;
 		}
 	}
 	
