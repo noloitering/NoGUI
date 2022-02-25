@@ -172,7 +172,7 @@ namespace NoGUI
 		void update();
 	
 		template <class C>
-		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="", const std::string& id="")
+		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Default")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
@@ -220,7 +220,7 @@ namespace NoGUI
 		void wrapElements(const TextWrap& wrapStyle);
 		
 		template <class C>
-		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option", const std::string& id="")
+		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
@@ -251,7 +251,7 @@ namespace NoGUI
 		}
 		
 		template <class C>
-		std::shared_ptr< Element > addElement(const std::string& inner="", const std::string& tag="Option", const std::string& id="")
+		std::shared_ptr< Element > addElement(const std::string& inner="", const std::string& tag="Option")
 		{
 			Style style = parent->styling();
 			switch (wrap)
