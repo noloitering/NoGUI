@@ -51,7 +51,6 @@ namespace NoGUI
 		Shadow shadow;
 		Crop cropping = Crop::NONE; // TODO: implement
 		std::shared_ptr< Font > font; // TTF, XNA fonts, AngelCode fonts
-		std::vector< std::string > contents;
 		float size = 20; // font size
 		float rotation = 0; // TODO: implement
 		Vector2 spacing = {4, 0};
@@ -94,6 +93,7 @@ namespace NoGUI
 		std::vector< Style > styles;
 	};
 	
+	// TODO: This component does not hold pure data
 	class CDropDown : public CInterface
 	{
 	public:
@@ -108,7 +108,7 @@ namespace NoGUI
 	typedef std::tuple< std::vector < CText >, std::vector < CImage >, std::vector < CInput >, std::vector< CMultiStyle >, std::vector< CDropDown > > CompContainer;
 	typedef std::variant< CText, CImage, CInput, CMultiStyle, CDropDown > Component;
 	
-	class CContainer // to be inherited from
+	class CContainer
 	{
 	protected:
 		Components components;
@@ -161,6 +161,48 @@ namespace NoGUI
 		{
 		
 			return getComponent< C >().owned;
+		}
+	};
+	
+	class CMap
+	{
+	protected:
+		std::map< std::string, std::shared_ptr< CContainer > > cmap;
+	public:
+		CMap() {}
+		CMap(std::map< std::string, std::shared_ptr< CContainer > > compMap)
+			: cmap(compMap) {}
+		virtual ~CMap() {}
+		
+		std::map< std::string, std::shared_ptr< CContainer > > getCMap()
+		{
+			
+			return cmap;
+		}
+		
+		std::shared_ptr< CContainer > getComponents(const std::string& key)
+		{
+			
+			return cmap[key];
+		}
+		
+		void addComponents(const std::string& key, std::shared_ptr< CContainer > comps)
+		{
+			cmap[key] = comps;
+		}
+		
+		std::shared_ptr< CContainer > addComponents(const std::string& key, CContainer comps)
+		{
+			cmap[key] = std::make_shared< CContainer >(comps);
+			
+			return cmap[key];
+		}
+		
+		std::shared_ptr< CContainer > addComponents(const std::string& key, Components comps)
+		{
+			cmap[key] = std::make_shared< CContainer >(comps);
+			
+			return cmap[key];
 		}
 	};
 }

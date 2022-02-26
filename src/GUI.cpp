@@ -188,7 +188,7 @@ Vector2 NoGUI::alignText(const char* text, const CText& fmt, const Style& elem, 
 
 std::string NoGUI::collectInput(Element* elem)
 {
-	CInput& input = elem->getComponent< CInput >();
+	CInput& input = elem->components->getComponent< CInput >();
 	std::string inner = elem->getInner();
 	int key = GetCharPressed();
 	// Check if more characters have been pressed on the same frame
@@ -231,14 +231,18 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 	Font font = (fmt.font) ? (*fmt.font) : GetFontDefault();
 	int numLines = 0; // number of lines
 	int numWords = 0; // total number of words
-	int lineIndex = 0; // current word
+	int wordIndex = 0; // current word
+	
+	// copy lines
 	const char **lines = TextSplit(text, '\n', &numLines); // changes numLines
-	const char **words;
 	std::vector< std::string > linesCopy;
 	for (int li=0; li < numLines; li++)
 	{
 		linesCopy.push_back(lines[li]);
 	}
+	
+	// split into words
+	const char **words;
 	for (int li=0; li < numLines; li++)
 	{
 		words = TextSplit(linesCopy[li].c_str(), ' ', &numWords); // changes numWords
@@ -248,15 +252,15 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 			line.append(" "); // TODO: add this after measuring the text
 			if ( MeasureTextEx(font, line.c_str(), fmt.size, fmt.spacing.x).x > width )
 			{
-				if ( i != lineIndex ) // check to see if it's a single word that's too big
+				if ( i != wordIndex ) // check to see if it's a single word that's too big
 				{
 					// append words up to i-1 to result and decrement i
 					int lineEnd = --i;
-					for (; lineIndex <= lineEnd; lineIndex++)
+					for (; wordIndex <= lineEnd; wordIndex++)
 					{
-						copy.append(words[lineIndex]);
+						copy.append(words[wordIndex]);
 						copy.append(" ");
-						words[lineIndex] = ""; // don't repeat words
+						words[wordIndex] = ""; // don't repeat words
 					}
 					result.push_back(copy);
 					// clear line and repeat
@@ -265,28 +269,28 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 				}
 				else
 				{
-					copy.append(words[lineIndex]);
-					words[lineIndex] = "";
+					copy.append(words[wordIndex]);
+					words[wordIndex] = "";
 					result.push_back(copy);
 					copy = std::string();
 					line = std::string();
-					lineIndex++;
+					wordIndex++;
 				}
 			}
 		}
 		if ( !line.empty() )
 		{
-			for (; lineIndex < numWords; lineIndex++)
+			for (; wordIndex < numWords; wordIndex++)
 			{
-				copy.append(words[lineIndex]);
-				copy.append(" ");
-				words[lineIndex] = "";
+				copy.append(words[wordIndex]);
+				copy.append(" "); // add space at end of word
+				words[wordIndex] = "";
 			}
 			result.push_back(copy);
 			line = std::string();
 			copy = std::string();
 		}
-		lineIndex = 0;
+		wordIndex = 0;
 	}
 	
 	return result;
@@ -295,70 +299,77 @@ std::vector<std::string> NoGUI::wrapText(const char* text, const CText& fmt, int
 void NoGUI::DrawGUIElement(Element* elem)
 {
 	Style shape = elem->styling();
-	CText& txtFmt = elem->getComponent< CText >();
-	CImage imgFmt = elem->getComponent< CImage >();
-	CMultiStyle children = elem->getComponent< CMultiStyle >();
-	CDropDown options = elem->getComponent< CDropDown >();
 	if ( elem->getHover() )
 	{
 		shape.backCol = elem->getHoverCol();
 	}
-	if ( elem->isVisible() )
+	if ( elem->components )
 	{
-		DrawGUIStyles(shape, children);
-		if ( options.owned )
+		CText& txtFmt = elem->components->getComponent< CText >();
+		CImage imgFmt = elem->components->getComponent< CImage >();
+		CMultiStyle children = elem->components->getComponent< CMultiStyle >();
+		CDropDown options = elem->components->getComponent< CDropDown >();
+		if ( elem->isVisible() )
 		{
-			bool set = false;
-			if ( options.options->isActive() ) // determine whether or not dropdown should remain active
+			DrawGUIStyles(shape, children);
+			if ( options.owned )
 			{
-				for (auto e : options.options->getElements()) 
+				bool set = false;
+				if ( options.options->isActive() ) // determine whether or not dropdown should remain active
 				{
-					if ( e->getFocus() )
+					for (auto e : options.options->getElements()) 
 					{
-						elem->setInner(e->getInner());
-						set = false;
+						if ( e->getFocus() )
+						{
+							elem->setInner(e->getInner());
+							set = false;
 						
-						break;
+							break;
+						}
+						if ( e->isHover() )
+						{
+							set = true;
+						
+							break;
+						}
 					}
-					if ( e->isHover() )
+					if ( !set ) // check if hovering over elem
 					{
-						set = true;
-						
-						break;
+						Vector2 mousePos = GetMousePosition();
+						Vector2 topLeftCorner = {shape.pos.x - shape.radius.x - shape.outlineThick, shape.pos.y - shape.radius.y - shape.outlineThick};
+						Vector2 length = {shape.radius.x * 2 + shape.outlineThick + 20, shape.radius.y * 2 + shape.outlineThick + 20};
+						Rectangle bbox = {topLeftCorner.x, topLeftCorner.y, length.x, length.y};
+						set = CheckCollisionPointRec(mousePos, bbox);
 					}
 				}
-				if ( !set ) // check if hovering over elem
-				{
-					Vector2 mousePos = GetMousePosition();
-					Vector2 topLeftCorner = {shape.pos.x - shape.radius.x - shape.outlineThick, shape.pos.y - shape.radius.y - shape.outlineThick};
-					Vector2 length = {shape.radius.x * 2 + shape.outlineThick + 20, shape.radius.y * 2 + shape.outlineThick + 20};
-					Rectangle bbox = {topLeftCorner.x, topLeftCorner.y, length.x, length.y};
-					set = CheckCollisionPointRec(mousePos, bbox);
-				}
+				options.options->setActive(set || elem->getFocus());
 			}
-			options.options->setActive(set || elem->getFocus());
-		}
-		if ( imgFmt.owned )
-		{
-			DrawGUIImage(imgFmt, elem->styling());
-		}
-		if ( txtFmt.owned )
-		{
-			if ( txtFmt.contents.empty() )
+			if ( imgFmt.owned )
 			{
-				int maxWidth;
-				if ( txtFmt.wrap == TextWrap::NONE )
-				{
-					maxWidth = std::numeric_limits<int>::max();
-				}
-				else
-				{
-					maxWidth = elem->styling().radius.x * 2 - txtFmt.margin.x;
-				}
-				txtFmt.contents = wrapText(elem->getInner().c_str(), txtFmt, maxWidth);
+				DrawGUIImage(imgFmt, elem->styling());
 			}
-			DrawGUITextWrapped(txtFmt.contents, txtFmt, elem->styling());
+			if ( txtFmt.owned )
+			{
+				if ( elem->getInnerWrap().empty() )
+				{
+					int maxWidth;
+					if ( txtFmt.wrap == TextWrap::NONE )
+					{
+						maxWidth = std::numeric_limits<int>::max();
+					}
+					else
+					{
+						maxWidth = elem->styling().radius.x * 2 - txtFmt.margin.x;
+					}
+					elem->setInnerWrap(wrapText(elem->getInner().c_str(), txtFmt, maxWidth));
+				}
+				DrawGUITextWrapped(elem->getInnerWrap(), txtFmt, elem->styling());
+			}
 		}
+	}
+	else if ( elem->isVisible() )
+	{
+		DrawGUIStyle(shape);
 	}
 }
 
@@ -762,9 +773,12 @@ bool Element::isHover()
 			break;
 		}
 	}
-	if ( hasComponent< CInput >() && hover && isActive() )
+	if ( components )
 	{
-		collectInput(this);
+		if ( components->hasComponent< CInput >() && hover && isActive() )
+		{
+			collectInput(this);
+		}
 	}
 	
 	return hover;
@@ -793,10 +807,22 @@ std::string Element::getInner()
 	return inner;
 }
 
+std::vector< std::string > Element::getInnerWrap()
+{
+	
+	return innerWrap;
+}
+
 const size_t Element::getId()
 {
 	
 	return id;
+}
+
+std::string Element::getTag()
+{
+	
+	return tag;
 }
 
 void Element::setFocus(bool set)
@@ -808,11 +834,25 @@ void Element::setFocus(bool set)
 void Element::setInner(const std::string& in)
 {
 	inner = in;
-	if ( hasComponent< CText >() )
+	if ( components )
 	{
-		CText& txtFmt = getComponent< CText >();
-		txtFmt.contents = wrapText(inner.c_str(), txtFmt, style.radius.x * 2 - txtFmt.margin.x);
+		CText& txtFmt = components->getComponent< CText >();
+		if ( txtFmt.owned )
+		{
+			innerWrap = wrapText(in.c_str(), txtFmt, style.radius.x * 2 - txtFmt.margin.x);
+		}
 	}
+}
+
+void Element::setInnerWrap(std::vector< std::string > in)
+{
+	innerWrap = in;
+}
+
+void Element::setTag(const std::string& t, std::shared_ptr< CContainer > comps)
+{
+	tag = t;
+	components = comps;
 }
 
 Style Element::styling()
@@ -1059,17 +1099,19 @@ void CheckBox::draw()
 		{
 			shape.backCol = hoverCol;
 		}
-		DrawGUIStyles(shape, getComponent< CMultiStyle >());
+		if ( components )
+		{
+			DrawGUIStyles(shape, components->getComponent< CMultiStyle >());
+		}
+		else
+		{
+			DrawGUIStyle(shape);
+		}
 	}
 	frames++;
 }
 
 // Pages
-Page::Page(bool init)
-{
-	active = init;
-}
-
 std::map< std::string, std::vector< std::shared_ptr< Element > > > Page::getBody()
 {
 	
@@ -1140,59 +1182,17 @@ std::vector< std::shared_ptr< Element > > Page::getElements(const std::string& t
 
 std::vector< std::shared_ptr< Element > > Page::getElements()
 {
-	std::vector< std::shared_ptr< Element > > result;
+	std::vector< std::shared_ptr< Element > > result(total);
 	
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
 		for (std::shared_ptr< Element > e : it->second)
 		{
-			result.push_back(e);
+			result.at(e->getId()) = e;
 		}
 	}
 	
 	return result;
-}
-
-std::string Page::getId(size_t id, bool strict)
-{
-	std::string errMsg = "no unique identifier associated with id num: " + std::to_string(id);
-	for (auto entry : ids)
-	{
-		if ( entry.second == id )
-		{
-			
-			return entry.first;
-		}
-	}
-	if (strict)
-	{
-		throw std::out_of_range(errMsg);
-	}
-	else
-	{
-		
-		return std::to_string(id);
-	}
-}
-
-std::map< std::string, size_t > Page::getIds()
-{
-	
-	return ids;
-}
-
-bool Page::hasId(size_t id)
-{
-	for (auto entry : ids)
-	{
-		if ( entry.second == id )
-		{
-			
-			return true;
-		}
-	}
-	
-	return false;
 }
 
 void Page::update()
@@ -1262,7 +1262,6 @@ void DropDown::wrapElements(const TextWrap& wrapStyle)
 	{
 		for (auto elem : entry.second)
 		{
-			std::cout << index << std::endl;
 			switch (wrapStyle)
 			{
 				case TextWrap::NONE:
@@ -1325,10 +1324,43 @@ void GUIManager::removeElement(size_t id, int pageIndex)
 	return pages[pageIndex]->removeElement(id);
 }
 
+std::shared_ptr< DropDown > GUIManager::addDropDown(std::shared_ptr< Element > parent, std::map< std::string, std::shared_ptr< CContainer > > comps, const TextWrap& wrap, bool init)
+{
+	std::shared_ptr< DropDown > e = std::make_shared< DropDown >(parent, comps, wrap, init);
+	if ( parent->components )
+	{
+		parent->components->addComponent< CDropDown >(e);
+	}
+	else
+	{
+		
+		return nullptr;
+	}
+	pages.push_back(e);
+	
+	return e;
+}
+
 std::shared_ptr< DropDown > GUIManager::addDropDown(std::shared_ptr< Element > parent, const TextWrap& wrap, bool init)
 {
 	std::shared_ptr< DropDown > e = std::make_shared< DropDown >(parent, wrap, init);
-	parent->addComponent< CDropDown >(e);
+	if ( parent->components )
+	{
+		parent->components->addComponent< CDropDown >(e);
+	}
+	else
+	{
+		
+		return nullptr;
+	}
+	pages.push_back(e);
+	
+	return e;
+}
+
+std::shared_ptr< Page > GUIManager::addPage(std::map< std::string, std::shared_ptr< CContainer > > comps, bool active)
+{
+	auto e = std::shared_ptr< Page >(new Page(comps, active));
 	pages.push_back(e);
 	
 	return e;
@@ -1366,6 +1398,7 @@ void GUIManager::removePage(int pageIndex)
 	pages.erase(pages.begin() + pageIndex - 1);
 }
 
+// TODO: fix so that events are executed in order.
 void GUIManager::update()
 {
 	for (auto page : pages)
