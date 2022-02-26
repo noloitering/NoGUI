@@ -36,27 +36,22 @@ int main(int argc, char ** argv)
 	NoGUI::Style bottomStyle = {BLACK, GRAY, (Vector2){center.x, 565}, (Vector2){50, 50}, 4, 0, 0};
 	NoGUI::Style botRightStyle = {BLACK, GRAY, (Vector2){368, 565}, (Vector2){50, 50}, 4, 0, 0};
 	
-	std::shared_ptr< NoGUI::Element > left = manager.addElement< NoGUI::Element >(leftStyle, "Left", "Label");
-	std::shared_ptr< NoGUI::Element > top = manager.addElement< NoGUI::Element >(topStyle, "Top", "Label");
-	std::shared_ptr< NoGUI::Element > right = manager.addElement< NoGUI::Element >(rightStyle, "Right", "Label");
-	std::shared_ptr< NoGUI::Element > leftWrap = manager.addElement< NoGUI::Element >(leftWrapStyle, "Left wrap down", "Label");
-//	std::shared_ptr< NoGUI::Element > leftWrap = manager.addElement< NoGUI::Element >(leftWrapStyle, "Center", "Label");
-	std::shared_ptr< NoGUI::Element > center = manager.addElement< NoGUI::Element >(centerStyle, "Center", "Label");
-//	std::shared_ptr< NoGUI::Element > center = manager.addElement< NoGUI::Element >(centerStyle, "Center wrap around", "Label");
-	std::shared_ptr< NoGUI::Element > rightWrap = manager.addElement< NoGUI::Element >(rightWrapStyle, "Right wrap down", "Label");
-//	std::shared_ptr< NoGUI::Element > rightWrap = manager.addElement< NoGUI::Element >(rightWrapStyle, "Center", "Label");
-	std::shared_ptr< NoGUI::Element > bottomLeft = manager.addElement< NoGUI::Element >(botLeftStyle, "Bottom Left wrap up", "Label");
-	std::shared_ptr< NoGUI::Element > bottom = manager.addElement< NoGUI::Element >(bottomStyle, "Bottom", "Label");
-	std::shared_ptr< NoGUI::Element > bottomRight = manager.addElement< NoGUI::Element >(botRightStyle, "Bottom Right wrap up", "Label");
+	std::shared_ptr< NoGUI::Element > left = manager.addElement< NoGUI::Element >(leftStyle, "Label", "Left");
+	std::shared_ptr< NoGUI::Element > top = manager.addElement< NoGUI::Element >(topStyle, "Label", "Top");
+	std::shared_ptr< NoGUI::Element > right = manager.addElement< NoGUI::Element >(rightStyle, "Label", "Right");
+	std::shared_ptr< NoGUI::Element > leftWrap = manager.addElement< NoGUI::Element >(leftWrapStyle, "Label", "Left wrap down");
+	std::shared_ptr< NoGUI::Element > center = manager.addElement< NoGUI::Element >(centerStyle, "Label", "Center");
+	std::shared_ptr< NoGUI::Element > rightWrap = manager.addElement< NoGUI::Element >(rightWrapStyle, "Label", "Right wrap down");
+	std::shared_ptr< NoGUI::Element > bottomLeft = manager.addElement< NoGUI::Element >(botLeftStyle, "Label", "Bottom Left wrap up");
+	std::shared_ptr< NoGUI::Element > bottom = manager.addElement< NoGUI::Element >(bottomStyle, "Label", "Bottom");
+	std::shared_ptr< NoGUI::Element > bottomRight = manager.addElement< NoGUI::Element >(botRightStyle, "Label", "Bottom Right wrap up");
 	
 	left->components->addComponent< NoGUI::CText >(leftText);
 	top->components->addComponent< NoGUI::CText >(topText);
 	right->components->addComponent< NoGUI::CText >(rightText);
 	leftWrap->components->addComponent< NoGUI::CText >(leftText);
-//	leftWrap->addComponent< NoGUI::CText >(centerText);
 	center->components->addComponent< NoGUI::CText >(centerText);
 	rightWrap->components->addComponent< NoGUI::CText >(rightText);
-//	rightWrap->addComponent< NoGUI::CText >(centerText);
 	bottomLeft->components->addComponent< NoGUI::CText >(botLeftText);
 	bottom->components->addComponent< NoGUI::CText >(bottomText);
 	bottomRight->components->addComponent< NoGUI::CText >(botRightText);

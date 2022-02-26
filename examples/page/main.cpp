@@ -43,8 +43,8 @@ int main(int argc, char ** argv)
 	NoGUI::Style elemText = {INVISIBLE, BLACK, (Vector2){center.x, elemStyle.pos.y + elemStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
 	NoGUI::Style buttonStyle = {BLACK, RAYWHITE, (Vector2){center.x, elemText.pos.y + spacing}, (Vector2){75, 35}, 4, 4, 0};
 	
-	std::shared_ptr< NoGUI::Element > button = manager.addElement< NoGUI::Element >(elemStyle, "Placeholder", "Text");
-	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Trigger >(buttonStyle, "Hide", "Text");
+	std::shared_ptr< NoGUI::Element > button = manager.addElement< NoGUI::Element >(elemStyle, "Text", "Placeholder");
+	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Trigger >(buttonStyle, "Text", "Hide");
 	button->setHoverCol(BLACK);
 	
 	while ( !WindowShouldClose() )

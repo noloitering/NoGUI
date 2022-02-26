@@ -57,16 +57,16 @@ int main(int argc, char ** argv)
 	std::shared_ptr< Texture > texture = std::make_shared< Texture >(LoadTexture("../imgs/ImageText.png"));
 	page->getComponents("Image")->addComponent< NoGUI::CImage >(texture);
 	
-	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Text", "Base");
-	std::shared_ptr< NoGUI::Element > elemLabel = manager.addElement< NoGUI::Element >(elemText, "draws Element::inner relative to Element's position", "Label");
+	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Base", "Text");
+	std::shared_ptr< NoGUI::Element > elemLabel = manager.addElement< NoGUI::Element >(elemText, "Label", "draws Element::inner relative to Element's position");
 	std::shared_ptr< NoGUI::Element > image = manager.addElement< NoGUI::Element >(imageStyle, "Image", "Image");
-	std::shared_ptr< NoGUI::Element > imageLabel = manager.addElement< NoGUI::Element >(imageText, "draws a texture relative to Element's position", "Label");
+	std::shared_ptr< NoGUI::Element > imageLabel = manager.addElement< NoGUI::Element >(imageText, "Label", "draws a texture relative to Element's position");
 	std::shared_ptr< NoGUI::Element > input = manager.addElement< NoGUI::Input >(inputStyle, "Input", "Input");
-	std::shared_ptr< NoGUI::Element > inputLabel = manager.addElement< NoGUI::Element >(inputText, "can enter/remove characters when hovering over", "Label");
-	std::shared_ptr< NoGUI::Element > box = manager.addElement< NoGUI::Element >(boxStyle, "Multi Style", "Multi");
-	std::shared_ptr< NoGUI::Element > boxLabel = manager.addElement< NoGUI::Element >(boxText, "Draws multiple shapes relative to Element's position", "Label");
-	std::shared_ptr< NoGUI::Element > combo = manager.addElement< NoGUI::Input >(comboStyle, "Drop Down", "ZInput");
-	std::shared_ptr< NoGUI::Element > comboLabel = manager.addElement< NoGUI::Element >(comboText, "Draws multiple elements relative to Element's position on focus", "Label");
+	std::shared_ptr< NoGUI::Element > inputLabel = manager.addElement< NoGUI::Element >(inputText, "Label", "can enter/remove characters when hovering over");
+	std::shared_ptr< NoGUI::Element > box = manager.addElement< NoGUI::Element >(boxStyle, "Multi", "Multi Style");
+	std::shared_ptr< NoGUI::Element > boxLabel = manager.addElement< NoGUI::Element >(boxText, "Label", "Draws multiple shapes relative to Element's position");
+	std::shared_ptr< NoGUI::Element > combo = manager.addElement< NoGUI::Input >(comboStyle, "ZInput", "Drop Down");
+	std::shared_ptr< NoGUI::Element > comboLabel = manager.addElement< NoGUI::Element >(comboText, "Label", "Draws multiple elements relative to Element's position on focus");
 	std::shared_ptr< NoGUI::DropDown > dropdown = manager.addDropDown(combo, NoGUI::TextWrap::DOWN);
 	dropdown->addComponents("Option", std::make_shared< NoGUI::CContainer >());
 	dropdown->getComponents("Option")->addComponent< NoGUI::CText >(textStyle);

@@ -69,18 +69,18 @@ int main(int argc, char ** argv)
 	NoGUI::Style triggerStyle = {BLACK, RAYWHITE, (Vector2){center.x, boxText.pos.y + spacing}, (Vector2){75, 35}, 4, 4, 0};
 	NoGUI::Style triggerText = {INVISIBLE, BLACK, (Vector2){center.x, triggerStyle.pos.y + boxStyle.radius.y * 2 + 25}, (Vector2){200, 50}, 4, 4, 0};
 	
-	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Element", "Base");
-	std::shared_ptr< NoGUI::Element > elemLabel = labels->addElement< NoGUI::Element >(elemText, "Base Class to Inherit from. Focus has to be manually set.", "Label");
+	std::shared_ptr< NoGUI::Element > element = manager.addElement< NoGUI::Element >(elemStyle, "Base", "Element");
+	std::shared_ptr< NoGUI::Element > elemLabel = labels->addElement< NoGUI::Element >(elemText, "Label", "Base Class to Inherit from. Focus has to be manually set.");
 	std::shared_ptr< NoGUI::Element > button = manager.addElement< NoGUI::Button >(buttonStyle, "Button", "Button");
 	button->setHoverCol(BLACK);
-	std::shared_ptr< NoGUI::Element > buttonLabel = labels->addElement< NoGUI::Element >(buttonText, "Focus when pressed (not held). Notify on and off press", "Label");
+	std::shared_ptr< NoGUI::Element > buttonLabel = labels->addElement< NoGUI::Element >(buttonText, "Label", "Focus when pressed (not held). Notify on and off press");
 	std::shared_ptr< NoGUI::Element > trigger = manager.addElement< NoGUI::Trigger >(triggerStyle, "Trigger", "Trigger");
 	trigger->setHoverCol(BLACK);
-	std::shared_ptr< NoGUI::Element > triggerLabel = labels->addElement< NoGUI::Element >(triggerText, "Focus when held. Notify on and off press", "Label");
+	std::shared_ptr< NoGUI::Element > triggerLabel = labels->addElement< NoGUI::Element >(triggerText, "Label", "Focus when held. Notify on and off press");
 	std::shared_ptr< NoGUI::Element > input = manager.addElement< NoGUI::Input >(inputStyle, "Input", "Input");
-	std::shared_ptr< NoGUI::Element > inputLabel = labels->addElement< NoGUI::Element >(inputText, "Focus when hovered. Notify on and off hover", "Label");
-	std::shared_ptr< NoGUI::Element > box = manager.addElement< NoGUI::Toggle >(boxStyle, "Toggle", "Input");
-	std::shared_ptr< NoGUI::Element > boxLabel = labels->addElement< NoGUI::Element >(boxText, "Focus toggles on/off when pressed. Notify on press", "Label");
+	std::shared_ptr< NoGUI::Element > inputLabel = labels->addElement< NoGUI::Element >(inputText, "Label", "Focus when hovered. Notify on and off hover");
+	std::shared_ptr< NoGUI::Element > box = manager.addElement< NoGUI::Toggle >(boxStyle, "Input", "Toggle");
+	std::shared_ptr< NoGUI::Element > boxLabel = labels->addElement< NoGUI::Element >(boxText, "Label", "Focus toggles on/off when pressed. Notify on press");
 	
 	while ( !WindowShouldClose() )
 	{

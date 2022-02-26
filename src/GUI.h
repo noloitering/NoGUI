@@ -172,7 +172,7 @@ namespace NoGUI
 		void update();
 	
 		template <class C>
-		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Default")
+		std::shared_ptr< Element > addElement(const Style& style, const std::string& tag="Default", const std::string& inner="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
@@ -220,7 +220,7 @@ namespace NoGUI
 		void wrapElements(const TextWrap& wrapStyle);
 		
 		template <class C>
-		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="Option")
+		std::shared_ptr< Element > addElement(const Style& style, const std::string& tag="Option", const std::string& inner="")
 		{
 			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
 			std::shared_ptr< CContainer > components = cmap[tag];
@@ -251,7 +251,7 @@ namespace NoGUI
 		}
 		
 		template <class C>
-		std::shared_ptr< Element > addElement(const std::string& inner="", const std::string& tag="Option")
+		std::shared_ptr< Element > addElement(const std::string& tag, const std::string& inner)
 		{
 			Style style = parent->styling();
 			switch (wrap)
@@ -294,24 +294,15 @@ namespace NoGUI
 					break;
 				}
 			}
-			auto e = std::shared_ptr< Element >(new C(total++, style, tag, inner));
-			std::shared_ptr< CContainer > components = cmap[tag];
-			if ( components )
-			{
-				e->components = components;
-			}
-			else if ( e->components )
-			{
-				components = e->components;
-			}
-			else
-			{
-				components = std::make_shared< CContainer >();
-				e->components = components;
-			}
-			toAdd[tag].push_back(e);
 			
-			return e;
+			return addElement< C >(style, tag, inner);
+		}
+		
+		template <class C>
+		std::shared_ptr< Element > addElement(const std::string& inner="")
+		{
+			
+			return addElement< C >("Option", inner);
 		}
 	};
 
@@ -340,10 +331,10 @@ namespace NoGUI
 		void setActive(size_t index);
 	
 		template <class C>
-		std::shared_ptr< Element > addElement(const Style& style, const std::string& inner="", const std::string& tag="", int pageIndex=0)
+		std::shared_ptr< Element > addElement(const Style& style, const std::string& tag="", const std::string& inner="", int pageIndex=0)
 		{
 		
-			return pages[pageIndex]->addElement< C >(style, inner, tag);
+			return pages[pageIndex]->addElement< C >(style, tag, inner);
 		}
 	};
 

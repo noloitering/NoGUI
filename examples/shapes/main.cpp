@@ -31,13 +31,13 @@ int main(int argc, char ** argv)
 		std::cout << "null page" << std::endl;
 	}
 	
-	std::shared_ptr< NoGUI::Element > elipse = manager.addElement< NoGUI::Element >(elipseStyle, "Elipse", "Shape");
-	std::shared_ptr< NoGUI::Element > point = manager.addElement< NoGUI::Element >(pointStyle, "Point", "Shape");
-	std::shared_ptr< NoGUI::Element > line = manager.addElement< NoGUI::Element >(lineStyle, "Line", "Shape");
-	std::shared_ptr< NoGUI::Element > triangle = manager.addElement< NoGUI::Element >(triStyle, "Triangle", "Shape");
-	std::shared_ptr< NoGUI::Element > rectangle = manager.addElement< NoGUI::Element >(rectStyle, "Rectangle", "Shape");
-	std::shared_ptr< NoGUI::Element > pentagon = manager.addElement< NoGUI::Element >(pentaStyle, "Pentagon", "Shape");
-	std::shared_ptr< NoGUI::Element > octagon = manager.addElement< NoGUI::Element >(octaStyle, "Octagon", "Shape");
+	std::shared_ptr< NoGUI::Element > elipse = manager.addElement< NoGUI::Element >(elipseStyle, "Shape", "Elipse");
+	std::shared_ptr< NoGUI::Element > point = manager.addElement< NoGUI::Element >(pointStyle, "Shape", "Point");
+	std::shared_ptr< NoGUI::Element > line = manager.addElement< NoGUI::Element >(lineStyle, "Shape", "Line");
+	std::shared_ptr< NoGUI::Element > triangle = manager.addElement< NoGUI::Element >(triStyle, "Shape", "Triangle");
+	std::shared_ptr< NoGUI::Element > rectangle = manager.addElement< NoGUI::Element >(rectStyle, "Shape", "Rectangle");
+	std::shared_ptr< NoGUI::Element > pentagon = manager.addElement< NoGUI::Element >(pentaStyle, "Shape", "Pentagon");
+	std::shared_ptr< NoGUI::Element > octagon = manager.addElement< NoGUI::Element >(octaStyle, "Shape", "Octagon");
 	
 	elipse->components->addComponent< NoGUI::CText >(textStyle);
 	point->components->addComponent< NoGUI::CText >(textStyle);
