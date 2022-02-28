@@ -57,7 +57,7 @@ namespace NoGUI
 		size_t lifetime();
 		void repos(const Vector2& newPos);
 		void resize(const Vector2& newRadi);
-		void recol (const Color& newBack, const Color& newHover);
+		void recol(const Color& newBack, const Color& newHover);
 		void reshape(int newSides);
 		void rotate(float rotation);
 		void setHoverCol(const Color& col);
