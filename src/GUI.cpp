@@ -1139,6 +1139,7 @@ void Page::removeElement(size_t id)
 			if ( it->second[elemIndex]->id == id )
 			{
 				it->second[elemIndex]->kill();
+				--total;
 				
 				return;
 			}
@@ -1155,6 +1156,7 @@ void Page::clearElements()
 			it->second[elemIndex]->kill();
 		}
 	}
+	total = 0;
 }
 
 std::shared_ptr< Element > Page::getElement(size_t id)
@@ -1182,7 +1184,7 @@ std::vector< std::shared_ptr< Element > > Page::getElements(const std::string& t
 
 std::vector< std::shared_ptr< Element > > Page::getElements()
 {
-	std::vector< std::shared_ptr< Element > > result(total);
+	std::vector< std::shared_ptr< Element > > result(size());
 	
 	for (auto it=elements.begin(); it != elements.end(); it++)
 	{
@@ -1228,11 +1230,6 @@ void Page::update()
 
 size_t Page::size()
 {
-	size_t total = 0;
-	for (auto classGroup : elements)
-	{
-		total += classGroup.second.size();
-	}
 	
 	return total;
 }
