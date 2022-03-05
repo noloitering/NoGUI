@@ -204,5 +204,12 @@ namespace NoGUI
 			
 			return cmap[key];
 		}
+		
+		std::shared_ptr< CContainer > addComponents(const std::string& key)
+		{
+			cmap[key] = std::make_shared< CContainer >();
+			
+			return cmap[key];
+		}
 	};
 }
