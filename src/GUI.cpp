@@ -1139,7 +1139,6 @@ void Page::removeElement(size_t id)
 			if ( it->second[elemIndex]->id == id )
 			{
 				it->second[elemIndex]->kill();
-				--total;
 				
 				return;
 			}
@@ -1184,17 +1183,25 @@ std::vector< std::shared_ptr< Element > > Page::getElements(const std::string& t
 
 std::vector< std::shared_ptr< Element > > Page::getElements()
 {
-	std::vector< std::shared_ptr< Element > > result(size());
+	std::vector< std::shared_ptr< Element > > result(total);
 	
-	for (auto it=elements.begin(); it != elements.end(); it++)
+	for (auto it=elements.begin(); it != elements.end(); it++) // order by id
 	{
 		for (std::shared_ptr< Element > e : it->second)
 		{
 			result.at(e->getId()) = e;
 		}
 	}
-	
-	return result;
+	std::vector< std::shared_ptr< Element > > newVec;
+	for (std::shared_ptr< Element > e : result) // eliminate deleted entities
+	{
+		if ( e )
+		{
+			newVec.push_back(e);
+		}
+	}
+
+	return newVec;
 }
 
 void Page::update()
