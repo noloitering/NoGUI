@@ -146,7 +146,6 @@ namespace NoGUI
 		void draw();
 	};
 
-	// TODO: fix map so that elements are ordered by time of insertion
 	class Page : public CMap // Container for Elements
 	{
 	protected:
@@ -326,6 +325,7 @@ namespace NoGUI
 		void removeElement(size_t id, int pageIndex=0);
 		void removeElement(const std::string& id, int pageIndex=0);
 		void removePage(int pageIndex);
+		void clear();
 		void update();
 		void render();
 		void setActive(size_t index);
