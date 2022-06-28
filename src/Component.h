@@ -42,9 +42,11 @@ namespace NoGUI
 	
 	struct Transform
 	{
-		Align origin = Align::CENTER;
 		Vector2 pos;
 		Vector2 radius;
+		Align origin = Align::CENTER;
 		float angle = 0;
+		Transform(const Vector2& position, const Vector2& radi, const Align& align=Align::CENTER, float rotation=0)
+			: pos(position), radius(radi), origin(align), angle(rotation) {}
 	};
 }

@@ -12,19 +12,24 @@ namespace NoGUI
 	protected:
 		bool active = true; // logic switch
 		bool focus = false; // programmable state
-		std::shared_ptr< Shape > shape;
 		Transform transform;
+		std::shared_ptr< Shape > shape;
 	public:
-		Element(const size_t& num, std::shared_ptr< Shape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const char* type="Default", const char* in="");
+		Element(const size_t& num, std::shared_ptr< Shape > style, const char* type="Default", const char* in="", const Align& origin=Align::CENTER, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f)
+			: GameObj(num, type, in), transform(pos, size, origin, rotation), shape(style) {}
 		virtual bool isFocus();
 		bool getFocus();
 		bool getActive();
-		Vector2 pos(const Align& origin=Align::LEFT);
+		Transform getTransform();
+		Vector2 pos(const Align& origin);
 		Vector2 size();
+		Align alignment();
 		float rotation();
-		Vector2 repos(const Vector2& newPos, const Align& origin=Align::LEFT);
+		Vector2 repos(const Vector2& newPos);
+		Vector2 repos(const Vector2& newPos, const Align& origin, bool update=false);
 		Vector2 resize(const Vector2& size);
-		void rotate(float degrees, const Align& origin=Align::LEFT);
+		void rotate(float degrees, const Align& origin=Align::CENTER);
+		void rotate(float degrees, const Vector2& origin);
 	};
 	
 	void DrawShape(const Transform& transform, const Shape& shape);

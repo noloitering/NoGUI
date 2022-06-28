@@ -22,10 +22,12 @@ void NoGUI::DrawShapeCenter(int posX, int posY, float radiusH, float radiusV, co
 		
 		case 2:
 		{
+			Vector2 startPos;
+			Vector2 endPos;
 			if ( angle == 0.0f )
 			{
-				Vector2 startPos = {posX - radiusH, (float)posY};
-				Vector2 endPos = {posX + radiusH, (float)posY};
+				startPos = {posX - radiusH, (float)posY};
+				endPos = {posX + radiusH, (float)posY};
 			}
 			else
 			{

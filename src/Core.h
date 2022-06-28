@@ -18,6 +18,7 @@ namespace NoMAD
 	public:
 		GameObj(const size_t& num=OBJCOUNT, const char* type="Default", const char* in="")
 			: id(num) {setTag(type); setInner(in); OBJCOUNT++;}
+		
 		const size_t getId()
 		{
 			
