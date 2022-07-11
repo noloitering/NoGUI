@@ -17,19 +17,29 @@ namespace NoGUI
 	public:
 		Element(const size_t& num, std::shared_ptr< Shape > style, const char* type="Default", const char* in="", const Align& origin=Align::CENTER, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f)
 			: GameObj(num, type, in), transform(pos, size, origin, rotation), shape(style) {}
-		virtual bool isFocus();
+		Element(const size_t& num, std::shared_ptr< Shape > style, const Transform& dimension, const char* type="Default", const char* in="")
+			: GameObj(num, type, in), transform(dimension), shape(style) {}
+//		virtual bool isFocus();
+		virtual void draw();
 		bool getFocus();
 		bool getActive();
-		Transform getTransform();
+		Transform dimensions();
+		std::shared_ptr< Shape > style(); // TODO: better name
+		Vector2 pos();
 		Vector2 pos(const Align& origin);
+		Vector2 radius();
 		Vector2 size();
-		Align alignment();
+		Align origin();
 		float rotation();
-		Vector2 repos(const Vector2& newPos);
-		Vector2 repos(const Vector2& newPos, const Align& origin, bool update=false);
-		Vector2 resize(const Vector2& size);
-		void rotate(float degrees, const Align& origin=Align::CENTER);
+		Vector2 repos(Vector2 newPos);
+		Vector2 repos(Vector2 newPos, const Align& origin, bool update=false);
+		void resize(const Vector2& size);
+		void rotate(float degrees, const Align& origin=Align::CENTER, bool update=false);
 		void rotate(float degrees, const Vector2& origin);
+		void reorient(float degrees, const Align& origin=Align::CENTER, bool update=false);
+		void reorient(float degrees, const Vector2& origin);
+		void reshape(std::shared_ptr< Shape > newShape);
+		void redimension(const Transform& newTransform);
 	};
 	
 	void DrawShape(const Transform& transform, const Shape& shape);
@@ -50,5 +60,6 @@ namespace NoGUI
 	void DrawShapeBottomR(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
 	void DrawShapeBottomR(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
 	void DrawPolyEx(Vector2 center, int sides, Vector2 radius, float angle=0, Color col=RAYWHITE);
-	void DrawElipsePro(int centerX, int centerY, float radiusH, float radiusV, float angle=0, Color col=RAYWHITE);
+	void DrawPolyPro(Vector2 center, int sides, Vector2 radius, Vector2 origin={0, 0}, float angle=0, Color col=RAYWHITE);
+	void DrawElipsePro(Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0, Color col=RAYWHITE);
 }

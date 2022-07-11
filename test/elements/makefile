@@ -23,9 +23,9 @@
 
 # -- CONFIGURATION --
 # paths
-EXE_NAME ?= client
+EXE_NAME ?= test_elems
 DESTDIR ?= ./
-SRC ?= main.cpp ../src/Core.cpp ../src/GUI.cpp
+SRC ?= main.cpp ../../src/Core.cpp ../../src/GUI.cpp
 OBJS = $(patsubst %.c, %.o, $(SRC))
 
 # compiler
@@ -36,7 +36,7 @@ PLATFORM ?= PLATFORM_DESKTOP
 # DEBUG or RELEASE
 BUILD_MODE ?= RELEASE
 
-RAYLIB_INSTALL_PATH ?= ../examples/include/raylib
+RAYLIB_INSTALL_PATH ?= ../../examples/include/raylib
 RAYLIB_SRC ?= $(RAYLIB_INSTALL_PATH)/src
 RAYLIB_HEADERS ?= -I$(RAYLIB_SRC) -I$(RAYLIB_SRC)/external -I$(RAYLIB_SRC)/extras
 RAYLIB_LIBS ?= -L$(RAYLIB_INSTALL_PATH) -L$(RAYLIB_SRC)
