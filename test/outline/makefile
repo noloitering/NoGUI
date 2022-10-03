@@ -23,7 +23,7 @@
 
 # -- CONFIGURATION --
 # paths
-EXE_NAME ?= test_elems
+EXE_NAME ?= test_outl
 DESTDIR ?= ./
 SRC ?= main.cpp ../../src/Core.cpp ../../src/GUI.cpp
 OBJS = $(patsubst %.c, %.o, $(SRC))
@@ -104,7 +104,7 @@ all:
 	
 #compile client
 $(EXE_NAME): $(OBJS)
-	$(CC) -o $(DESTDIR)/$(EXE_NAME) $(OBJS) $(CFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBFLAGS) -D$(PLATFORM) -D_GNU_SOURCE
+	$(CC) -o $(DESTDIR)/$(EXE_NAME) $(OBJS) $(CFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBFLAGS) -D$(PLATFORM)
 
 # Compile source files
 %.o: %.cpp

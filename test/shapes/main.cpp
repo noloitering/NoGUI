@@ -24,18 +24,20 @@ int main(int argc, char ** argv)
 	// shapes
 	int rotation = 0;
 	std::shared_ptr< NoGUI::Fill > testFill = std::make_shared< NoGUI::Fill >(RAYWHITE);
-	NoGUI::Shape ellipse = (NoGUI::Shape){0, testFill, nullptr};
-	NoGUI::Shape line = (NoGUI::Shape){2, testFill, nullptr};
-	NoGUI::Shape triangle = (NoGUI::Shape){3, testFill, nullptr};
-	NoGUI::Shape rectangle = (NoGUI::Shape){4, testFill, nullptr};
-	NoGUI::Shape octagon = (NoGUI::Shape){8, testFill, nullptr};
+	std::shared_ptr< NoGUI::Fill > outlineFill = std::make_shared< NoGUI::Fill >(GRAY);
+	std::shared_ptr< NoGUI::Outline > testOutline = std::make_shared< NoGUI::Outline >(outlineFill, 10);
+	NoGUI::nShape ellipse = (NoGUI::nShape){0, testFill, testOutline};
+	NoGUI::nShape line = (NoGUI::nShape){2, testFill, testOutline};
+	NoGUI::nShape triangle = (NoGUI::nShape){3, testFill, testOutline};
+	NoGUI::nShape rectangle = (NoGUI::nShape){4, testFill, testOutline};
+	NoGUI::nShape octagon = (NoGUI::nShape){8, testFill, testOutline};
 	InitWindow(1280, 720, "test");
 	SetTargetFPS(60);
 	while ( !WindowShouldClose() )
 	{
 		if ( argc > 1 )
 		{
-			if ( strcmp(argv[1], "circle") == 0 )
+			if ( strcasecmp(argv[1], "circle") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -48,7 +50,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, ellipse, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "ellipse") == 0 )
+			else if ( strcasecmp(argv[1], "ellipse") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -61,7 +63,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, ellipse, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "line") == 0 )
+			else if ( strcasecmp(argv[1], "line") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -74,7 +76,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, line, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "tri") == 0 )
+			else if ( strcasecmp(argv[1], "tri") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -87,7 +89,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, triangle, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "triangle") == 0 )
+			else if ( strcasecmp(argv[1], "triangle") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -100,7 +102,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, triangle, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "square") == 0 )
+			else if ( strcasecmp(argv[1], "square") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -113,7 +115,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, rectangle, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "rectangle") == 0 )
+			else if ( strcasecmp(argv[1], "rectangle") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
@@ -126,14 +128,14 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, rectangle, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "poly") == 0 )
+			else if ( strcasecmp(argv[1], "poly") == 0 )
 			{
-				NoGUI::Shape fivegon = (NoGUI::Shape){5, testFill, nullptr};
-				NoGUI::Shape sixgon = (NoGUI::Shape){6, testFill, nullptr};
-				NoGUI::Shape sevengon = (NoGUI::Shape){7, testFill, nullptr};
-				NoGUI::Shape ninegon = (NoGUI::Shape){9, testFill, nullptr};
-				NoGUI::Shape tengon = (NoGUI::Shape){10, testFill, nullptr};
-				NoGUI::Shape elevengon = (NoGUI::Shape){11, testFill, nullptr};
+				NoGUI::nShape fivegon = (NoGUI::nShape){5, testFill, testOutline};
+				NoGUI::nShape sixgon = (NoGUI::nShape){6, testFill, testOutline};
+				NoGUI::nShape sevengon = (NoGUI::nShape){7, testFill, testOutline};
+				NoGUI::nShape ninegon = (NoGUI::nShape){9, testFill, testOutline};
+				NoGUI::nShape tengon = (NoGUI::nShape){10, testFill, testOutline};
+				NoGUI::nShape elevengon = (NoGUI::nShape){11, testFill, testOutline};
 				BeginDrawing();
 					ClearBackground(BLACK);
 					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 100}, octagon, rotation);
@@ -145,14 +147,14 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, elevengon, rotation);
 				EndDrawing();
 			}
-			else if ( strcmp(argv[1], "polygon") == 0 )
+			else if ( strcasecmp(argv[1], "polygon") == 0 )
 			{
-				NoGUI::Shape fivegon = (NoGUI::Shape){5, testFill, nullptr};
-				NoGUI::Shape sixgon = (NoGUI::Shape){6, testFill, nullptr};
-				NoGUI::Shape sevengon = (NoGUI::Shape){7, testFill, nullptr};
-				NoGUI::Shape ninegon = (NoGUI::Shape){9, testFill, nullptr};
-				NoGUI::Shape tengon = (NoGUI::Shape){10, testFill, nullptr};
-				NoGUI::Shape elevengon = (NoGUI::Shape){11, testFill, nullptr};
+				NoGUI::nShape fivegon = (NoGUI::nShape){5, testFill, testOutline};
+				NoGUI::nShape sixgon = (NoGUI::nShape){6, testFill, testOutline};
+				NoGUI::nShape sevengon = (NoGUI::nShape){7, testFill, testOutline};
+				NoGUI::nShape ninegon = (NoGUI::nShape){9, testFill, testOutline};
+				NoGUI::nShape tengon = (NoGUI::nShape){10, testFill, testOutline};
+				NoGUI::nShape elevengon = (NoGUI::nShape){11, testFill, testOutline};
 				BeginDrawing();
 					ClearBackground(BLACK);
 					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, octagon, rotation);
@@ -166,8 +168,9 @@ int main(int argc, char ** argv)
 			}
 			else
 			{
-				std::cout << "Sorry! " << argv[1] << "is not a valid command" << std::endl;
+				std::cout << "Sorry! " << argv[1] << " is not a valid command" << std::endl;
 				std::cout << "TIP: REMEMBER TO USE LOWER CASE" << std::endl;
+				CloseWindow();
 			}
 		}
 		else

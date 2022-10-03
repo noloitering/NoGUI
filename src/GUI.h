@@ -1,65 +1,28 @@
 #pragma once
-
 #include "Core.h"
 #include "Component.h"
-
-#include "rlgl.h"
+//#include "rlgl.h"
 
 namespace NoGUI
 {
-	class Element : public NoMAD::GameObj
+	class Element : public NoMAD::GameObj, public NoGUI::Transform
 	{
 	protected:
 		bool active = true; // logic switch
 		bool focus = false; // programmable state
-		Transform transform;
-		std::shared_ptr< Shape > shape;
+		std::shared_ptr< nShape > shape;
 	public:
-		Element(const size_t& num, std::shared_ptr< Shape > style, const char* type="Default", const char* in="", const Align& origin=Align::CENTER, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f)
-			: GameObj(num, type, in), transform(pos, size, origin, rotation), shape(style) {}
-		Element(const size_t& num, std::shared_ptr< Shape > style, const Transform& dimension, const char* type="Default", const char* in="")
-			: GameObj(num, type, in), transform(dimension), shape(style) {}
-//		virtual bool isFocus();
+		Element(const size_t& num, std::shared_ptr< nShape > style, const char* type="Default", const char* in="", const Align& origin=Align(), const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f)
+			: GameObj(num, type, in), Transform(pos, size, origin, rotation), shape(style) {}
+		Element(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimension, const char* type="Default", const char* in="")
+			: GameObj(num, type, in), Transform(dimension), shape(style) {}
 		virtual void draw();
 		bool getFocus();
 		bool getActive();
-		Transform dimensions();
-		std::shared_ptr< Shape > style(); // TODO: better name
-		Vector2 pos();
-		Vector2 pos(const Align& origin);
-		Vector2 radius();
-		Vector2 size();
-		Align origin();
-		float rotation();
-		Vector2 repos(Vector2 newPos);
-		Vector2 repos(Vector2 newPos, const Align& origin, bool update=false);
-		void resize(const Vector2& size);
-		void rotate(float degrees, const Align& origin=Align::CENTER, bool update=false);
-		void rotate(float degrees, const Vector2& origin);
-		void reorient(float degrees, const Align& origin=Align::CENTER, bool update=false);
-		void reorient(float degrees, const Vector2& origin);
-		void reshape(std::shared_ptr< Shape > newShape);
-		void redimension(const Transform& newTransform);
+		std::shared_ptr< nShape > style(); // TODO: better name
 	};
 	
-	void DrawShape(const Transform& transform, const Shape& shape);
-	void DrawShape(const Vector2& pos, const Vector2& radius, const Shape& shape, const Align& origin=Align::CENTER, float angle=0);
-	void DrawShape(int posX, int posY, float radiusH, float radiusV, const Shape& shape, const Align& origin=Align::CENTER, float angle=0);
-	void DrawShapeCenter(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeCenter(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawShapeLeft(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeLeft(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawShapeRight(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeRight(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawShapeTop(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeTop(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawShapeBottom(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeBottom(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawShapeBottomL(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeBottomL(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawShapeBottomR(const Vector2& pos, const Vector2& radius, const Shape& shape, float angle=0);
-	void DrawShapeBottomR(int posX, int posY, float radiusH, float radiusV, const Shape& shape, float angle=0);
-	void DrawPolyEx(Vector2 center, int sides, Vector2 radius, float angle=0, Color col=RAYWHITE);
-	void DrawPolyPro(Vector2 center, int sides, Vector2 radius, Vector2 origin={0, 0}, float angle=0, Color col=RAYWHITE);
-	void DrawElipsePro(Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0, Color col=RAYWHITE);
+	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
+	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
+	void DrawElement(Element* elem);
 }

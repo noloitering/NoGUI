@@ -9,8 +9,8 @@ int main(int argc, char ** argv)
 	Vector2 elemSize = {100, 50};
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >();
-	std::shared_ptr< NoGUI::Shape > rect = std::make_shared< NoGUI::Shape >(4, fill);
-	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align::CENTER);
+	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill);
+	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerT);
 	
 	// main
@@ -25,35 +25,35 @@ int main(int argc, char ** argv)
 		}
 		if ( IsKeyPressed(KEY_Z) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::LEFT, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(-1), update);
 		}
 		else if ( IsKeyPressed(KEY_X) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::RIGHT, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(1), update);
 		}
 		else if ( IsKeyPressed(KEY_C) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::CENTER, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(), update);
 		}
 		else if ( IsKeyPressed(KEY_V) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::TOP, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(0), update);
 		}
 		else if ( IsKeyPressed(KEY_B) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::BOTTOM, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(0, 1), update);
 		}
 		else if ( IsKeyPressed(KEY_N) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::BOTTOML, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(-1, 1), update);
 		}
 		else if ( IsKeyPressed(KEY_M) )
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align::BOTTOMR, update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(1, 1), update);
 		}
 		else if ( IsKeyPressed(KEY_R) )
 		{
-			centerElem->repos((Vector2){window.x / 2, window.y / 2}, NoGUI::Align::CENTER, true);
+			centerElem->repos((Vector2){window.x / 2, window.y / 2}, NoGUI::Align(), true);
 		}
 		BeginDrawing();
 			ClearBackground(BLACK);

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstring>
+//#include <cstring>
+#include <string.h>
 
 #include "raylib.h"
 
