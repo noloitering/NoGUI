@@ -41,91 +41,91 @@ int main(int argc, char ** argv)
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 100}, ellipse, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 100}, ellipse, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 100}, ellipse, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 100}, ellipse, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 100}, ellipse, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 100}, ellipse, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, ellipse, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){640, 360}, (Vector2){100, 100}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){0, 0}, (Vector2){100, 100}, (Vector2){-100, -100}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){1280, 0}, (Vector2){100, 100}, (Vector2){100, -100}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){640, 0}, (Vector2){100, 100}, (Vector2){0, -100}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){640, 720}, (Vector2){100, 100}, (Vector2){0, 100}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){0, 720}, (Vector2){100, 100}, (Vector2){-100, 100}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){1280, 720}, (Vector2){100, 100}, (Vector2){100, 100}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "ellipse") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, ellipse, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 50}, ellipse, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 50}, ellipse, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 50}, ellipse, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 50}, ellipse, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 50}, ellipse, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, ellipse, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){0, 720}, (Vector2){100, 50}, (Vector2){-100, 50}, rotation);
+					NoGUI::DrawShape(ellipse, (Vector2){1280, 720}, (Vector2){100, 50}, (Vector2){100, 50}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "line") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, line, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 50}, line, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 50}, line, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 50}, line, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 50}, line, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 50}, line, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, line, rotation);
+					NoGUI::DrawShape(line, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(line, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(line, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
+					NoGUI::DrawShape(line, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
+					NoGUI::DrawShape(line, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
+					NoGUI::DrawShape(line, (Vector2){0, 720}, (Vector2){100, 50}, (Vector2){-100, 50}, rotation);
+					NoGUI::DrawShape(line, (Vector2){1280, 720}, (Vector2){100, 50}, (Vector2){100, 50}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "tri") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 100}, triangle, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 100}, triangle, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 100}, triangle, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 100}, triangle, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 100}, triangle, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 100}, triangle, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, triangle, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 360}, (Vector2){100, 100}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){0, 0}, (Vector2){100, 100}, (Vector2){-100, -100}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){1280, 0}, (Vector2){100, 100}, (Vector2){100, -100}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 0}, (Vector2){100, 100}, (Vector2){0, -100}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 720}, (Vector2){100, 100}, (Vector2){0, 100}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){0, 720}, (Vector2){100, 100}, (Vector2){-100, 100}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){1280, 720}, (Vector2){100, 100}, (Vector2){100, 100}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "triangle") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, triangle, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 50}, triangle, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 50}, triangle, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 50}, triangle, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 50}, triangle, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 50}, triangle, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, triangle, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){0, 720}, (Vector2){100, 50}, (Vector2){-100, 50}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){1280, 720}, (Vector2){100, 50}, (Vector2){100, 50}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "square") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 100}, rectangle, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 100}, rectangle, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 100}, rectangle, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 100}, rectangle, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 100}, rectangle, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 100}, rectangle, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, rectangle, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){640, 360}, (Vector2){100, 100}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){0, 0}, (Vector2){100, 100}, (Vector2){-100, -100}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){1280, 0}, (Vector2){100, 100}, (Vector2){100, -100}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){640, 0}, (Vector2){100, 100}, (Vector2){0, -100}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){640, 720}, (Vector2){100, 100}, (Vector2){0, 100}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){0, 720}, (Vector2){100, 100}, (Vector2){-100, 100}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){1280, 720}, (Vector2){100, 100}, (Vector2){100, 100}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "rectangle") == 0 )
 			{
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, rectangle, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 50}, rectangle, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 50}, rectangle, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 50}, rectangle, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 50}, rectangle, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 50}, rectangle, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, rectangle, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){0, 720}, (Vector2){100, 50}, (Vector2){-100, 50}, rotation);
+					NoGUI::DrawShape(rectangle, (Vector2){1280, 720}, (Vector2){100, 50}, (Vector2){100, 50}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "poly") == 0 )
@@ -138,13 +138,13 @@ int main(int argc, char ** argv)
 				NoGUI::nShape elevengon = (NoGUI::nShape){11, testFill, testOutline};
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 100}, octagon, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 100}, fivegon, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 100}, sevengon, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 100}, sixgon, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 100}, tengon, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 100}, ninegon, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, elevengon, rotation);
+					NoGUI::DrawShape(octagon, (Vector2){640, 360}, (Vector2){100, 100}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(fivegon, (Vector2){0, 0}, (Vector2){100, 100}, (Vector2){-100, -100}, rotation);
+					NoGUI::DrawShape(sevengon, (Vector2){1280, 0}, (Vector2){100, 100}, (Vector2){100, -100}, rotation);
+					NoGUI::DrawShape(sixgon, (Vector2){640, 0}, (Vector2){100, 100}, (Vector2){0, -100}, rotation);
+					NoGUI::DrawShape(tengon, (Vector2){640, 720}, (Vector2){100, 100}, (Vector2){0, 100}, rotation);
+					NoGUI::DrawShape(ninegon, (Vector2){0, 720}, (Vector2){100, 100}, (Vector2){-100, 100}, rotation);
+					NoGUI::DrawShape(elevengon, (Vector2){1280, 720}, (Vector2){100, 100}, (Vector2){100, 100}, rotation);
 				EndDrawing();
 			}
 			else if ( strcasecmp(argv[1], "polygon") == 0 )
@@ -157,13 +157,13 @@ int main(int argc, char ** argv)
 				NoGUI::nShape elevengon = (NoGUI::nShape){11, testFill, testOutline};
 				BeginDrawing();
 					ClearBackground(BLACK);
-					NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, octagon, rotation);
-					NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 50}, fivegon, rotation);
-					NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 50}, sevengon, rotation);
-					NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 50}, sixgon, rotation);
-					NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 50}, tengon, rotation);
-					NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 50}, ninegon, rotation);
-					NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 50}, elevengon, rotation);
+					NoGUI::DrawShape(octagon, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
+					NoGUI::DrawShape(fivegon, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(sevengon, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50},  rotation);
+					NoGUI::DrawShape(sixgon, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
+					NoGUI::DrawShape(tengon, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
+					NoGUI::DrawShape(ninegon, (Vector2){0, 720}, (Vector2){100, 50}, (Vector2){-100, 50}, rotation);
+					NoGUI::DrawShape(elevengon, (Vector2){1280, 720}, (Vector2){100, 50}, (Vector2){100, 50}, rotation);
 				EndDrawing();
 			}
 			else
@@ -177,13 +177,13 @@ int main(int argc, char ** argv)
 		{
 			BeginDrawing();
 				ClearBackground(BLACK);
-				NoGUI::DrawShapeCenter((Vector2){640, 360}, (Vector2){100, 50}, ellipse, rotation);
-				NoGUI::DrawShapeLeft((Vector2){0, 0}, (Vector2){100, 50}, line, rotation);
-				NoGUI::DrawShapeRight((Vector2){1280, 0}, (Vector2){100, 50}, rectangle, rotation);
-				NoGUI::DrawShapeTop((Vector2){640, 0}, (Vector2){100, 50}, triangle, rotation);
-				NoGUI::DrawShapeBottom((Vector2){640, 720}, (Vector2){100, 50}, octagon, rotation);
-				NoGUI::DrawShapeBottomL((Vector2){0, 720}, (Vector2){100, 100}, rectangle, rotation);
-				NoGUI::DrawShapeBottomR((Vector2){1280, 720}, (Vector2){100, 100}, ellipse, rotation);
+				NoGUI::DrawShape(ellipse, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
+				NoGUI::DrawShape(line, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+				NoGUI::DrawShape(rectangle, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
+				NoGUI::DrawShape(triangle, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
+				NoGUI::DrawShape(octagon, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
+				NoGUI::DrawShape(rectangle, (Vector2){0, 720}, (Vector2){100, 100}, (Vector2){-100, 100}, rotation);
+				NoGUI::DrawShape(ellipse, (Vector2){1280, 720}, (Vector2){100, 100}, (Vector2){100, 100}, rotation);
 			EndDrawing();
 		}
 		if ( IsMouseButtonDown(MOUSE_LEFT_BUTTON) )

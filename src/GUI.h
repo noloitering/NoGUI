@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
 #include "Component.h"
-//#include "rlgl.h"
 
 namespace NoGUI
 {
