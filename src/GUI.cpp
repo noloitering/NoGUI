@@ -59,7 +59,38 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 		
 		case 3:
 		{
+			Vector2 v1;
+			Vector2 v2;
+			Vector2 v3;
+			if ( angle == 0 )
+			{
+				v1 = {center.x - origin.x, center.y - origin.y - radius.y};
+				v2 = {center.x - origin.x - radius.x, center.y - origin.y + radius.y};
+				v3 = {center.x - origin.x + radius.x, center.y - origin.y + radius.y};
+			}
+			else
+			{
+				float sinRotation = sinf(angle*DEG2RAD);
+				float cosRotation = cosf(angle*DEG2RAD);
+				// align to origin
+				Vector2 o1 = {-origin.x, -origin.y - radius.y};
+				Vector2 o2 = {-origin.x - radius.x, -origin.y + radius.y};
+				Vector2 o3 = {-origin.x + radius.x, -origin.y + radius.y};
+				// rotate
+				Vector2 v1Rotation = {o1.x * cosRotation - o1.y * sinRotation, o1.x * sinRotation + o1.y * cosRotation};
+				Vector2 v2Rotation = {o2.x * cosRotation - o2.y * sinRotation, o2.x * sinRotation + o2.y * cosRotation};
+				Vector2 v3Rotation = {o3.x * cosRotation - o3.y * sinRotation, o3.x * sinRotation + o3.y * cosRotation};
+				// translate back
+				v1 = {v1Rotation.x + center.x, v1Rotation.y + center.y};
+				v2 = {v2Rotation.x + center.x, v2Rotation.y + center.y};
+				v3 = {v3Rotation.x + center.x, v3Rotation.y + center.y};
+			}
 			
+			DrawTriangle(v1, v2, v3, shape.fill->col);
+			if ( shape.outline )
+			{
+				DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->col);
+			}
 			
 			break;
 		}
@@ -69,6 +100,7 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 			Rectangle rect = {center.x, center.y, radius.x * 2, radius.y * 2};
 			origin.x += radius.x;
 			origin.y += radius.y;
+			
 			DrawRectanglePro(rect, origin, angle, shape.fill->col);
 			if ( shape.outline )
 			{
