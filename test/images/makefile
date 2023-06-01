@@ -23,14 +23,14 @@
 
 # -- CONFIGURATION --
 # paths
-EXE_NAME ?= test_shapes
+EXE_NAME ?= test_imgs
 DESTDIR ?= ./
 SRC ?= main.cpp ../../src/Core.cpp ../../src/GUI.cpp
 OBJS = $(patsubst %.c, %.o, $(SRC))
 
 # compiler
 CC = g++
-CFLAGS += -Wall -Werror -std=c++17
+CFLAGS += -Wall -Werror -std=c++17 -g
 MAKE = make
 PLATFORM ?= PLATFORM_DESKTOP
 # DEBUG or RELEASE
@@ -104,7 +104,7 @@ all:
 	
 #compile client
 $(EXE_NAME): $(OBJS)
-	$(CC) -o $(DESTDIR)/$(EXE_NAME) $(OBJS) $(CFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBFLAGS) -D$(PLATFORM)
+	$(CC) -o $(DESTDIR)/$(EXE_NAME) $(OBJS) $(CFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBFLAGS) -D$(PLATFORM) -D_GNU_SOURCE
 
 # Compile source files
 %.o: %.cpp

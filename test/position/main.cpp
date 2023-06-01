@@ -23,41 +23,71 @@ int main(int argc, char ** argv)
 		{
 			centerElem->repos(GetMousePosition());
 		}
-		if ( IsKeyPressed(KEY_Z) )
+		if ( IsKeyPressed(KEY_Z) ) // top left
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align(-1), update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(-1, -1), update);
 		}
-		else if ( IsKeyPressed(KEY_X) )
+		else if ( IsKeyPressed(KEY_X) ) // top right
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align(1), update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(1, -1), update);
 		}
-		else if ( IsKeyPressed(KEY_C) )
+		else if ( IsKeyPressed(KEY_C) ) // center
 		{
 			centerElem->repos(centerElem->pos(), NoGUI::Align(), update);
 		}
-		else if ( IsKeyPressed(KEY_V) )
+		else if ( IsKeyPressed(KEY_V) ) // top
 		{
-			centerElem->repos(centerElem->pos(), NoGUI::Align(0), update);
+			centerElem->repos(centerElem->pos(), NoGUI::Align(0, -1), update);
 		}
-		else if ( IsKeyPressed(KEY_B) )
+		else if ( IsKeyPressed(KEY_B) ) // bottom
 		{
 			centerElem->repos(centerElem->pos(), NoGUI::Align(0, 1), update);
 		}
-		else if ( IsKeyPressed(KEY_N) )
+		else if ( IsKeyPressed(KEY_N) ) // bottom left
 		{
 			centerElem->repos(centerElem->pos(), NoGUI::Align(-1, 1), update);
 		}
-		else if ( IsKeyPressed(KEY_M) )
+		else if ( IsKeyPressed(KEY_M) ) // bottom right
 		{
 			centerElem->repos(centerElem->pos(), NoGUI::Align(1, 1), update);
 		}
-		else if ( IsKeyPressed(KEY_R) )
+		else if ( IsKeyPressed(KEY_COMMA) ) // center left
+		{
+			centerElem->repos(centerElem->pos(), NoGUI::Align(-1, 0), update);
+		}
+		else if ( IsKeyPressed(KEY_PERIOD) ) // center right
+		{
+			centerElem->repos(centerElem->pos(), NoGUI::Align(1, 0), update);
+		}
+		else if ( IsKeyPressed(KEY_R) ) // reset
 		{
 			centerElem->repos((Vector2){window.x / 2, window.y / 2}, NoGUI::Align(), true);
+			centerElem->angle = 0;
+		}
+		else
+		{
+			if ( IsKeyDown(KEY_W) || IsKeyDown(KEY_UP) )
+			{
+				centerElem->translate(0, -1);
+			}
+			if ( IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT) )
+			{
+				centerElem->translate(-1, 0);
+			}
+			if ( IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN) )
+			{
+				centerElem->translate(0, 1);
+			}
+			if ( IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT) )
+			{
+				centerElem->translate(1, 0);
+			}
 		}
 		BeginDrawing();
 			ClearBackground(BLACK);
+			centerElem->angle -= GetMouseWheelMove();
 			centerElem->draw();
+			DrawCircleV(centerElem->pos(NoGUI::Align(0, 0)), 6, RED);
 		EndDrawing();
 	}
 	

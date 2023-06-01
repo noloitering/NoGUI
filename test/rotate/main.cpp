@@ -28,6 +28,7 @@ int main(int argc, char ** argv)
 			ClearBackground(BLACK);
 			topElem->draw();
 			centerElem->draw();
+			DrawCircleV(topElem->pos(NoGUI::Align(0, 0)), 6, RED);
 		EndDrawing();
 		if ( IsMouseButtonDown(MOUSE_LEFT_BUTTON) )
 		{
@@ -94,7 +95,7 @@ int main(int argc, char ** argv)
 				topElem->rotate(270, centerElem->pos());
 			}
 		}
-		else if ( IsKeyPressed(KEY_X) )
+		else if ( IsKeyPressed(KEY_V) )
 		{
 			if ( IsMouseButtonDown(KEY_LEFT_SHIFT) || IsMouseButtonDown(KEY_RIGHT_SHIFT) )
 			{

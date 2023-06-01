@@ -5,6 +5,7 @@
 
 #include "raylib.h"
 
+// TODO: move to NoMEM
 namespace NoMAD
 {
 	const size_t TAGBUFF = 51;

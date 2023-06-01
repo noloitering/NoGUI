@@ -97,7 +97,7 @@ int main(int argc, char ** argv)
 					NoGUI::DrawShape(triangle, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
 					NoGUI::DrawShape(triangle, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
 					NoGUI::DrawShape(triangle, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
-					NoGUI::DrawShape(triangle, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
+					NoGUI::DrawShape(triangle, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
 					NoGUI::DrawShape(triangle, (Vector2){0, 720}, (Vector2){100, 50}, (Vector2){-100, 50}, rotation);
 					NoGUI::DrawShape(triangle, (Vector2){1280, 720}, (Vector2){100, 50}, (Vector2){100, 50}, rotation);
 				EndDrawing();

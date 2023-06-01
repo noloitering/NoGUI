@@ -10,6 +10,7 @@ namespace NoGUI
 	enum class Wrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
 	enum class XAlign {LEFT = -1, CENTER = 0, RIGHT = 1};
 	enum class YAlign {TOP = -1, CENTER = 0, BOTTOM = 1};
+	enum class Crop {NONE, FIT, CUT, SCROLL};
 	
 	struct Align
 	{
@@ -17,7 +18,7 @@ namespace NoGUI
 		YAlign y = YAlign::CENTER;
 		Align(const XAlign& xalign=XAlign::CENTER, const YAlign& yalign=YAlign::CENTER)
 			: x(xalign), y(yalign) {}
-		Align(int xint, int yint=-1)
+		Align(int xint, int yint)
 		{
 			if ( xint < 0 )
 			{
@@ -53,7 +54,7 @@ namespace NoGUI
 	{
 		std::shared_ptr< Fill > fill;
 		int thick = 1;
-		Wrap border = Wrap::UP; // down = outline into the element, UP = outline outwards from the element, AROUND = outline about center of the element
+		Wrap border = Wrap::AROUND; // down = outline into the element, UP = outline outwards from the element, AROUND = outline about center of the element
 		Outline(std::shared_ptr< Fill > col, int width=1, const Wrap& style=Wrap::AROUND)
 			: fill(col), thick(width), border(style) {}
 	};
@@ -85,204 +86,77 @@ namespace NoGUI
 			}
 	};
 	
-	class Transform
+	class CInterface
 	{
 	public:
-		Vector2 position;
-		Vector2 radius;
-		Align origin;
-		float angle = 0;
-		Transform(const Vector2& p, const Vector2& radi, const Align& a, float r=0)
-			: position(p), radius(radi), origin(a), angle(r) {}
-		
-		Vector2 pos() const
-		{
+		bool active = false;
+	};
 	
-			return position;
-		}
+	class CImage : public CInterface
+	{
+	public:
+		CImage(std::shared_ptr< Texture2D > texture=nullptr, const Crop& cropping=Crop::NONE, const Vector2& scaleVec={1, 1}, const Color& color=WHITE)
+			: img(texture), crop(cropping), scale(scaleVec), col(color) {}
+		std::shared_ptr< Texture2D > img;
+		Crop crop = Crop::NONE;
+		Vector2 scale = {1, 1};
+		Color col = WHITE;
+	};
+	
+	typedef std::tuple< CImage > Components;
+	
+	class CContainer
+	{
+	protected:
+		Components components;
+	public:
+		CContainer() {}
+		CContainer(Components c)
+			: components(c) {}
 		
-		Vector2 pos(const Align& originPoint) const
+		Components getComponents()
 		{
-			Vector2 ret = position;
-			int xdes = static_cast< int >(originPoint.x);
-			int ydes = static_cast< int >(originPoint.y);
 			
-			Vector2 dest = {xdes * radius.x, ydes * radius.y};
-			Vector2 curr = offset();
+			return components;
+		}
+		
+		void setComponents(Components c)
+		{
+			components = c;
+		}
+		
+		template <class C>
+		C& getComponent()
+		{
 			
-			ret.x += dest.x - curr.x;
-			ret.y += dest.y - curr.y;
-
-			return ret;
+			return std::get< C >(components);
 		}
 		
-		Vector2 size() const
+		template <class C, typename... Args>
+		C& addComponent(Args&&... CArgs)
 		{
-	
-			return radius;
-		}
-		
-		Align originPoint() const
-		{
-	
-			return origin;
-		}
-		
-		Vector2 offset() const
-		{
-			int xint = static_cast< int >(origin.x);
-			int yint = static_cast< int >(origin.y);
+			auto& component = getComponent<C>();
+			component = C(std::forward<Args>(CArgs)...);
+			component.active = true;
 			
-			return {xint * radius.x, yint * radius.y};
+			return component;
 		}
 		
-		float rotation() const
+		template <class C>
+		C& addComponent(C& c)
 		{
-	
-			return angle;
-		}
-		
-		Vector2 translate(float x, float y)
-		{
-			position.x += x;
-			position.y += y;
+			auto& component = getComponent< C >();
+			component = c;
+			component.active = true;
 			
-			return position;
+			return component;
 		}
 		
-		Vector2 translate(const Vector2 inc)
+		template <class C>
+		C& hasComponent()
 		{
-			position.x += inc.x;
-			position.y += inc.y;
 			
-			return position;
-		}
-		
-		Vector2 repos(Vector2 newPos)
-		{
-			position = newPos;
-	
-			return position;
-		}
-		
-		Vector2 repos(Vector2 newPos, const Align& originPoint, bool update=false)
-		{
-			if ( update )
-			{
-				origin = originPoint;
-			}
-			else
-			{
-				Vector2 translate = pos(originPoint);
-				translate.x -= position.x;
-				translate.y -= position.y;
-				newPos.x -= translate.x;
-				newPos.y -= translate.y;
-			}
-	
-			repos(newPos);
-	
-			return position;
-		}
-		
-		void resize(const Vector2& size)
-		{
-			radius = size;
-		}
-		
-		void rotate(float degrees, const Align& originPoint, bool update=false)
-		{
-			if ( origin.x == originPoint.x &&  origin.y == originPoint.y )
-			{
-				angle += degrees;
-			}
-			else if ( update )
-			{
-				origin = originPoint;
-				angle += degrees;
-			}
-			else
-			{
-				rotate(degrees, pos(originPoint));
-			}
-		}
-		
-		void rotate(float degrees, const Vector2& originPoint)
-		{
-			angle += degrees;
-			Vector2 newPos = {position.x - originPoint.x, position.y - originPoint.y};
-			Vector2 posInc;
-			// calculate values
-			float sinRotation = sinf(degrees*DEG2RAD);
-			float cosRotation = cosf(degrees*DEG2RAD);
-		
-			posInc.x = newPos.x * cosRotation - newPos.y * sinRotation;
-			posInc.y = newPos.x * sinRotation + newPos.y * cosRotation;				
-			// translate back
-			position.x = posInc.x + originPoint.x;
-			position.y = posInc.y + originPoint.y;
-		}
-		
-		void reorient(float degrees, const Align& originPoint, bool update=false)
-		{
-			if ( origin.x == originPoint.x && origin.y == originPoint.y )
-			{
-				angle = degrees;
-			}
-			else if ( update )
-			{
-				origin = originPoint;
-				angle = degrees;
-			}
-			else
-			{
-				reorient(degrees, pos(originPoint));
-			}
-		}
-		
-		void reorient(float degrees, const Vector2& originPoint)
-		{
-			angle = degrees;
-			Vector2 temp = {position.x - originPoint.x, position.y - originPoint.y};
-			float currAngle;
-			if ( temp.x == 0 ) // avoid division by zero
-			{
-				if ( temp.y < 0)
-				{
-					currAngle = 270;
-				}
-				else
-				{
-					currAngle = 90;
-				}
-			}
-			else if ( temp.y == 0 ) // still avoiding division by zero
-			{
-				if ( temp.x < 0)
-				{
-					currAngle = 180;
-				}
-				else
-				{
-					currAngle = 0;
-				}
-			}
-			else
-			{
-				currAngle = asin(temp.y / temp.x) * RAD2DEG;
-			}
-	
-			float theta = degrees - currAngle;
-			Vector2 posInc;
-			float sinRotation = sinf(theta*DEG2RAD);
-			float cosRotation = cosf(theta*DEG2RAD);
-	
-			// rotation matrix
-			posInc.x = temp.x * cosRotation - temp.y * sinRotation;
-			posInc.y = temp.x * sinRotation + temp.y * cosRotation;			
-			// translate back
-			position.x += posInc.x;
-			position.y += posInc.y;
+			return getComponent< C >().active;
 		}
 	};
 }

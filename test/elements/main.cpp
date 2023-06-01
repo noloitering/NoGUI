@@ -209,11 +209,11 @@ int main(int argc, char ** argv)
 			{
 				if ( plustate )
 				{
-					elem->rotate(1, elem->originPoint());
+					elem->rotate(1, elem->origin);
 				}
 				else if ( minustate )
 				{
-					elem->rotate(-1, elem->originPoint());
+					elem->rotate(-1, elem->origin);
 				}
 				elem->draw();
 			}

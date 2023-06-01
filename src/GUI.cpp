@@ -8,13 +8,14 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 	{
 		case 0:
 		{
-			DrawEllipsePro(center, radius, origin, angle, shape.fill->col);
+			if (shape.fill)
+			{
+				DrawEllipsePro(center, radius, origin, angle, shape.fill->col);
+			}
 			if ( shape.outline )
 			{
 				DrawEllipseLinesPro(center, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
 			}
-			
-			break;
 		}
 		
 		case 1:
@@ -35,16 +36,13 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 			}
 			else
 			{
-				float sinRotation = sinf(angle*DEG2RAD);
-				float cosRotation = cosf(angle*DEG2RAD);
+				float rads = angle * DEG2RAD;
 				// align to origin
 				Vector2 leftPos = {-radius.x - origin.x, -origin.y / 2};
 				Vector2 rightPos = {radius.x - origin.x, -origin.y / 2};
 				// rotate
-				startPos.x = leftPos.x * cosRotation - leftPos.y * sinRotation;
-				startPos.y = leftPos.x * sinRotation + leftPos.y * cosRotation;
-				endPos.x = rightPos.x * cosRotation - rightPos.y * sinRotation;
-				endPos.y = rightPos.x * sinRotation + rightPos.y * cosRotation;
+				startPos = Vector2Rotate(leftPos, rads);
+				endPos = Vector2Rotate(rightPos, rads);
 				// translate back
 				startPos.x += center.x;
 				startPos.y += center.y;
@@ -70,23 +68,25 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 			}
 			else
 			{
-				float sinRotation = sinf(angle*DEG2RAD);
-				float cosRotation = cosf(angle*DEG2RAD);
+				float rads = angle * DEG2RAD;
 				// align to origin
 				Vector2 o1 = {-origin.x, -origin.y - radius.y};
 				Vector2 o2 = {-origin.x - radius.x, -origin.y + radius.y};
 				Vector2 o3 = {-origin.x + radius.x, -origin.y + radius.y};
 				// rotate
-				Vector2 v1Rotation = {o1.x * cosRotation - o1.y * sinRotation, o1.x * sinRotation + o1.y * cosRotation};
-				Vector2 v2Rotation = {o2.x * cosRotation - o2.y * sinRotation, o2.x * sinRotation + o2.y * cosRotation};
-				Vector2 v3Rotation = {o3.x * cosRotation - o3.y * sinRotation, o3.x * sinRotation + o3.y * cosRotation};
+				Vector2 v1Rotate = Vector2Rotate(o1, rads);
+				Vector2 v2Rotate = Vector2Rotate(o2, rads);
+				Vector2 v3Rotate = Vector2Rotate(o3, rads);
 				// translate back
-				v1 = {v1Rotation.x + center.x, v1Rotation.y + center.y};
-				v2 = {v2Rotation.x + center.x, v2Rotation.y + center.y};
-				v3 = {v3Rotation.x + center.x, v3Rotation.y + center.y};
+				v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+				v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+				v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
 			}
 			
-			DrawTriangle(v1, v2, v3, shape.fill->col);
+			if (shape.fill)
+			{
+				DrawTriangle(v1, v2, v3, shape.fill->col);
+			}
 			if ( shape.outline )
 			{
 				DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->col);
@@ -101,7 +101,10 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 			origin.x += radius.x;
 			origin.y += radius.y;
 			
-			DrawRectanglePro(rect, origin, angle, shape.fill->col);
+			if (shape.fill)
+			{
+				DrawRectanglePro(rect, origin, angle, shape.fill->col);
+			}
 			if ( shape.outline )
 			{
 				DrawRectangleLinesPro(rect, origin, angle, shape.outline->thick, shape.outline->fill->col);
@@ -112,7 +115,10 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 		
 		default:
 		{
-			DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->col);
+			if (shape.fill)
+			{
+				DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->col);
+			}
 			if ( shape.outline )
 			{
 				DrawPolyLinesPro(center, shape.n, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
@@ -125,19 +131,597 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 
 void NoGUI::DrawShape(const nShape& shape, const NoGUI::Transform& transform)
 {
-	DrawShape(shape, transform.pos(), transform.radius, transform.offset(), transform.rotation());
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	
+	DrawShape(shape, transform.pos(), transform.radius, shapeOrigin, transform.rotation());
 }
 
+void NoGUI::DrawCImage(const CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
+{
+	switch(img.crop)
+	{
+		case Crop::NONE:
+		{
+			Vector2 imgSize = {img.img->width * img.scale.x, img.img->height * img.scale.y};
+			Rectangle source = {0, 0, (float)img.img->width, (float)img.img->height};
+			Rectangle dest = {transform.pos().x, transform.pos().y, imgSize.x, imgSize.y}; // the destination point is the point the image will rotate around. Set to shape's position
+			Vector2 origin = {transform.radius.x + transform.radius.x * static_cast<int>(transform.origin.x), (transform.radius.y + transform.radius.y * static_cast<int>(transform.origin.y))};
+			DrawTexturePro((*img.img), source, dest, origin, transform.angle, img.col);
+			
+			break;
+		}
+		
+		case Crop::FIT:
+		{
+			switch (shape->n)
+			{
+				case 0:
+				{
+					int max = 37;
+					float centralAngle = transform.angle;
+					Vector2 texcoords[max] = { 0 };
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						texcoords[i] = (Vector2){0.5f + sinf(centralAngle * DEG2RAD) * 0.5f, 0.5f + cosf(centralAngle * DEG2RAD) * 0.5f};
+						centralAngle += 10;
+						
+						points[i].x = (texcoords[i].x - 0.5f) * transform.width();
+						points[i].y = (texcoords[i].y - 0.5f) * transform.height();
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), points, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				case 1:
+				{
+			
+					break;
+				}
+		
+				case 2:
+				{
+			
+					break;
+				}
+		
+				case 3:
+				{
+					int max = 4;
+					Vector2 texcoords[max] =
+					{ 
+						(Vector2){0.5f, 0.0f},
+						(Vector2){0.0f, 1.0f},
+						(Vector2){1.0f, 1.0f},
+						(Vector2){0.5f, 0.0f}
+					};
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						points[i].x = (texcoords[i].x - 0.5f) * transform.width();
+						points[i].y = (texcoords[i].y - 0.5f) * transform.height();
+					}
+					
+					Vector2 positions[max] = { 0 };
+					for (int i = 0; i < max; i++) 
+					{	
+						positions[i] = points[i];
+					}
+					for (int i = 0; i < max; i++)
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				// Use DrawTexturePro??
+				case 4:
+				{
+					int max = 5;
+					Vector2 texcoords[max] =
+					{ 
+						(Vector2){0.0f, 0.0f},
+						(Vector2){0.0f, 1.0f},
+						(Vector2){1.0f, 1.0f},
+						(Vector2){1.0f, 0.0f},
+						(Vector2){0.0f, 0.0f}
+					};
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						points[i].x = (texcoords[i].x - 0.5f) * transform.width();
+						points[i].y = (texcoords[i].y - 0.5f) * transform.height();
+					}
+					Vector2 positions[max] = { 0 };
+					for (int i = 0; i < max; i++) 
+					{	
+						positions[i] = points[i];
+					}
+					for (int i = 0; i < max; i++)
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				default:
+				{
+					int max = shape->n + 1;
+					float centralAngle = 0;
+					Vector2 texcoords[max] = { 0 };
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						texcoords[i] = (Vector2){0.5f + sinf(centralAngle * DEG2RAD) * 0.5f, 0.5f + cosf(centralAngle * DEG2RAD) * 0.5f};
+						centralAngle += 360.0f / (float)shape->n;
+						
+						points[i].x = (texcoords[i].x - 0.5f) * transform.width();
+						points[i].y = (texcoords[i].y - 0.5f) * transform.height();
+					}
+					Vector2 positions[max] = { 0 };
+					for (int i = 0; i < max; i++) 
+					{	
+						positions[i] = points[i];
+					}
+					for (int i = 0; i < max; i++)
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+			}
+			
+			break;
+		}
+		
+		case Crop::CUT:
+		{
+			// calculate img dimensions
+			Vector2 imgSize = {img.img->width * img.scale.x, img.img->height * img.scale.y};
+			// convert into same proportions as shape.
+			Vector2 maxSize = imgSize;
+			bool isMax = false;
+			if ( imgSize.x > transform.width() )
+			{
+				maxSize.x = transform.width();
+				isMax = imgSize.y >= transform.height();
+			}
+			if ( imgSize.y > transform.height() )
+			{
+				maxSize.y = transform.height();
+			}
+			if ( !isMax )
+			{
+				if ( imgSize.y < imgSize.x )
+				{ 
+					float widthRate = transform.width() / transform.height();
+					maxSize.x = maxSize.y * widthRate;
+				}
+				else if ( imgSize.y > imgSize.x )
+				{
+					float heightRate = transform.height() / transform.width();
+					maxSize.y = maxSize.x * heightRate;
+				}
+			}
+			// if texture is bigger than maxSize then crop texture
+			Vector2 diff = {imgSize.x - maxSize.x, imgSize.y - maxSize.y};
+			float umod = (diff.x > 0) ? diff.x / 2 / imgSize.x : 0;
+			float vmod = (diff.y > 0) ? diff.y / 2 / imgSize.y : 0;
+			
+			switch (shape->n)
+			{
+				case 0:
+				{
+					int max = 37;
+					float centralAngle = 0;
+					float mod = sqrtf((umod * umod) + (vmod * vmod));
+					Vector2 texcoords[max] = { 0 };
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						float sin = sinf(centralAngle * DEG2RAD);
+						float cos = cosf(centralAngle * DEG2RAD);
+						// calculate texture coordnites before u,v modification
+						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
+						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
+						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
+						// apply u,v modification
+						texcoords[i].x -= mod * sin;
+						texcoords[i].y -= mod * cos;
+						
+						centralAngle += 10;
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), points, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				case 1:
+				{
+			
+					break;
+				}
+		
+				case 2:
+				{
+			
+					break;
+				}
+		
+				case 3:
+				{
+					int max = 4;					
+					// create UVs for triangle
+					Vector2 texcoords[max] =
+					{ 
+						(Vector2){0.5f, 0.0f + vmod},
+						(Vector2){0.0f + umod, 1.0f - vmod},
+						(Vector2){1.0f - umod, 1.0f - vmod},
+						(Vector2){0.5f, 0.0f + vmod}
+					};
+					// create coordnites for texture (triangle)
+					Vector2 points[max] = 
+					{
+						(Vector2){0.5f, 0.0f},
+						(Vector2){0.0f, 1.0f},
+						(Vector2){1.0f, 1.0f},
+						(Vector2){0.5f, 0.0f}
+					};
+					for (int i=0; i < max; i++)
+					{
+						points[i].x = (points[i].x - 0.5f) * maxSize.x;
+						points[i].y = (points[i].y - 0.5f) * maxSize.y;
+					}
+					// create copy to rotate coordnites
+					Vector2 positions[max] = { 0 };
+					for (int i = 0; i < max; i++)
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				case 4:
+				{
+					int max = 5;
+					// create UVs for square
+					Vector2 texcoords[max] =
+					{ 
+						(Vector2){0.0f + umod, 0.0f + vmod},
+						(Vector2){0.0f + umod, 1.0f - vmod},
+						(Vector2){1.0f - umod, 1.0f - vmod},
+						(Vector2){1.0f - umod, 0.0f + vmod},
+						(Vector2){0.0f + umod, 0.0f + vmod}
+					};
+					// create coordnites for texture (square/rectangle)
+					Vector2 points[max] =
+					{
+						(Vector2){0.0f, 0.0f},
+						(Vector2){0.0f, 1.0f},
+						(Vector2){1.0f, 1.0f},
+						(Vector2){1.0f, 0.0f},
+						(Vector2){0.0f, 0.0f}
+					};
+					for (int i=0; i < max; i++)
+					{
+						points[i].x = (points[i].x - 0.5f) * maxSize.x;
+						points[i].y = (points[i].y - 0.5f) * maxSize.y;
+					}
+					// create copy to rotate coordnites
+					Vector2 positions[max] = { 0 };
+					for (int i = 0; i < max; i++) 
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+					
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					
+					break;
+				}
+		
+				default:
+				{
+					int max = shape->n + 1;
+					float centralAngle = 0;
+					float mod = sqrtf((umod * umod) + (vmod * vmod));
+					Vector2 texcoords[max] = { 0 };
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						float sin = sinf(centralAngle * DEG2RAD);
+						float cos = cosf(centralAngle * DEG2RAD);
+						// calculate texture coordnites before u,v modification
+						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
+						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
+						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
+						// apply u,v modification
+						texcoords[i].x -= mod * sin;
+						texcoords[i].y -= mod * cos;
+						
+						centralAngle += 360.0f / (float)shape->n;
+					}
+					// create copy to rotate coordnites
+					Vector2 positions[max] = { 0 };
+					for (int i=0; i < max; i++) 
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+			}
+			
+			break;
+		}
+		
+		case Crop::SCROLL:
+		{
+			
+			break;
+		}
+	}	
+}
 
 void NoGUI::DrawElement(Element* elem)
 {
 	std::shared_ptr< NoGUI::nShape > shape = elem->style();
 	DrawShape(*(shape.get()), *(elem));
+	if (elem->components)
+	{
+		CImage& imgComp = elem->components->getComponent< NoGUI::CImage >();
+		if ( imgComp.active )
+		{
+			DrawCImage(imgComp, elem->style(), (*elem));
+		}
+	}
+}
+
+Vector2 NoGUI::Transform::pos() const
+{
+	
+	return position;
+}
+
+Vector2 NoGUI::Transform::pos(const Align& originPoint) const
+{
+	// TODO: account for angle
+	Vector2 ret = position;
+	int xdes = static_cast< int >(originPoint.x);
+	int ydes = static_cast< int >(originPoint.y);
+	
+//	Vector2 coords = {xdes * radius.x + position.x, ydes * radius.y + position.y};
+//	dest = Vector2RotateAround(coords, position, angle);
+//	dest.x -= position.x;
+//	dest.y -= position.y;
+	
+//	Vector2 dir = {xdes * radius.x, ydes * radius.y};
+//	if ( angle == 0 )
+//	{
+//		dest = dir;
+//	}
+//	else
+//	{
+//		float mag = Vector2Length(dir);
+//		float dirAngle = atan2f(ydes * -1, xdes) * RAD2DEG;
+//		dirAngle -= angle;
+//		dest = {mag * cosf(dirAngle * DEG2RAD), mag * sinf(dirAngle * DEG2RAD)};
+//	}
+	
+	if (xdes == 0 && ydes == 0)
+	{
+		ret.x -= offset().x;
+		ret.y -= offset().y;
+	}
+	else
+	{
+		Vector2 dest = {xdes * radius.x, ydes * radius.y};
+		Vector2 curr = offset();
+		
+		ret.x += dest.x - curr.x;
+		ret.y += dest.y - curr.y;
+	}
+
+	return ret;
+}
+
+Vector2 NoGUI::Transform::size() const
+{
+	Vector2 ret;
+	ret.x = radius.x * 2;
+	ret.y = radius.y * 2;
+	
+	return ret;
+}
+
+float NoGUI::Transform::width() const
+{
+
+	return radius.x * 2;
+}
+
+float NoGUI::Transform::height() const
+{
+			
+	return radius.y * 2;
+}
+
+Vector2 NoGUI::Transform::offset() const
+{
+	// TODO: account for angle
+	int xint = static_cast< int >(origin.x);
+	int yint = static_cast< int >(origin.y);
+	Vector2 off = {xint * radius.x, yint * radius.y};
+	if ( angle == 0 )
+	{
+		
+		return off;
+	}
+	else
+	{
+		float mag;
+		float direction;
+		if ( off.x == 0 )
+		{
+			mag = off.y;
+//			direction = angle;
+			if ( mag > 0 )
+			{
+				mag *= -1;
+			}
+		}
+		else if ( off.y == 0 )
+		{
+			mag = off.x;
+//			direction = angle;
+			if ( mag > 0 )
+			{
+				mag *= -1;
+			}
+		}
+		else
+		{
+			mag = Vector2Length(off);
+			if ( mag > 0 )
+			{
+				mag *= -1;
+			}
+		}
+		
+		direction = atan2(off.y * -1, off.x * -1) * RAD2DEG;
+		if ( direction < 0 )
+		{
+			direction += 360;
+		}
+		direction += angle;
+		off = {mag * cosf(direction * DEG2RAD), mag * sinf(direction * DEG2RAD)};
+		
+		return off;
+	}
+}
+
+float NoGUI::Transform::rotation() const
+{
+	
+	return angle;
+}
+	
+Vector2 NoGUI::Transform::translate(float x, float y)
+{
+	position.x += x;
+	position.y += y;
+
+	return position;
+}
+	
+Vector2 NoGUI::Transform::translate(const Vector2 inc)
+{
+	
+	return translate(inc.x, inc.y);
+}
+	
+Vector2 NoGUI::Transform::repos(Vector2 newPos)
+{
+	position = newPos;
+
+	return position;
+}
+	
+Vector2 NoGUI::Transform::repos(Vector2 newPos, const Align& originPoint, bool update)
+{
+	if ( update )
+	{
+		origin = originPoint;
+	}
+	else
+	{
+		Vector2 translate = pos(originPoint);
+		translate.x -= position.x;
+		translate.y -= position.y;
+		newPos.x -= translate.x;
+		newPos.y -= translate.y;
+	}
+	
+	repos(newPos);
+	
+	return position;
+}
+	
+void NoGUI::Transform::resize(const Vector2& size)
+{
+	radius = size;
+}
+	
+void NoGUI::Transform::rotate(float degrees, const Align& originPoint, bool update)
+{
+	if ( origin.x == originPoint.x &&  origin.y == originPoint.y )
+	{
+		angle += degrees;
+	}
+	else if ( update )
+	{
+		origin = originPoint;
+		angle += degrees;
+	}
+	else
+	{
+		rotate(degrees, pos(originPoint));
+	}
+}
+
+void NoGUI::Transform::rotate(float degrees, const Vector2& originPoint)
+{
+	angle += degrees;
+	position = Vector2RotateAround(position, originPoint, degrees * DEG2RAD);
+}
+
+void NoGUI::Transform::reorient(float degrees, const Align& originPoint, bool update)
+{
+	if ( origin.x == originPoint.x && origin.y == originPoint.y )
+	{
+		angle = degrees;
+	}
+	else if ( update )
+	{
+		origin = originPoint;
+		angle = degrees;
+	}
+	else
+	{
+		reorient(degrees, pos(originPoint));
+	}
+}
+
+void NoGUI::Transform::reorient(float degrees, const Vector2& originPoint)
+{
+	angle = degrees;
+	Vector2 temp = {position.x - originPoint.x, position.y - originPoint.y};
+	Vector2 posInc = Vector2Rotate(temp, degrees * DEG2RAD);
+	// translate back
+	position.x += posInc.x;
+	position.y += posInc.y;
 }
 
 void Element::draw()
 {
-//	DrawShape(transform, *(shape.get()));
 	DrawElement(this);
 }
 
@@ -158,152 +742,3 @@ std::shared_ptr< nShape > Element::style()
 	
 	return shape;
 }
-
-// void NoGUI::DrawPolyEx(Vector2 center, int sides, Vector2 radius, float angle, Color col)
-// {
-    // if (sides < 3) sides = 3;
-    // float centralAngle = 0.0f;
-
-// #if defined(SUPPORT_QUADS_DRAW_MODE)
-    // rlCheckRenderBatchLimit(4*sides); // Each side is a quad
-// #else
-    // rlCheckRenderBatchLimit(3*sides);
-// #endif
-
-    // rlPushMatrix();
-        // rlTranslatef(center.x, center.y, 0.0f);
-        // rlRotatef(angle, 0.0f, 0.0f, 1.0f);
-
-// #if defined(SUPPORT_QUADS_DRAW_MODE)
-		// rlSetTexture(texShapes.id);
-
-		// rlBegin(RL_QUADS);
-			// for (int i = 0; i < sides; i++)
-			// {
-				// rlColor4ub(col.r, col.g, col.b, col.a);
-
-				// rlTexCoord2f(texShapesRec.x/texShapes.width, texShapesRec.y/texShapes.height);
-				// rlVertex2f(0, 0);
-
-				// rlTexCoord2f(texShapesRec.x/texShapes.width, (texShapesRec.y + texShapesRec.height)/texShapes.height);
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-
-				// rlTexCoord2f((texShapesRec.x + texShapesRec.width)/texShapes.width, (texShapesRec.y + texShapesRec.height)/texShapes.height);
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-
-				// centralAngle += 360.0f/(float)sides;
-				// rlTexCoord2f((texShapesRec.x + texShapesRec.width)/texShapes.width, texShapesRec.y/texShapes.height);
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-			// }
-		// rlEnd();
-		// rlSetTexture(0);
-// #else
-		// rlBegin(RL_TRIANGLES);
-			// for (int i = 0; i < sides; i++)
-			// {
-				// rlColor4ub(col.r, col.g, col.b, col.a);
-
-				// rlVertex2f(0, 0);
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-
-				// centralAngle += 360.0f/(float)sides;
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-			// }
-			// rlEnd();
-// #endif
-	// rlPopMatrix();
-// }
-
-// void NoGUI::DrawPolyPro(Vector2 center, int sides, Vector2 radius, Vector2 origin, float angle, Color col)
-// {
-    // if (sides < 3) sides = 3;
-    // float centralAngle = 0.0f;
-	// if ( angle == 0 )
-	// {
-		// center.x -= origin.x;
-		// center.y -= origin.y;
-	// }
-	// else
-	// {
-		// float sinRotation = sinf(angle*DEG2RAD);
-		// float cosRotation = cosf(angle*DEG2RAD);
-		// Vector2 pivot = {center.x + origin.x, center.y + origin.y};
-		// Vector2 newPos = center;
-		// Vector2 finalPos;
-		// newPos.x -= pivot.x;
-		// newPos.y -= pivot.y;
-			
-		// finalPos.x = newPos.x * cosRotation - newPos.y * sinRotation;
-		// finalPos.y = newPos.x * sinRotation + newPos.y * cosRotation;
-				
-		// center.x += finalPos.x;
-		// center.y += finalPos.y;
-	// }
-// #if defined(SUPPORT_QUADS_DRAW_MODE)
-    // rlCheckRenderBatchLimit(4*sides); // Each side is a quad
-// #else
-    // rlCheckRenderBatchLimit(3*sides);
-// #endif
-
-    // rlPushMatrix();
-        // rlTranslatef(center.x, center.y, 0.0f);
-        // rlRotatef(angle, 0.0f, 0.0f, 1.0f);
-
-		// rlBegin(RL_TRIANGLES);
-			// for (int i = 0; i < sides; i++)
-			// {
-				// rlColor4ub(col.r, col.g, col.b, col.a);
-
-				// rlVertex2f(0, 0);
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-
-				// centralAngle += 360.0f/(float)sides;
-				// rlVertex2f(sinf(DEG2RAD*centralAngle)*radius.x, cosf(DEG2RAD*centralAngle)*radius.y);
-			// }
-		// rlEnd();
-	// rlPopMatrix();
-// }
-
-// void NoGUI::DrawEllipsePro(Vector2 center, Vector2 radius, Vector2 origin, float angle, Color col)
-// {
-	// if ( angle == 0 )
-	// {
-		// center.x -= origin.x;
-		// center.y -= origin.y;
-	// }
-	// else
-	// {
-		// float sinRotation = sinf(angle*DEG2RAD);
-		// float cosRotation = cosf(angle*DEG2RAD);
-		// Vector2 pivot = {center.x + origin.x, center.y + origin.y};
-		// Vector2 newPos = center;
-		// Vector2 finalPos;
-		// newPos.x -= pivot.x;
-		// newPos.y -= pivot.y;
-			
-		// finalPos.x = newPos.x * cosRotation - newPos.y * sinRotation;
-		// finalPos.y = newPos.x * sinRotation + newPos.y * cosRotation;
-				
-		// center.x += finalPos.x;
-		// center.y += finalPos.y;
-	// }
-	
-	// rlCheckRenderBatchLimit(3*36);
-	
-	// rlPushMatrix();
-		// rlTranslatef(center.x, center.y, 0.0f);
-		// rlRotatef(angle, 0.0f, 0.0f, 1.0f);
-		
-		// rlBegin(RL_TRIANGLES);
-			// for (int i = 0; i < 360; i += 10)
-			// {
-				// rlColor4ub(col.r, col.g, col.b, col.a);
-				
-				// rlVertex2f(0, 0);
-				// rlVertex2f(sinf(DEG2RAD*i)*radius.x, cosf(DEG2RAD*i)*radius.y);
-				
-				// rlVertex2f(sinf(DEG2RAD*(i + 10))*radius.x, cosf(DEG2RAD*(i + 10))*radius.y);
-			// }
-		// rlEnd();
-	// rlPopMatrix();
-// }
