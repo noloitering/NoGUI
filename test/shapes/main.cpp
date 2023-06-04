@@ -177,12 +177,12 @@ int main(int argc, char ** argv)
 		{
 			BeginDrawing();
 				ClearBackground(BLACK);
-				NoGUI::DrawShape(ellipse, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
 				NoGUI::DrawShape(line, (Vector2){0, 0}, (Vector2){100, 50}, (Vector2){-100, -50}, rotation);
-				NoGUI::DrawShape(rectangle, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
 				NoGUI::DrawShape(triangle, (Vector2){640, 0}, (Vector2){100, 50}, (Vector2){0, -50}, rotation);
-				NoGUI::DrawShape(octagon, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
+				NoGUI::DrawShape(rectangle, (Vector2){1280, 0}, (Vector2){100, 50}, (Vector2){100, -50}, rotation);
+				NoGUI::DrawShape(ellipse, (Vector2){640, 360}, (Vector2){100, 50}, (Vector2){0, 0}, rotation);
 				NoGUI::DrawShape(rectangle, (Vector2){0, 720}, (Vector2){100, 100}, (Vector2){-100, 100}, rotation);
+				NoGUI::DrawShape(octagon, (Vector2){640, 720}, (Vector2){100, 50}, (Vector2){0, 50}, rotation);
 				NoGUI::DrawShape(ellipse, (Vector2){1280, 720}, (Vector2){100, 100}, (Vector2){100, 100}, rotation);
 			EndDrawing();
 		}
