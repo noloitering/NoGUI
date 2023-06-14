@@ -53,6 +53,6 @@ namespace NoGUI
 	
 	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
 	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
-	void DrawCImage(const CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
+	void DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawElement(Element* elem);
 }

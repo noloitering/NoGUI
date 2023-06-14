@@ -114,6 +114,25 @@ int main(int argc, char ** argv)
 			}
 		}
 		
+		if ( IsKeyPressed(KEY_UP) )
+		{
+			comps->getComponent< NoGUI::CImage >().scrollPos.y -= 0.1; // scroll up
+		}
+		if ( IsKeyPressed(KEY_DOWN) )
+		{
+			comps->getComponent< NoGUI::CImage >().scrollPos.y += 0.1; // scroll down
+		}
+		if ( IsKeyPressed(KEY_RIGHT) )
+		{
+			comps->getComponent< NoGUI::CImage >().scrollPos.x += 0.1; // scroll right
+		}
+		if ( IsKeyPressed(KEY_LEFT) )
+		{
+			comps->getComponent< NoGUI::CImage >().scrollPos.x -= 0.1; // scroll left
+		}
+		
+		
+		
 		BeginDrawing();
 			ClearBackground(BLACK);
 			for ( auto elem : elemVec )

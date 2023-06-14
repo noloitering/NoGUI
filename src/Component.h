@@ -100,6 +100,7 @@ namespace NoGUI
 		std::shared_ptr< Texture2D > img;
 		Crop crop = Crop::NONE;
 		Vector2 scale = {1, 1};
+		Vector2 scrollPos = {0.5, 0.5};
 		Color col = WHITE;
 	};
 	

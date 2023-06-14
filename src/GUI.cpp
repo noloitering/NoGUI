@@ -138,7 +138,7 @@ void NoGUI::DrawShape(const nShape& shape, const NoGUI::Transform& transform)
 	DrawShape(shape, transform.pos(), transform.radius, shapeOrigin, transform.rotation());
 }
 
-void NoGUI::DrawCImage(const CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
+void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
 {
 	switch(img.crop)
 	{
@@ -221,7 +221,6 @@ void NoGUI::DrawCImage(const CImage& img, std::shared_ptr< nShape > shape, const
 					break;
 				}
 		
-				// Use DrawTexturePro??
 				case 4:
 				{
 					int max = 5;
@@ -400,38 +399,33 @@ void NoGUI::DrawCImage(const CImage& img, std::shared_ptr< nShape > shape, const
 		
 				case 4:
 				{
-					int max = 5;
-					// create UVs for square
-					Vector2 texcoords[max] =
-					{ 
-						(Vector2){0.0f + umod, 0.0f + vmod},
-						(Vector2){0.0f + umod, 1.0f - vmod},
-						(Vector2){1.0f - umod, 1.0f - vmod},
-						(Vector2){1.0f - umod, 0.0f + vmod},
-						(Vector2){0.0f + umod, 0.0f + vmod}
-					};
-					// create coordnites for texture (square/rectangle)
-					Vector2 points[max] =
+					Rectangle source = {img.scrollPos.x * (img.img->width - maxSize.x), img.scrollPos.y * (img.img->height - maxSize.y), maxSize.x, maxSize.y};
+					Rectangle dest = {transform.pos(NoGUI::Align(0, 0)).x, transform.pos(NoGUI::Align(0, 0)).y, maxSize.x, maxSize.y};
+					Vector2 origin = {dest.width / 2, dest.height / 2};
+					if ( isMax )
 					{
-						(Vector2){0.0f, 0.0f},
-						(Vector2){0.0f, 1.0f},
-						(Vector2){1.0f, 1.0f},
-						(Vector2){1.0f, 0.0f},
-						(Vector2){0.0f, 0.0f}
-					};
-					for (int i=0; i < max; i++)
-					{
-						points[i].x = (points[i].x - 0.5f) * maxSize.x;
-						points[i].y = (points[i].y - 0.5f) * maxSize.y;
+						// texture
+						Vector2 sourceSize = {maxSize.x + (1.0f - img.scale.x) * maxSize.x, maxSize.y + (1.0f - img.scale.y) * maxSize.y};
+						if ( sourceSize.x > img.img->width )
+						{
+							sourceSize.x = img.img->width;
+						}
+						if ( sourceSize.y > img.img->height )
+						{
+							sourceSize.y = img.img->height;
+						}
+						if ( sourceSize.x < 1.0f )
+						{
+							sourceSize.x = 1.0f;
+						}
+						if ( sourceSize.y < 1.0f )
+						{
+							sourceSize.y = 1.0f;
+						}
+						Vector2 sourcePos = {img.scrollPos.x * (img.img->width - sourceSize.x), img.scrollPos.y * (img.img->height - sourceSize.y)};
+						source = {sourcePos.x, sourcePos.y, sourceSize.x, sourceSize.y};
 					}
-					// create copy to rotate coordnites
-					Vector2 positions[max] = { 0 };
-					for (int i = 0; i < max; i++) 
-					{	
-						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
-					}
-					
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePro((*img.img), source, dest, origin, transform.angle, WHITE);
 					
 					break;
 				}
@@ -475,6 +469,245 @@ void NoGUI::DrawCImage(const CImage& img, std::shared_ptr< nShape > shape, const
 		
 		case Crop::SCROLL:
 		{
+			// calculate img dimensions
+			Vector2 imgSize = {img.img->width * img.scale.x, img.img->height * img.scale.y};
+			// convert into same proportions as shape.
+			Vector2 maxSize = imgSize;
+			bool isMax = false;
+			if ( imgSize.x > transform.width() )
+			{
+				maxSize.x = transform.width();
+				isMax = imgSize.y >= transform.height();
+			}
+			if ( imgSize.y > transform.height() )
+			{
+				maxSize.y = transform.height();
+			}
+			if ( !isMax )
+			{
+				if ( imgSize.y < imgSize.x )
+				{ 
+					float widthRate = transform.width() / transform.height();
+					maxSize.x = maxSize.y * widthRate;
+				}
+				else if ( imgSize.y > imgSize.x )
+				{
+					float heightRate = transform.height() / transform.width();
+					maxSize.y = maxSize.x * heightRate;
+				}
+			}
+			// if texture is bigger than maxSize then crop texture
+			Vector2 diff = {imgSize.x - maxSize.x, imgSize.y - maxSize.y};
+//			Vector2 scrollPos = {0.5, 0.5}; // add to cimage?? element?? transform??
+			float umod = (diff.x > 0) ? diff.x / 2 / imgSize.x : 0;
+			float vmod = (diff.y > 0) ? diff.y / 2 / imgSize.y : 0;
+			// TODO: prolly a cleaner more efficent way of doing this
+			if (img.scrollPos.x > 1)
+			{
+				img.scrollPos.x = 1;
+			}
+			if (img.scrollPos.x < 0)
+			{
+				img.scrollPos.x = 0;
+			}
+			if (img.scrollPos.y > 1)
+			{
+				img.scrollPos.y = 1;
+			}
+			if (img.scrollPos.y < 0)
+			{
+				img.scrollPos.y = 0;
+			}
+			
+			switch (shape->n)
+			{
+				case 0:
+				{
+					int max = 37;
+					float centralAngle = 0;
+					float mod = sqrtf((umod * umod) + (vmod * vmod));
+					Vector2 texcoords[max] = { 0 };
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						float sin = sinf(centralAngle * DEG2RAD);
+						float cos = cosf(centralAngle * DEG2RAD);
+						// calculate texture coordnites before u,v modification
+						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
+						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
+						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
+						// apply u,v modification
+						texcoords[i].x -= mod * sin;
+						texcoords[i].y -= mod * cos;
+						
+						centralAngle += 10;
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), points, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				case 1:
+				{
+			
+					break;
+				}
+		
+				case 2:
+				{
+			
+					break;
+				}
+		
+				case 3:
+				{
+					int max = 4;					
+					// create UVs for triangle
+					Vector2 texcoords[max] =
+					{ 
+						(Vector2){0.5f, 0.0f + vmod},
+						(Vector2){0.0f + umod, 1.0f - vmod},
+						(Vector2){1.0f - umod, 1.0f - vmod},
+						(Vector2){0.5f, 0.0f + vmod}
+					};
+					// create coordnites for texture (triangle)
+					Vector2 points[max] = 
+					{
+						(Vector2){0.5f, 0.0f},
+						(Vector2){0.0f, 1.0f},
+						(Vector2){1.0f, 1.0f},
+						(Vector2){0.5f, 0.0f}
+					};
+					for (int i=0; i < max; i++)
+					{
+						points[i].x = (points[i].x - 0.5f) * maxSize.x;
+						points[i].y = (points[i].y - 0.5f) * maxSize.y;
+					}
+					// create copy to rotate coordnites
+					Vector2 positions[max] = { 0 };
+					for (int i = 0; i < max; i++)
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+		
+				case 4:
+				{					
+					Rectangle source = {img.scrollPos.x * (img.img->width - maxSize.x), img.scrollPos.y * (img.img->height - maxSize.y), maxSize.x, maxSize.y};
+					Rectangle dest = {transform.pos(NoGUI::Align(0, 0)).x, transform.pos(NoGUI::Align(0, 0)).y, maxSize.x, maxSize.y};
+					Vector2 origin = {dest.width / 2, dest.height / 2};
+					if ( isMax )
+					{
+						// texture
+						Vector2 sourceSize = {maxSize.x + (1.0f - img.scale.x) * maxSize.x, maxSize.y + (1.0f - img.scale.y) * maxSize.y};
+						if ( sourceSize.x > img.img->width )
+						{
+							sourceSize.x = img.img->width;
+						}
+						if ( sourceSize.y > img.img->height )
+						{
+							sourceSize.y = img.img->height;
+						}
+						if ( sourceSize.x < 1.0f )
+						{
+							sourceSize.x = 1.0f;
+						}
+						if ( sourceSize.y < 1.0f )
+						{
+							sourceSize.y = 1.0f;
+						}
+						Vector2 sourcePos = {img.scrollPos.x * (img.img->width - sourceSize.x), img.scrollPos.y * (img.img->height - sourceSize.y)};
+						source = {sourcePos.x, sourcePos.y, sourceSize.x, sourceSize.y};
+						DrawTexturePro((*img.img), source, dest, origin, transform.angle, WHITE); // draw before scroll bars
+						// scroll bars
+						float scrollBarSize = 3;
+						std::shared_ptr< NoGUI::Fill > barCol = std::make_shared< NoGUI::Fill >(shape->fill->hoverCol);
+						std::shared_ptr< NoGUI::Fill > outlineCol = std::make_shared< NoGUI::Fill >(BLACK);
+						std::shared_ptr< NoGUI::Outline > barOutline = std::make_shared< NoGUI::Outline >(outlineCol, 1);
+						std::shared_ptr< NoGUI::Fill > cursorCol = std::make_shared< NoGUI::Fill >(shape->outline->fill->col, shape->outline->fill->hoverCol);
+						NoGUI::nShape barShape = {4, barCol, barOutline};
+						NoGUI::nShape cursorShape = {4, cursorCol, barOutline};
+						
+						if ( diff.y > 0 )
+						{
+							Vector2 scrollBarPos = transform.pos(NoGUI::Align(1, 0));
+							scrollBarPos.x -= scrollBarSize;
+							float percentShown = maxSize.y / imgSize.y;
+							float percentCropped = 1 - percentShown;
+							Vector2 scrollCursorPos = {scrollBarPos.x, scrollBarPos.y};
+							scrollCursorPos.y += (img.scrollPos.y - 0.5) * percentCropped * transform.size().y;
+							float scrollCursorSize = percentShown * transform.size().y;
+							if (shape->fill)
+							{
+								DrawShape(barShape, scrollBarPos, (Vector2){scrollBarSize, transform.radius.y}, (Vector2){0, 0}, transform.angle);
+								DrawShape(cursorShape, scrollCursorPos, (Vector2){scrollBarSize, scrollCursorSize / 2}, (Vector2){0, 0}, transform.angle);
+							}
+							
+						}
+						if ( diff.x > 0 )
+						{
+							Vector2 scrollBarPos = transform.pos(NoGUI::Align(0, 1));
+							scrollBarPos.y -= scrollBarSize;
+							float percentShown = maxSize.x / imgSize.x;
+							float percentCropped = 1 - percentShown;
+							Vector2 scrollCursorPos = {scrollBarPos.x, scrollBarPos.y};
+							scrollCursorPos.x += (img.scrollPos.x - 0.5) * percentCropped * transform.size().x;
+							float scrollCursorSize = percentShown * transform.size().x;
+							if (shape->fill)
+							{
+								DrawShape(barShape, scrollBarPos, (Vector2){transform.radius.x, scrollBarSize}, (Vector2){0, 0}, transform.angle);
+								DrawShape(cursorShape, scrollCursorPos, (Vector2){scrollCursorSize / 2, scrollBarSize}, (Vector2){0, 0}, transform.angle);
+							}
+						}
+					}
+					else
+					{
+						DrawTexturePro((*img.img), source, dest, origin, transform.angle, WHITE);
+					}
+					
+					
+					break;
+				}
+		
+				default:
+				{
+					int max = shape->n + 1;
+					float centralAngle = 0;
+					float mod = sqrtf((umod * umod) + (vmod * vmod));
+					Vector2 texcoords[max] = { 0 };
+					Vector2 points[max] = { 0 };
+					for (int i=0; i < max; i++)
+					{
+						float sin = sinf(centralAngle * DEG2RAD);
+						float cos = cosf(centralAngle * DEG2RAD);
+						// calculate texture coordnites before u,v modification
+						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
+						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
+						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
+						// apply u,v modification
+						texcoords[i].x -= mod * sin;
+						texcoords[i].y -= mod * cos;
+						
+						centralAngle += 360.0f / (float)shape->n;
+					}
+					// create copy to rotate coordnites
+					Vector2 positions[max] = { 0 };
+					for (int i=0; i < max; i++) 
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
+					}
+			
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+			
+					break;
+				}
+			}
+			
 			
 			break;
 		}
