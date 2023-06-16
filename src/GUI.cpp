@@ -144,10 +144,14 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 	{
 		case Crop::NONE:
 		{
+			// calculate image dimensions
 			Vector2 imgSize = {img.img->width * img.scale.x, img.img->height * img.scale.y};
 			Rectangle source = {0, 0, (float)img.img->width, (float)img.img->height};
-			Rectangle dest = {transform.pos().x, transform.pos().y, imgSize.x, imgSize.y}; // the destination point is the point the image will rotate around. Set to shape's position
-			Vector2 origin = {transform.radius.x + transform.radius.x * static_cast<int>(transform.origin.x), (transform.radius.y + transform.radius.y * static_cast<int>(transform.origin.y))};
+			// center on shape
+			Vector2 destPos = transform.pos(NoGUI::Align(0, 0));
+			Rectangle dest = {destPos.x, destPos.y, imgSize.x, imgSize.y};
+			Vector2 origin = {dest.width / 2, dest.height / 2};
+			
 			DrawTexturePro((*img.img), source, dest, origin, transform.angle, img.col);
 			
 			break;
