@@ -290,7 +290,6 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 		{
 			// calculate img dimensions
 			Vector2 imgSize = {img.img->width * img.scale.x, img.img->height * img.scale.y};
-			// convert into same proportions as shape.
 			Vector2 maxSize = imgSize;
 			bool isMax = false;
 			if ( imgSize.x > transform.width() )
@@ -302,6 +301,10 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 			{
 				maxSize.y = transform.height();
 			}
+			// convert into same proportions as shape.
+			Vector2 diff;
+			float umod = 0;
+			float vmod = 0;
 			if ( !isMax )
 			{
 				if ( imgSize.y < imgSize.x )
@@ -314,11 +317,18 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 					float heightRate = transform.height() / transform.width();
 					maxSize.y = maxSize.x * heightRate;
 				}
+				
+				// calculate difference between texture and shape as percentage
+				diff = {(imgSize.x - maxSize.x * img.scale.x) / imgSize.x, (imgSize.y - maxSize.y * img.scale.y) / imgSize.y};
+				umod = (diff.x > 0) ? diff.x / 2 : 0;
+				vmod = (diff.y > 0) ? diff.y / 2 : 0;
 			}
-			// if texture is bigger than maxSize then crop texture
-			Vector2 diff = {imgSize.x - maxSize.x, imgSize.y - maxSize.y};
-			float umod = (diff.x > 0) ? diff.x / 2 / imgSize.x : 0;
-			float vmod = (diff.y > 0) ? diff.y / 2 / imgSize.y : 0;
+			else
+			{
+				diff = {(imgSize.x - maxSize.x) / imgSize.x, (imgSize.y - maxSize.y) / imgSize.y};
+				umod = diff.x / 2;
+				vmod = diff.y / 2;
+			}
 			
 			switch (shape->n)
 			{
@@ -326,20 +336,17 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				{
 					int max = 37;
 					float centralAngle = 0;
-					float mod = sqrtf((umod * umod) + (vmod * vmod));
 					Vector2 texcoords[max] = { 0 };
 					Vector2 points[max] = { 0 };
 					for (int i=0; i < max; i++)
 					{
 						float sin = sinf(centralAngle * DEG2RAD);
 						float cos = cosf(centralAngle * DEG2RAD);
-						// calculate texture coordnites before u,v modification
-						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
-						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
-						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
-						// apply u,v modification
-						texcoords[i].x -= mod * sin;
-						texcoords[i].y -= mod * cos;
+						// calculate texture coordnites offset
+						points[i].x = sin * 0.5f * maxSize.x;
+						points[i].y = cos * 0.5f * maxSize.y;
+						// calculate texture coordnites
+						texcoords[i] = (Vector2){0.5f + sin * (0.5f - umod), 0.5f + cos * (0.5f - vmod)};
 						
 						centralAngle += 10;
 					}
@@ -364,6 +371,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				case 3:
 				{
 					int max = 4;					
+					Vector2 maxRadius = {maxSize.x / 2, maxSize.y / 2};
 					// create UVs for triangle
 					Vector2 texcoords[max] =
 					{ 
@@ -375,16 +383,11 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 					// create coordnites for texture (triangle)
 					Vector2 points[max] = 
 					{
-						(Vector2){0.5f, 0.0f},
-						(Vector2){0.0f, 1.0f},
-						(Vector2){1.0f, 1.0f},
-						(Vector2){0.5f, 0.0f}
+						(Vector2){0, maxRadius.y * -1},
+						(Vector2){maxRadius.x * -1, maxRadius.y},
+						(Vector2){maxSize.x / 2, maxRadius.y},
+						(Vector2){0.0f, maxRadius.y * -1}
 					};
-					for (int i=0; i < max; i++)
-					{
-						points[i].x = (points[i].x - 0.5f) * maxSize.x;
-						points[i].y = (points[i].y - 0.5f) * maxSize.y;
-					}
 					// create copy to rotate coordnites
 					Vector2 positions[max] = { 0 };
 					for (int i = 0; i < max; i++)
@@ -399,33 +402,34 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 		
 				case 4:
 				{
-					Rectangle source = {img.scrollPos.x * (img.img->width - maxSize.x), img.scrollPos.y * (img.img->height - maxSize.y), maxSize.x, maxSize.y};
-					Rectangle dest = {transform.pos(NoGUI::Align(0, 0)).x, transform.pos(NoGUI::Align(0, 0)).y, maxSize.x, maxSize.y};
-					Vector2 origin = {dest.width / 2, dest.height / 2};
-					if ( isMax )
+					int max = 5;
+					Vector2 maxRadius = {maxSize.x / 2, maxSize.y / 2};
+					// create UVs for rectangle
+					Vector2 texcoords[5] = 
 					{
-						// texture
-						Vector2 sourceSize = {maxSize.x + (1.0f - img.scale.x) * maxSize.x, maxSize.y + (1.0f - img.scale.y) * maxSize.y};
-						if ( sourceSize.x > img.img->width )
-						{
-							sourceSize.x = img.img->width;
-						}
-						if ( sourceSize.y > img.img->height )
-						{
-							sourceSize.y = img.img->height;
-						}
-						if ( sourceSize.x < 1.0f )
-						{
-							sourceSize.x = 1.0f;
-						}
-						if ( sourceSize.y < 1.0f )
-						{
-							sourceSize.y = 1.0f;
-						}
-						Vector2 sourcePos = {img.scrollPos.x * (img.img->width - sourceSize.x), img.scrollPos.y * (img.img->height - sourceSize.y)};
-						source = {sourcePos.x, sourcePos.y, sourceSize.x, sourceSize.y};
+						(Vector2){0.0f + umod, 0.0f + vmod},
+						(Vector2){0.0f + umod, 1.0f - vmod},
+						(Vector2){1.0f - umod, 1.0f - vmod},
+						(Vector2){1.0f - umod, 0.0f + vmod},
+						(Vector2){0.0f + umod, 0.0f + vmod}
+					};
+					// create coordnites for texture (rectangle)
+					Vector2 points[max] = 
+					{
+						(Vector2){maxRadius.x * -1, maxRadius.y * -1},
+						(Vector2){maxRadius.x * -1, maxRadius.y},
+						(Vector2){maxRadius.x, maxRadius.y},
+						(Vector2){maxRadius.x, maxRadius.y * -1},
+						(Vector2){maxRadius.x * -1, maxRadius.y * -1}
+					};
+					// create copy to rotate coordnites
+					Vector2 positions[5] = { 0 };
+					for (int i = 0; i < max; i++)
+					{	
+						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
-					DrawTexturePro((*img.img), source, dest, origin, transform.angle, WHITE);
+					
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
 					
 					break;
 				}
@@ -434,20 +438,17 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				{
 					int max = shape->n + 1;
 					float centralAngle = 0;
-					float mod = sqrtf((umod * umod) + (vmod * vmod));
 					Vector2 texcoords[max] = { 0 };
 					Vector2 points[max] = { 0 };
 					for (int i=0; i < max; i++)
 					{
 						float sin = sinf(centralAngle * DEG2RAD);
 						float cos = cosf(centralAngle * DEG2RAD);
-						// calculate texture coordnites before u,v modification
-						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
-						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
-						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
-						// apply u,v modification
-						texcoords[i].x -= mod * sin;
-						texcoords[i].y -= mod * cos;
+						// calculate texture coordnites offset
+						points[i].x = sin * 0.5f * maxSize.x;
+						points[i].y = cos * 0.5f * maxSize.y;
+						// calculate texture coordnites
+						texcoords[i] = (Vector2){0.5f + sin * (0.5f - umod), 0.5f + cos * (0.5f - vmod)};
 						
 						centralAngle += 360.0f / (float)shape->n;
 					}
@@ -471,7 +472,6 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 		{
 			// calculate img dimensions
 			Vector2 imgSize = {img.img->width * img.scale.x, img.img->height * img.scale.y};
-			// convert into same proportions as shape.
 			Vector2 maxSize = imgSize;
 			bool isMax = false;
 			if ( imgSize.x > transform.width() )
@@ -483,6 +483,10 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 			{
 				maxSize.y = transform.height();
 			}
+			// convert into same proportions as shape.
+			Vector2 diff;
+			float umod = 0;
+			float vmod = 0;
 			if ( !isMax )
 			{
 				if ( imgSize.y < imgSize.x )
@@ -495,12 +499,18 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 					float heightRate = transform.height() / transform.width();
 					maxSize.y = maxSize.x * heightRate;
 				}
+				
+				// calculate difference between texture and shape as percentage
+				diff = {(imgSize.x - maxSize.x * img.scale.x) / imgSize.x, (imgSize.y - maxSize.y * img.scale.y) / imgSize.y};
+				umod = (diff.x > 0) ? diff.x / 2 : 0;
+				vmod = (diff.y > 0) ? diff.y / 2 : 0;
 			}
-			// if texture is bigger than maxSize then crop texture
-			Vector2 diff = {imgSize.x - maxSize.x, imgSize.y - maxSize.y};
-//			Vector2 scrollPos = {0.5, 0.5}; // add to cimage?? element?? transform??
-			float umod = (diff.x > 0) ? diff.x / 2 / imgSize.x : 0;
-			float vmod = (diff.y > 0) ? diff.y / 2 / imgSize.y : 0;
+			else
+			{
+				diff = {(imgSize.x - maxSize.x) / imgSize.x, (imgSize.y - maxSize.y) / imgSize.y};
+				umod = diff.x / 2;
+				vmod = diff.y / 2;
+			}
 			// TODO: prolly a cleaner more efficent way of doing this
 			if (img.scrollPos.x > 1)
 			{
@@ -525,20 +535,17 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				{
 					int max = 37;
 					float centralAngle = 0;
-					float mod = sqrtf((umod * umod) + (vmod * vmod));
 					Vector2 texcoords[max] = { 0 };
 					Vector2 points[max] = { 0 };
 					for (int i=0; i < max; i++)
 					{
 						float sin = sinf(centralAngle * DEG2RAD);
 						float cos = cosf(centralAngle * DEG2RAD);
-						// calculate texture coordnites before u,v modification
-						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
-						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
-						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
-						// apply u,v modification
-						texcoords[i].x -= mod * sin;
-						texcoords[i].y -= mod * cos;
+						// calculate texture coordnites offset
+						points[i].x = sin * 0.5f * maxSize.x;
+						points[i].y = cos * 0.5f * maxSize.y;
+						// calculate texture coordnites
+						texcoords[i] = (Vector2){0.5f + sin * (0.5f - umod), 0.5f + cos * (0.5f - vmod)};
 						
 						centralAngle += 10;
 					}
@@ -563,6 +570,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				case 3:
 				{
 					int max = 4;					
+					Vector2 maxRadius = {maxSize.x / 2, maxSize.y / 2};
 					// create UVs for triangle
 					Vector2 texcoords[max] =
 					{ 
@@ -574,16 +582,11 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 					// create coordnites for texture (triangle)
 					Vector2 points[max] = 
 					{
-						(Vector2){0.5f, 0.0f},
-						(Vector2){0.0f, 1.0f},
-						(Vector2){1.0f, 1.0f},
-						(Vector2){0.5f, 0.0f}
+						(Vector2){0, maxRadius.y * -1},
+						(Vector2){maxRadius.x * -1, maxRadius.y},
+						(Vector2){maxSize.x / 2, maxRadius.y},
+						(Vector2){0.0f, maxRadius.y * -1}
 					};
-					for (int i=0; i < max; i++)
-					{
-						points[i].x = (points[i].x - 0.5f) * maxSize.x;
-						points[i].y = (points[i].y - 0.5f) * maxSize.y;
-					}
 					// create copy to rotate coordnites
 					Vector2 positions[max] = { 0 };
 					for (int i = 0; i < max; i++)
@@ -678,20 +681,17 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				{
 					int max = shape->n + 1;
 					float centralAngle = 0;
-					float mod = sqrtf((umod * umod) + (vmod * vmod));
 					Vector2 texcoords[max] = { 0 };
 					Vector2 points[max] = { 0 };
 					for (int i=0; i < max; i++)
 					{
 						float sin = sinf(centralAngle * DEG2RAD);
 						float cos = cosf(centralAngle * DEG2RAD);
-						// calculate texture coordnites before u,v modification
-						texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
-						points[i].x = (texcoords[i].x - 0.5f) * maxSize.x;
-						points[i].y = (texcoords[i].y - 0.5f) * maxSize.y;
-						// apply u,v modification
-						texcoords[i].x -= mod * sin;
-						texcoords[i].y -= mod * cos;
+						// calculate texture coordnites offset
+						points[i].x = sin * 0.5f * maxSize.x;
+						points[i].y = cos * 0.5f * maxSize.y;
+						// calculate texture coordnites
+						texcoords[i] = (Vector2){0.5f + sin * (0.5f - umod), 0.5f + cos * (0.5f - vmod)};
 						
 						centralAngle += 360.0f / (float)shape->n;
 					}
