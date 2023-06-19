@@ -138,6 +138,7 @@ void NoGUI::DrawShape(const nShape& shape, const NoGUI::Transform& transform)
 	DrawShape(shape, transform.pos(), transform.radius, shapeOrigin, transform.rotation());
 }
 
+// TODO: break and clean this up
 void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
 {
 	switch(img.crop)
@@ -301,9 +302,18 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				maxSize.x = transform.width();
 				isMax = imgSize.y >= transform.height();
 			}
+			else if ( imgSize.x < transform.width() * -1 )
+			{
+				maxSize.x = transform.width() * -1;
+				isMax = imgSize.y <= transform.height() * -1;
+			}
 			if ( imgSize.y > transform.height() )
 			{
 				maxSize.y = transform.height();
+			}
+			else if ( imgSize.y < transform.height() * -1 )
+			{
+				maxSize.y = transform.height() * -1;
 			}
 			// convert into same proportions as shape.
 			Vector2 diff;
@@ -323,7 +333,22 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				}
 				
 				// calculate difference between texture and shape as percentage
-				diff = {(imgSize.x - maxSize.x * img.scale.x) / imgSize.x, (imgSize.y - maxSize.y * img.scale.y) / imgSize.y};
+				if ( img.scale.x > 0 )
+				{
+					diff.x = (imgSize.x - maxSize.x * img.scale.x) / imgSize.x;
+				}
+				else
+				{
+					diff.x = (imgSize.x + maxSize.x * img.scale.x) / imgSize.x;
+				}
+				if ( img.scale.y > 0 )
+				{
+					diff.y = (imgSize.y - maxSize.y * img.scale.y) / imgSize.y;
+				}
+				else
+				{
+					diff.y = (imgSize.y + maxSize.y * img.scale.y) / imgSize.y;
+				}
 				umod = (diff.x > 0) ? diff.x / 2 : 0;
 				vmod = (diff.y > 0) ? diff.y / 2 : 0;
 			}
@@ -483,12 +508,21 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				maxSize.x = transform.width();
 				isMax = imgSize.y >= transform.height();
 			}
+			else if ( imgSize.x < transform.width() * -1 )
+			{
+				maxSize.x = transform.width() * -1;
+				isMax = imgSize.y <= transform.height() * -1;
+			}
 			if ( imgSize.y > transform.height() )
 			{
 				maxSize.y = transform.height();
 			}
+			else if ( imgSize.y < transform.height() * -1 )
+			{
+				maxSize.y = transform.height() * -1;
+			}
 			// convert into same proportions as shape.
-			Vector2 diff;
+			Vector2 diff = {0};
 			float umod = 0;
 			float vmod = 0;
 			if ( !isMax )
@@ -505,7 +539,22 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				}
 				
 				// calculate difference between texture and shape as percentage
-				diff = {(imgSize.x - maxSize.x * img.scale.x) / imgSize.x, (imgSize.y - maxSize.y * img.scale.y) / imgSize.y};
+				if ( img.scale.x > 0 )
+				{
+					diff.x = (imgSize.x - maxSize.x * img.scale.x) / imgSize.x;
+				}
+				else
+				{
+					diff.x = (imgSize.x + maxSize.x * img.scale.x) / imgSize.x;
+				}
+				if ( img.scale.y > 0 )
+				{
+					diff.y = (imgSize.y - maxSize.y * img.scale.y) / imgSize.y;
+				}
+				else
+				{
+					diff.y = (imgSize.y + maxSize.y * img.scale.y) / imgSize.y;
+				}
 				umod = (diff.x > 0) ? diff.x / 2 : 0;
 				vmod = (diff.y > 0) ? diff.y / 2 : 0;
 			}
@@ -604,32 +653,36 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 				}
 		
 				case 4:
-				{					
-					Rectangle source = {img.scrollPos.x * (img.img->width - maxSize.x), img.scrollPos.y * (img.img->height - maxSize.y), maxSize.x, maxSize.y};
-					Rectangle dest = {transform.pos(NoGUI::Align(0, 0)).x, transform.pos(NoGUI::Align(0, 0)).y, maxSize.x, maxSize.y};
-					Vector2 origin = {dest.width / 2, dest.height / 2};
+				{
+					Vector2 sourceSize = maxSize; // texture size
+					Vector2 destSize = sourceSize; // screen size
+					Vector2 sourcePos = {img.scrollPos.x * (img.img->width - maxSize.x), img.scrollPos.y * (img.img->height - maxSize.y)};
+					Vector2 destPos = transform.pos(NoGUI::Align(0, 0));
+					if ( img.scale.x <  0 )
+					{
+						sourcePos.x = img.scrollPos.x * (img.img->width + maxSize.x);
+						destSize.x *= -1;
+					}
+					if ( img.scale.y <  0 )
+					{
+						sourcePos.y = img.scrollPos.y * (img.img->height + maxSize.y);
+						destSize.y *= -1;
+					}
 					if ( isMax )
 					{
-						// texture
-						Vector2 sourceSize = {maxSize.x + (1.0f - img.scale.x) * maxSize.x, maxSize.y + (1.0f - img.scale.y) * maxSize.y};
-						if ( sourceSize.x > img.img->width )
+						sourceSize = {maxSize.x - maxSize.x * (1.0f - 1.0f / img.scale.x), maxSize.y - maxSize.y * (1.0f - 1.0f / img.scale.y)};
+						sourcePos = {img.scrollPos.x * (img.img->width - sourceSize.x), img.scrollPos.y * (img.img->height - sourceSize.y)};
+						if ( img.scale.x <  0 )
 						{
-							sourceSize.x = img.img->width;
+							destSize.x *= -1;
 						}
-						if ( sourceSize.y > img.img->height )
+						if ( img.scale.y <  0 )
 						{
-							sourceSize.y = img.img->height;
+							destSize.y *= -1;
 						}
-						if ( sourceSize.x < 1.0f )
-						{
-							sourceSize.x = 1.0f;
-						}
-						if ( sourceSize.y < 1.0f )
-						{
-							sourceSize.y = 1.0f;
-						}
-						Vector2 sourcePos = {img.scrollPos.x * (img.img->width - sourceSize.x), img.scrollPos.y * (img.img->height - sourceSize.y)};
-						source = {sourcePos.x, sourcePos.y, sourceSize.x, sourceSize.y};
+						Rectangle source = {sourcePos.x, sourcePos.y, sourceSize.x, sourceSize.y};
+						Rectangle dest = {destPos.x, destPos.y, destSize.x, destSize.y};
+						Vector2 origin = {dest.width / 2, dest.height / 2};
 						DrawTexturePro((*img.img), source, dest, origin, transform.angle, WHITE); // draw before scroll bars
 						// scroll bars
 						float scrollBarSize = 3;
@@ -654,7 +707,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 								DrawShape(barShape, scrollBarPos, (Vector2){scrollBarSize, transform.radius.y}, (Vector2){0, 0}, transform.angle);
 								DrawShape(cursorShape, scrollCursorPos, (Vector2){scrollBarSize, scrollCursorSize / 2}, (Vector2){0, 0}, transform.angle);
 							}
-							
+						
 						}
 						if ( diff.x > 0 )
 						{
@@ -674,9 +727,11 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 					}
 					else
 					{
+						Rectangle source = {sourcePos.x, sourcePos.y, sourceSize.x, sourceSize.y};
+						Rectangle dest = {destPos.x, destPos.y, destSize.x, destSize.y};
+						Vector2 origin = {dest.width / 2, dest.height / 2};
 						DrawTexturePro((*img.img), source, dest, origin, transform.angle, WHITE);
 					}
-					
 					
 					break;
 				}
