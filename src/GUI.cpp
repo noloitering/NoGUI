@@ -695,12 +695,17 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						
 						if ( diff.y > 0 )
 						{
+							float sin = sinf(transform.angle * DEG2RAD);
+							float cos = cosf(transform.angle * DEG2RAD);
 							Vector2 scrollBarPos = transform.pos(NoGUI::Align(1, 0));
-							scrollBarPos.x -= scrollBarSize;
+							scrollBarPos.x -= scrollBarSize * cos;
+							scrollBarPos.y -= scrollBarSize * sin;
 							float percentShown = maxSize.y / imgSize.y;
 							float percentCropped = 1 - percentShown;
 							Vector2 scrollCursorPos = {scrollBarPos.x, scrollBarPos.y};
-							scrollCursorPos.y += (img.scrollPos.y - 0.5) * percentCropped * transform.size().y;
+							float scrollLength = (img.scrollPos.y - 0.5) * percentCropped * transform.size().y;
+							scrollCursorPos.x -= scrollLength * sin;
+							scrollCursorPos.y += scrollLength * cos;
 							float scrollCursorSize = percentShown * transform.size().y;
 							if (shape->fill)
 							{
@@ -711,12 +716,17 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						}
 						if ( diff.x > 0 )
 						{
+							float sin = sinf(transform.angle * DEG2RAD);
+							float cos = cosf(transform.angle * DEG2RAD);
 							Vector2 scrollBarPos = transform.pos(NoGUI::Align(0, 1));
-							scrollBarPos.y -= scrollBarSize;
+							scrollBarPos.y -= scrollBarSize * cos;
+							scrollBarPos.x += scrollBarSize * sin;
 							float percentShown = maxSize.x / imgSize.x;
 							float percentCropped = 1 - percentShown;
 							Vector2 scrollCursorPos = {scrollBarPos.x, scrollBarPos.y};
-							scrollCursorPos.x += (img.scrollPos.x - 0.5) * percentCropped * transform.size().x;
+							float scrollLength = (img.scrollPos.x - 0.5) * percentCropped * transform.size().x;
+							scrollCursorPos.x += scrollLength * cosf(transform.angle * DEG2RAD);
+							scrollCursorPos.y += scrollLength * sinf(transform.angle * DEG2RAD);
 							float scrollCursorSize = percentShown * transform.size().x;
 							if (shape->fill)
 							{
@@ -794,71 +804,44 @@ Vector2 NoGUI::Transform::pos() const
 }
 
 Vector2 NoGUI::Transform::pos(const Align& originPoint) const
-{
-	// TODO: account for angle
-	Vector2 ret = position;
-	int xdes = static_cast< int >(originPoint.x);
-	int ydes = static_cast< int >(originPoint.y);
-	
-//	Vector2 coords = {xdes * radius.x + position.x, ydes * radius.y + position.y};
-//	dest = Vector2RotateAround(coords, position, angle);
-//	dest.x -= position.x;
-//	dest.y -= position.y;
-	
-//	Vector2 dir = {xdes * radius.x, ydes * radius.y};
-//	if ( angle == 0 )
-//	{
-//		dest = dir;
-//	}
-//	else
-//	{
-//		float mag = Vector2Length(dir);
-//		float dirAngle = atan2f(ydes * -1, xdes) * RAD2DEG;
-//		dirAngle -= angle;
-//		dest = {mag * cosf(dirAngle * DEG2RAD), mag * sinf(dirAngle * DEG2RAD)};
-//	}
-	
-	if (xdes == 0 && ydes == 0)
+{	
+	Vector2 ret = Vector2Subtract(position, offset()); // center on element
+	int xdir = static_cast< int >(originPoint.x);
+	int ydir = static_cast< int >(originPoint.y);
+	Vector2 distance = {xdir * radius.x, ydir * radius.y};
+	if ( angle == 0 )
 	{
-		ret.x -= offset().x;
-		ret.y -= offset().y;
+		ret = Vector2Add(ret, distance);
 	}
 	else
 	{
-		Vector2 dest = {xdes * radius.x, ydes * radius.y};
-		Vector2 curr = offset();
-		
-		ret.x += dest.x - curr.x;
-		ret.y += dest.y - curr.y;
+		ret = Vector2Add(ret, Vector2Rotate(distance, angle * DEG2RAD));
 	}
-
+	
 	return ret;
 }
 
 Vector2 NoGUI::Transform::size() const
 {
-	Vector2 ret;
-	ret.x = radius.x * 2;
-	ret.y = radius.y * 2;
+	Vector2 ret = Vector2Scale(radius, 2);
 	
 	return ret;
 }
 
 float NoGUI::Transform::width() const
 {
-
-	return radius.x * 2;
+	
+	return radius.x * 2.0f;
 }
 
 float NoGUI::Transform::height() const
 {
-			
-	return radius.y * 2;
+	
+	return radius.y * 2.0f;
 }
 
 Vector2 NoGUI::Transform::offset() const
 {
-	// TODO: account for angle
 	int xint = static_cast< int >(origin.x);
 	int yint = static_cast< int >(origin.y);
 	Vector2 off = {xint * radius.x, yint * radius.y};
@@ -874,7 +857,6 @@ Vector2 NoGUI::Transform::offset() const
 		if ( off.x == 0 )
 		{
 			mag = off.y;
-//			direction = angle;
 			if ( mag > 0 )
 			{
 				mag *= -1;
@@ -883,7 +865,6 @@ Vector2 NoGUI::Transform::offset() const
 		else if ( off.y == 0 )
 		{
 			mag = off.x;
-//			direction = angle;
 			if ( mag > 0 )
 			{
 				mag *= -1;
@@ -945,11 +926,8 @@ Vector2 NoGUI::Transform::repos(Vector2 newPos, const Align& originPoint, bool u
 	}
 	else
 	{
-		Vector2 translate = pos(originPoint);
-		translate.x -= position.x;
-		translate.y -= position.y;
-		newPos.x -= translate.x;
-		newPos.y -= translate.y;
+		Vector2 translate = Vector2Subtract(pos(originPoint), position);
+		newPos = Vector2Subtract(newPos, translate);
 	}
 	
 	repos(newPos);
@@ -964,7 +942,7 @@ void NoGUI::Transform::resize(const Vector2& size)
 	
 void NoGUI::Transform::rotate(float degrees, const Align& originPoint, bool update)
 {
-	if ( origin.x == originPoint.x &&  origin.y == originPoint.y )
+	if ( origin.x == originPoint.x && origin.y == originPoint.y )
 	{
 		angle += degrees;
 	}
@@ -1008,8 +986,7 @@ void NoGUI::Transform::reorient(float degrees, const Vector2& originPoint)
 	Vector2 temp = {position.x - originPoint.x, position.y - originPoint.y};
 	Vector2 posInc = Vector2Rotate(temp, degrees * DEG2RAD);
 	// translate back
-	position.x += posInc.x;
-	position.y += posInc.y;
+	position = Vector2Add(position, posInc);
 }
 
 void Element::draw()

@@ -29,6 +29,10 @@ int main(int argc, char ** argv)
 			topElem->draw();
 			centerElem->draw();
 			DrawCircleV(topElem->pos(NoGUI::Align(0, 0)), 6, RED);
+			DrawCircleV(topElem->pos(NoGUI::Align(-1, 0)), 6, RED);
+			DrawCircleV(topElem->pos(NoGUI::Align(1, 0)), 6, RED);
+			DrawCircleV(topElem->pos(NoGUI::Align(0, -1)), 6, RED);
+			DrawCircleV(topElem->pos(NoGUI::Align(0, 1)), 6, RED);
 		EndDrawing();
 		if ( IsMouseButtonDown(MOUSE_LEFT_BUTTON) )
 		{
