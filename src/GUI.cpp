@@ -177,7 +177,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						points[i].y = (texcoords[i].y - 0.5f) * transform.height();
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), points, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, points, texcoords, max, img.col);
 			
 					break;
 				}
@@ -221,7 +221,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
@@ -253,7 +253,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
@@ -282,7 +282,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
@@ -380,7 +380,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						centralAngle += 10;
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), points, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, points, texcoords, max, img.col);
 			
 					break;
 				}
@@ -424,7 +424,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
@@ -458,7 +458,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 					
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 					
 					break;
 				}
@@ -488,7 +488,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
@@ -603,7 +603,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						centralAngle += 10;
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), points, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, points, texcoords, max, img.col);
 			
 					break;
 				}
@@ -647,7 +647,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
@@ -771,7 +771,7 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 						positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 					}
 			
-					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), positions, texcoords, max, img.col);
+					DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, img.col);
 			
 					break;
 				}
