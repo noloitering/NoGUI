@@ -53,6 +53,10 @@ namespace NoGUI
 	
 	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
 	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
+	void DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform, bool scroll=false);
+	void DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
+	void DrawCImage(CImage& img, const NoGUI::Transform& transform);
 	void DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
+	void DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const NoGUI::Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size);
 	void DrawElement(Element* elem);
 }
