@@ -10,7 +10,7 @@ namespace NoGUI
 	enum class Wrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
 	enum class XAlign {LEFT = -1, CENTER = 0, RIGHT = 1};
 	enum class YAlign {TOP = -1, CENTER = 0, BOTTOM = 1};
-	enum class Crop {NONE, FIT, CUT, SCROLL};
+	enum class Crop {NONE, FIT, CUT};
 	
 	struct Align
 	{
@@ -46,7 +46,7 @@ namespace NoGUI
 		Color hoverCol;
 		Fill(Color c, Color hc)
 			: col(c), hoverCol(hc) {}
-		Fill(Color c=RAYWHITE)
+		Fill(Color c=WHITE)
 			: col(c), hoverCol(c) {}
 	};
 	
@@ -95,13 +95,14 @@ namespace NoGUI
 	class CImage : public CInterface
 	{
 	public:
-		CImage(std::shared_ptr< Texture2D > texture=nullptr, const Crop& cropping=Crop::NONE, const Vector2& scaleVec={1, 1}, const Color& color=WHITE)
-			: img(texture), crop(cropping), scale(scaleVec), col(color) {}
+		CImage(std::shared_ptr< Texture2D > texture=nullptr, std::shared_ptr< nShape > nshape=nullptr, const Crop& cropping=Crop::NONE, bool scroll=false, const Vector2& scaleVec={1, 1})
+			: img(texture), shape(nshape), crop(cropping), scrollable(scroll), scale(scaleVec) {}
 		std::shared_ptr< Texture2D > img;
+		std::shared_ptr< nShape > shape;
 		Crop crop = Crop::NONE;
+		bool scrollable = false;
 		Vector2 scale = {1, 1};
 		Vector2 scrollPos = {0.5, 0.5};
-		Color col = WHITE;
 	};
 	
 	typedef std::tuple< CImage > Components;

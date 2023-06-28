@@ -25,6 +25,7 @@ int main(int argc, char ** argv)
 	{
 		image.img = std::make_shared< Texture2D >(LoadTexture("testimg.gif"));
 		image.scale = (Vector2){0.5f, 0.5f};
+		image.scrollable = true;
 		image.crop = NoGUI::Crop::NONE;
 	}
 	
@@ -64,7 +65,6 @@ int main(int argc, char ** argv)
 	elemVec.push_back(bottomLElem);
 	elemVec.push_back(bottomElem);
 	elemVec.push_back(bottomRElem);
-	
 	// main
 	while ( !WindowShouldClose() )
 	{
@@ -85,33 +85,30 @@ int main(int argc, char ** argv)
 			{
 				case NoGUI::Crop::NONE:
 				{
-//					image.crop = NoGUI::Crop::FIT;
-					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::FIT;
+					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::CUT;
 					
 					break;
 				}
 				
 				case NoGUI::Crop::FIT:
 				{
-					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::CUT;
+					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::NONE;
 					
 					break;
 				}
 				
 				case NoGUI::Crop::CUT:
 				{
-					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::SCROLL;
-					
-					break;
-				}
-				
-				case NoGUI::Crop::SCROLL:
-				{
-					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::NONE;
+					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::FIT;
 					
 					break;
 				}
 			}
+		}
+		
+		if ( IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_Q) )
+		{
+			comps->getComponent< NoGUI::CImage >().scrollable = !(comps->getComponent< NoGUI::CImage >().scrollable);
 		}
 		
 		if ( IsKeyPressed(KEY_UP) )
@@ -131,20 +128,16 @@ int main(int argc, char ** argv)
 			comps->getComponent< NoGUI::CImage >().scrollPos.x -= 0.1; // scroll left
 		}
 		
-		
-		
 		BeginDrawing();
 			ClearBackground(BLACK);
 			for ( auto elem : elemVec )
 			{
 				if ( rLeft )
 				{
-//					elem->rotate(1, NoGUI::Align(0, 0));
 					elem->rotate(1, elem->origin);
 				}
 				else if ( rRight )
 				{
-//					elem->rotate(-1, NoGUI::Align(0, 0));
 					elem->rotate(-1, elem->origin);
 				}
 				elem->draw();

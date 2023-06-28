@@ -1,11 +1,18 @@
 test_imgs.exe
 Tests the 4 different ways of displaying images (NONE, FIT, CUT, SCROLL) and manipulation of those images.
+TODO: need to test scaling in a single direction
 
 CONTROLS:
 Spacebar: change display mode
 Scrollwheel: scale image
 Left Mouse Button: rotate 1 degree clockwise around origin point
 Right Mouse Button: rotate 1 degree counter-clockwise around origin point
+Q: toggle texture scrolling
+ENTER: toggle texture scrolling
+UP: scroll up
+LEFT: scroll left
+DOWN: scroll down
+RIGHT: scroll right
 
 TESTS:
 1) "NONE" CASE
@@ -16,6 +23,3 @@ TESTS:
 	
 3) "CUT" CASE
 	- EXPECTED: Texture takes shape of element, and will not exceed boundaries of that element. Scaling past the boundary will result in a zoom
-	
-4) "SCROLL" CASE
-	- EXPECTED: 
