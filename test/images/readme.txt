@@ -5,9 +5,14 @@ TODO: need to test scaling in a single direction
 CONTROLS:
 Spacebar: change display mode
 Scrollwheel: scale image
+W: Scale image up y direction
+A: Scale image down x direction
+S: Scale image down y direction
+D: Scale image up x direction
 Left Mouse Button: rotate 1 degree clockwise around origin point
 Right Mouse Button: rotate 1 degree counter-clockwise around origin point
 Q: toggle texture scrolling
+E: toggle texture scrolling
 ENTER: toggle texture scrolling
 UP: scroll up
 LEFT: scroll left

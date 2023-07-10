@@ -78,6 +78,22 @@ int main(int argc, char ** argv)
 			comps->getComponent< NoGUI::CImage >().scale.x += 0.1f * scroll;
 			comps->getComponent< NoGUI::CImage >().scale.y += 0.1f * scroll;
 		}
+		if ( IsKeyPressed(KEY_W) )
+		{
+			comps->getComponent< NoGUI::CImage >().scale.y += 0.1f;
+		}
+		if ( IsKeyPressed(KEY_A) )
+		{
+			comps->getComponent< NoGUI::CImage >().scale.x -= 0.1f;
+		}
+		if ( IsKeyPressed(KEY_S) )
+		{
+			comps->getComponent< NoGUI::CImage >().scale.y -= 0.1f;
+		}
+		if ( IsKeyPressed(KEY_D) )
+		{
+			comps->getComponent< NoGUI::CImage >().scale.x += 0.1f;
+		}
 		
 		if ( IsKeyPressed(KEY_SPACE) )
 		{
@@ -106,7 +122,7 @@ int main(int argc, char ** argv)
 			}
 		}
 		
-		if ( IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_Q) )
+		if ( IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_Q) || IsKeyPressed(KEY_E) )
 		{
 			comps->getComponent< NoGUI::CImage >().scrollable = !(comps->getComponent< NoGUI::CImage >().scrollable);
 		}
