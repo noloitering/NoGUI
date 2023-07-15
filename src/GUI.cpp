@@ -214,6 +214,71 @@ void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShap
 	}
 }
 
+void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+{
+	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
+	Color col = fmt.fill ? fmt.fill->col : WHITE;
+	Vector2 pos = transform.pos(fmt.align);
+	// text rotates around it's position, not the origin funny enough
+	// adjust origin to reposition text while having each line rotate around the same point
+	Vector2 origin = { 0 };
+	Vector2 size = MeasureTextEx(font, txt, fmt.size, fmt.spacing.x);
+	int numLines = 0;
+	const char **lines = TextSplit(txt, '\n', &numLines);
+	Vector2 lineSize = MeasureTextEx(font, lines[0], fmt.size, fmt.spacing.x);
+	switch ( fmt.align.x )
+	{
+		case NoGUI::XAlign::LEFT:
+		{
+			origin.x = 0.0f;
+			
+			break;
+		}
+		// TODO: perform this calculation per line
+		case NoGUI::XAlign::CENTER:
+		{
+			origin.x = size.x / 2.0f;
+			
+			break;
+		}
+		
+		case NoGUI::XAlign::RIGHT:
+		{
+			origin.x = size.x;
+			
+			break;
+		}
+	}
+	switch ( fmt.align.y )
+	{
+		case NoGUI::YAlign::TOP:
+		{
+			origin.y = 0;
+			
+			break;
+		}
+		
+		case NoGUI::YAlign::CENTER:
+		{
+			origin.y = (lineSize.y * numLines + fmt.spacing.y * (numLines - 1)) / 2; // shift origin half of the total size of text
+			
+			break;
+		}
+		
+		case NoGUI::YAlign::BOTTOM:
+		{
+			origin.y = lineSize.y; // shift origin 1 line size above position
+			
+			break;
+		}
+	}
+	for (int li=0; li < numLines; li++)
+	{
+		DrawTextPro(font, lines[li], pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
+		origin.y -= lineSize.y + fmt.spacing.y; // go down to next line
+	}
+}
+
 void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
 {
 	// calculate img dimensions	
@@ -1110,6 +1175,7 @@ void NoGUI::DrawElement(Element* elem)
 	if (elem->components)
 	{
 		CImage& imgComp = elem->components->getComponent< NoGUI::CImage >();
+		CText& txtComp = elem->components->getComponent< NoGUI::CText >();
 		if ( imgComp.active )
 		{
 			if ( imgComp.shape )
@@ -1122,6 +1188,10 @@ void NoGUI::DrawElement(Element* elem)
 				std::shared_ptr< NoGUI::nShape > imgShape =  std::make_shared< NoGUI::nShape >(elem->style()->n, imgFill, nullptr); // ehhh, not the greatest solution
 				DrawCImage(imgComp, imgShape, (*elem));
 			}
+		}
+		if ( txtComp.active )
+		{
+			DrawCText(elem->getInner(), txtComp, (*elem));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../src/GUI.h"
+#include "../../../src/GUI.h"
 
 int main(int argc, char ** argv)
 {

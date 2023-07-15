@@ -1,6 +1,6 @@
 test_imgs.exe
 Tests the 4 different ways of displaying images (NONE, FIT, CUT, SCROLL) and manipulation of those images.
-TODO: need to test scaling in a single direction
+
 
 CONTROLS:
 Spacebar: change display mode

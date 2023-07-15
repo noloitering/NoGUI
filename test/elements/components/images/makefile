@@ -23,20 +23,20 @@
 
 # -- CONFIGURATION --
 # paths
-EXE_NAME ?= test_shapes
+EXE_NAME ?= test_imgs
 DESTDIR ?= ./
-SRC ?= main.cpp ../../src/Core.cpp ../../src/GUI.cpp
+SRC ?= main.cpp ../../../../src/Core.cpp ../../../../src/GUI.cpp
 OBJS = $(patsubst %.c, %.o, $(SRC))
 
 # compiler
 CC = g++
-CFLAGS += -Wall -Werror -std=c++17
+CFLAGS += -Wall -Werror -std=c++17 -g
 MAKE = make
 PLATFORM ?= PLATFORM_DESKTOP
 # DEBUG or RELEASE
 BUILD_MODE ?= RELEASE
 
-RAYLIB_INSTALL_PATH ?= ../../examples/include/raylib
+RAYLIB_INSTALL_PATH ?= ../../../../examples/include/raylib
 RAYLIB_SRC ?= $(RAYLIB_INSTALL_PATH)/src
 RAYLIB_HEADERS ?= -I$(RAYLIB_SRC) -I$(RAYLIB_SRC)/external -I$(RAYLIB_SRC)/extras
 RAYLIB_LIBS ?= -L$(RAYLIB_INSTALL_PATH) -L$(RAYLIB_SRC)
@@ -104,7 +104,7 @@ all:
 	
 #compile client
 $(EXE_NAME): $(OBJS)
-	$(CC) -o $(DESTDIR)/$(EXE_NAME) $(OBJS) $(CFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBFLAGS) -D$(PLATFORM)
+	$(CC) -o $(DESTDIR)/$(EXE_NAME) $(OBJS) $(CFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBFLAGS) -D$(PLATFORM) -D_GNU_SOURCE
 
 # Compile source files
 %.o: %.cpp

@@ -52,6 +52,7 @@ namespace NoGUI
 	
 	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
 	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
+	void DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform);
 	void DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std::shared_ptr< nShape > shape);

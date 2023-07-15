@@ -105,7 +105,21 @@ namespace NoGUI
 		Vector2 scrollPos = {0.5, 0.5};
 	};
 	
-	typedef std::tuple< CImage > Components;
+	class CText : public CInterface
+	{
+	public:
+		CText(std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Font > style=nullptr, float big=20.0f, const Align& pos=Align(), float rotation=0.0f, const Vector2& space={2,0})
+			: fill(col), font(style), spacing(space), size(big), align(pos), angle(rotation) {}
+		std::shared_ptr< Fill > fill;
+		std::shared_ptr< Font > font;
+		Vector2 spacing = {2, 0};
+		float size = 20.0f;
+		Align align;
+		float angle = 0.0f;
+		
+	};
+	
+	typedef std::tuple< CImage, CText > Components;
 	
 	class CContainer
 	{
