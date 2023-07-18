@@ -12,6 +12,8 @@ int main(int argc, char ** argv)
 	std::vector< std::shared_ptr< NoGUI::Element > > elemVec;
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >();
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill, nullptr);
 	std::shared_ptr< NoGUI::nShape > ellipse = std::make_shared< NoGUI::nShape >(0, fill, nullptr);
 	std::shared_ptr< NoGUI::nShape > line = std::make_shared< NoGUI::nShape >(2, fill, nullptr);
 	std::shared_ptr< NoGUI::nShape > triangle = std::make_shared< NoGUI::nShape >(3, fill, nullptr);
@@ -22,6 +24,8 @@ int main(int argc, char ** argv)
 	NoGUI::Transform topT = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
 	NoGUI::Transform rightT = NoGUI::Transform((Vector2){window.x, 0}, elemSize, NoGUI::Align(1, -1));
 	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
+	NoGUI::Transform centerLeftT = NoGUI::Transform((Vector2){0, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerRightT = NoGUI::Transform((Vector2){window.x, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(1, 0));
 	NoGUI::Transform bottomLT = NoGUI::Transform((Vector2){0, window.y}, elemSize, NoGUI::Align(-1, 1));
 	NoGUI::Transform bottomT = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
 	NoGUI::Transform bottomRT = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, NoGUI::Align(1, 1));
@@ -30,6 +34,8 @@ int main(int argc, char ** argv)
 	bottomLT.radius.x = elemSize.y;
 	bottomRT.radius.x = elemSize.y;
 	
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip");
+	std::shared_ptr< NoGUI::Element > shapeElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, std::make_shared< NoGUI::CContainer >(), "Tip");
 	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT);
 	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, topT);
 	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightT);
@@ -37,8 +43,12 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, bottomT);
 	std::shared_ptr< NoGUI::Element > bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLT);
 	std::shared_ptr< NoGUI::Element > bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomRT);
+	shapeElem->components->addComponent< NoGUI::CText >();
+	dataElem->components->addComponent< NoGUI::CText >();
+	shapeElem->setInner("");
 	if ( argc > 1 )
 	{
+		shapeElem->setInner(argv[1]);
 		if ( strcasecmp(argv[1], "circle") == 0 )
 		{
 			leftT.radius.x = elemSize.y;
@@ -183,6 +193,8 @@ int main(int argc, char ** argv)
 		}
 	}
 	
+	elemVec.push_back(shapeElem);
+	elemVec.push_back(dataElem);
 	elemVec.push_back(leftElem);
 	elemVec.push_back(topElem);
 	elemVec.push_back(rightElem);
@@ -203,17 +215,21 @@ int main(int argc, char ** argv)
 	{
 		bool plustate = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
 		bool minustate = IsMouseButtonDown(MOUSE_RIGHT_BUTTON);
+		dataElem->setInner(TextFormat("Angle: %03.02f", centerElem->angle));
 		BeginDrawing();
 			ClearBackground(BLACK);
 			for ( auto elem : elemVec )
 			{
-				if ( plustate )
+				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
-					elem->rotate(1, elem->origin);
-				}
-				else if ( minustate )
-				{
-					elem->rotate(-1, elem->origin);
+					if ( plustate )
+					{
+						elem->rotate(1, elem->origin);
+					}
+					else if ( minustate )
+					{
+						elem->rotate(-1, elem->origin);
+					}
 				}
 				elem->draw();
 			}

@@ -116,7 +116,6 @@ namespace NoGUI
 		float size = 20.0f;
 		Align align;
 		float angle = 0.0f;
-		
 	};
 	
 	typedef std::tuple< CImage, CText > Components;

@@ -17,9 +17,11 @@ int main(int argc, char ** argv)
 	SetTargetFPS(60);
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(GRAY);
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
+	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< Font > font = nullptr;
 	if ( argc > 1 )
 	{
@@ -40,6 +42,7 @@ int main(int argc, char ** argv)
 	NoGUI::Align bottom = NoGUI::Align(0, 1);
 	NoGUI::Align bottomRight = NoGUI::Align(1, 1);
 	
+	NoGUI::Transform dataT = NoGUI::Transform((Vector2){(elemSize.x + window.x / 2) / 2, window.y / 2}, elemSize, center);
 	NoGUI::Transform leftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, left);
 	NoGUI::Transform topPos = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, top);
 	NoGUI::Transform rightPos = NoGUI::Transform((Vector2){window.x, 0}, elemSize, right);
@@ -50,6 +53,7 @@ int main(int argc, char ** argv)
 	NoGUI::Transform bottomPos = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, bottom);
 	NoGUI::Transform bottomRightPos = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, bottomRight);
 
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, dataT, std::make_shared< NoGUI::CContainer >(), "Tip");
 	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
@@ -60,6 +64,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > bottomLeftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLeftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > bottomRightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomRightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	
+	dataElem->components->addComponent< NoGUI::CText >();
 	leftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, left);
 	topElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, top);
 	rightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, right);
@@ -70,6 +75,7 @@ int main(int argc, char ** argv)
 	bottomLeftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottomLeft);
 	bottomRightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottomRight);
 	
+	elemVec.push_back(dataElem);
 	elemVec.push_back(leftElem);
 	elemVec.push_back(topElem);
 	elemVec.push_back(rightElem);
@@ -134,36 +140,41 @@ int main(int argc, char ** argv)
 			addLine = true;
 		}
 		
+		dataElem->setInner(TextFormat("Element Angle: %03.02f\nText Angle: %03.02f\nText Size: %01.01f\nHorizontal Spacing: %01.01f\nVertical Spacing: %01.01f", centerElem->angle, centerElem->components->getComponent< NoGUI::CText >().angle, centerElem->components->getComponent< NoGUI::CText >().size, centerElem->components->getComponent< NoGUI::CText >().spacing.x, centerElem->components->getComponent< NoGUI::CText >().spacing.y));
+		
 		BeginDrawing();
 			ClearBackground(BLACK);
 			for ( auto elem : elemVec )
 			{
-				NoGUI::CText& txtComp = elem->components->getComponent< NoGUI::CText >();
-				txtComp.spacing.x += translateX;
-				txtComp.spacing.y += translateY;
-				if ( scroll )
+				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
-					txtComp.size += 1.0f * scroll;
-				}
-				if ( addLine )
-				{
-					elem->setInner(msg);
-				}
-				if ( rElemLeft )
-				{
-					elem->rotate(1, elem->origin);
-				}
-				else if ( rElemRight )
-				{
-					elem->rotate(-1, elem->origin);
-				}
-				if ( rTxtLeft )
-				{
-					txtComp.angle -= 1.0f;
-				}
-				else if ( rTxtRight )
-				{
-					txtComp.angle += 1.0f;
+					NoGUI::CText& txtComp = elem->components->getComponent< NoGUI::CText >();
+					txtComp.spacing.x += translateX;
+					txtComp.spacing.y += translateY;
+					if ( scroll )
+					{
+						txtComp.size += 1.0f * scroll;
+					}
+					if ( addLine )
+					{
+						elem->setInner(msg);
+					}
+					if ( rElemLeft )
+					{
+						elem->rotate(-1, elem->origin);
+					}
+					else if ( rElemRight )
+					{
+						elem->rotate(1, elem->origin);
+					}
+					if ( rTxtLeft )
+					{
+						txtComp.angle -= 1.0f;
+					}
+					else if ( rTxtRight )
+					{
+						txtComp.angle += 1.0f;
+					}
 				}
 				elem->draw();
 			}

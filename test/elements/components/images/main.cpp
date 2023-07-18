@@ -19,7 +19,9 @@ int main(int argc, char ** argv)
 	
 	if ( argc > 1 )
 	{
-		// TODO: load texture
+		image.img = std::make_shared< Texture2D >(LoadTexture(argv[1]));
+		image.scrollable = true;
+		image.crop = NoGUI::Crop::NONE;
 	}
 	if ( image.img == nullptr )
 	{
@@ -30,8 +32,11 @@ int main(int argc, char ** argv)
 	}
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >();
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > toggleFill = std::make_shared< NoGUI::Fill >(GREEN);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
+	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill, outline);
 	std::shared_ptr< NoGUI::nShape > ellipse = std::make_shared< NoGUI::nShape >(0, fill, outline);
 	std::shared_ptr< NoGUI::nShape > triangle = std::make_shared< NoGUI::nShape >(3, fill, outline);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
@@ -44,10 +49,18 @@ int main(int argc, char ** argv)
 	NoGUI::Transform topT = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
 	NoGUI::Transform rightT = NoGUI::Transform((Vector2){window.x, 0}, elemSize, NoGUI::Align(1, -1));
 	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
+	NoGUI::Transform centerLeftT = NoGUI::Transform((Vector2){0, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerRightT = NoGUI::Transform((Vector2){window.x, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(1, 0));
 	NoGUI::Transform bottomLT = NoGUI::Transform((Vector2){0, window.y}, elemSize, NoGUI::Align(-1, 1));
 	NoGUI::Transform bottomT = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
 	NoGUI::Transform bottomRT = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, NoGUI::Align(1, 1));
 	
+	std::shared_ptr< NoGUI::Element > styleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip", "NONE");
+	std::shared_ptr< NoGUI::Element > scrollElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip", "\nscrolling ENABLED");
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, std::make_shared< NoGUI::CContainer >(), "Tip");
+	styleElem->components->addComponent< NoGUI::CText >();
+	dataElem->components->addComponent< NoGUI::CText >();
+	scrollElem->components->addComponent< NoGUI::CText >(toggleFill, nullptr, 20.0f, NoGUI::Align(), 0.0f, (Vector2){2, 24});
 	std::shared_ptr< NoGUI::CContainer > comps = std::make_shared< NoGUI::CContainer >();
 	comps->addComponent< NoGUI::CImage >(image);
 	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT, comps);
@@ -58,6 +71,9 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, bottomLT, comps);
 	std::shared_ptr< NoGUI::Element > bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, bottomRT, comps);
 	
+	elemVec.push_back(dataElem);
+	elemVec.push_back(styleElem);
+	elemVec.push_back(scrollElem);
 	elemVec.push_back(leftElem);
 	elemVec.push_back(topElem);
 	elemVec.push_back(rightElem);
@@ -102,6 +118,7 @@ int main(int argc, char ** argv)
 				case NoGUI::Crop::NONE:
 				{
 					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::CUT;
+					styleElem->setInner("CUT");
 					
 					break;
 				}
@@ -109,6 +126,7 @@ int main(int argc, char ** argv)
 				case NoGUI::Crop::FIT:
 				{
 					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::NONE;
+					styleElem->setInner("NONE");
 					
 					break;
 				}
@@ -116,6 +134,7 @@ int main(int argc, char ** argv)
 				case NoGUI::Crop::CUT:
 				{
 					comps->getComponent< NoGUI::CImage >().crop = NoGUI::Crop::FIT;
+					styleElem->setInner("FIT");
 					
 					break;
 				}
@@ -143,18 +162,32 @@ int main(int argc, char ** argv)
 		{
 			comps->getComponent< NoGUI::CImage >().scrollPos.x -= 0.1; // scroll left
 		}
+		dataElem->setInner(TextFormat("Img Size: {%i, %i}\nAngle: %03.02f\nScale: {%02.02f, %02.02f}\nScroll: {%01.02f, %01.02f}", comps->getComponent< NoGUI::CImage >().img->width, comps->getComponent< NoGUI::CImage >().img->height, centerElem->angle, comps->getComponent< NoGUI::CImage >().scale.x, comps->getComponent< NoGUI::CImage >().scale.y, comps->getComponent< NoGUI::CImage >().scrollPos.x, comps->getComponent< NoGUI::CImage >().scrollPos.y));
+		if ( comps->getComponent< NoGUI::CImage >().scrollable )
+		{
+			toggleFill->col = GREEN;
+			scrollElem->setInner("\nscrolling ENABLED");
+		}
+		else
+		{
+			toggleFill->col = RED;
+			scrollElem->setInner("\nscrolling DISABLED");
+		}
 		
 		BeginDrawing();
 			ClearBackground(BLACK);
 			for ( auto elem : elemVec )
 			{
-				if ( rLeft )
+				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
-					elem->rotate(1, elem->origin);
-				}
-				else if ( rRight )
-				{
-					elem->rotate(-1, elem->origin);
+					if ( rLeft )
+					{
+						elem->rotate(1, elem->origin);
+					}
+					else if ( rRight )
+					{
+						elem->rotate(-1, elem->origin);
+					}
 				}
 				elem->draw();
 			}
