@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 #include "../../../../src/GUI.h"
 
@@ -60,7 +59,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, std::make_shared< NoGUI::CContainer >(), "Tip");
 	styleElem->components->addComponent< NoGUI::CText >();
 	dataElem->components->addComponent< NoGUI::CText >();
-	scrollElem->components->addComponent< NoGUI::CText >(toggleFill, nullptr, 20.0f, NoGUI::Align(), 0.0f, (Vector2){2, 24});
+	scrollElem->components->addComponent< NoGUI::CText >(toggleFill, nullptr, 20.0f, NoGUI::Align(), NoGUI::Wrap::DOWN, NoGUI::Crop::NONE, 0.0f, (Vector2){2, 24});
 	std::shared_ptr< NoGUI::CContainer > comps = std::make_shared< NoGUI::CContainer >();
 	comps->addComponent< NoGUI::CImage >(image);
 	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT, comps);

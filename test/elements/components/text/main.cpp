@@ -23,6 +23,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
 	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< Font > font = nullptr;
+	NoGUI::Wrap wrap = NoGUI::Wrap::DOWN;
 	if ( argc > 1 )
 	{
 		font = std::make_shared< Font >(LoadFont(argv[1]));
@@ -43,6 +44,7 @@ int main(int argc, char ** argv)
 	NoGUI::Align bottomRight = NoGUI::Align(1, 1);
 	
 	NoGUI::Transform dataT = NoGUI::Transform((Vector2){(elemSize.x + window.x / 2) / 2, window.y / 2}, elemSize, center);
+	NoGUI::Transform toggleT = NoGUI::Transform((Vector2){(elemSize.x * 2 + window.x / 2), window.y / 2}, elemSize, center);
 	NoGUI::Transform leftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, left);
 	NoGUI::Transform topPos = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, top);
 	NoGUI::Transform rightPos = NoGUI::Transform((Vector2){window.x, 0}, elemSize, right);
@@ -54,6 +56,7 @@ int main(int argc, char ** argv)
 	NoGUI::Transform bottomRightPos = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, bottomRight);
 
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, dataT, std::make_shared< NoGUI::CContainer >(), "Tip");
+	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, toggleT, std::make_shared< NoGUI::CContainer >(), "Tip", "Wrap DOWN");
 	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
@@ -63,19 +66,20 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > bottomLeftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLeftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > bottomRightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomRightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	
 	dataElem->components->addComponent< NoGUI::CText >();
-	leftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, left);
-	topElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, top);
-	rightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, right);
-	centerElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, center);
-	centerLeftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, centerLeft);
-	centerRightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, centerRight);
-	bottomElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottom);
-	bottomLeftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottomLeft);
-	bottomRightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottomRight);
+	toggleElem->components->addComponent< NoGUI::CText >();
+	leftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, left, wrap);
+	topElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, top, wrap);
+	rightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, right, wrap);
+	centerElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, center, wrap);
+	centerLeftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, centerLeft, wrap);
+	centerRightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, centerRight, wrap);
+	bottomElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottom, wrap);
+	bottomLeftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottomLeft, wrap);
+	bottomRightElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, bottomRight, wrap);
 	
 	elemVec.push_back(dataElem);
+	elemVec.push_back(toggleElem);
 	elemVec.push_back(leftElem);
 	elemVec.push_back(topElem);
 	elemVec.push_back(rightElem);
@@ -138,6 +142,26 @@ int main(int argc, char ** argv)
 		{
 			TextAppend(msg, "\ntest", &msgLength);
 			addLine = true;
+		}
+		if ( IsKeyPressed(KEY_SPACE) )
+		{
+			for (auto elem : elemVec)
+			{
+				if (!TextIsEqual(elem->getTag(), "Tip"))
+				{
+					NoGUI::CText& txtComp = elem->components->getComponent< NoGUI::CText >();
+					if ( txtComp.wrap == NoGUI::Wrap::UP )
+					{
+						txtComp.wrap = NoGUI::Wrap::DOWN;
+						toggleElem->setInner("Wrap DOWN");
+					}
+					else
+					{
+						txtComp.wrap = NoGUI::Wrap::UP;
+						toggleElem->setInner("Wrap UP");
+					}
+				}
+			}
 		}
 		
 		dataElem->setInner(TextFormat("Element Angle: %03.02f\nText Angle: %03.02f\nText Size: %01.01f\nHorizontal Spacing: %01.01f\nVertical Spacing: %01.01f", centerElem->angle, centerElem->components->getComponent< NoGUI::CText >().angle, centerElem->components->getComponent< NoGUI::CText >().size, centerElem->components->getComponent< NoGUI::CText >().spacing.x, centerElem->components->getComponent< NoGUI::CText >().spacing.y));

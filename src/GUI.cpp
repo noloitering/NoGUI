@@ -214,19 +214,97 @@ void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShap
 	}
 }
 
-void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area)
+{
+	float scaleFactor = fontSize / (float)font.baseSize;
+	int counter = 0;
+	unsigned int lastWord = 0;
+	float lineWidth = 0;
+	
+	static char buffer[NoMAD::INBUFF] = { 0 };
+	memset(buffer, 0, NoMAD::INBUFF);
+	std::vector< std::tuple< const char*, float > > lines;
+	lines.push_back(std::make_tuple(buffer, lineWidth));
+	
+	if (txt != NULL)
+    {
+		counter = 1;
+
+        // Count how many substrings we have on text and point to every one
+        for (size_t i = 0; i < NoMAD::INBUFF; i++)
+        {
+			buffer[i] = txt[i];
+			if (buffer[i] == '\0')
+			{	
+				break;
+			}
+			int codepointByteCount = 0;
+			int codepoint = GetCodepoint(&txt[i], &codepointByteCount);
+			int index = GetGlyphIndex(font, codepoint);
+			float glyphWidth = 0;
+			
+			if ((codepoint == ' ') || (codepoint == '\t') || (codepoint == '\n')) 
+			{
+				lastWord = i;
+			}
+			
+			if (codepoint != '\n')
+			{
+				glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+ 				lineWidth += glyphWidth + spacing;
+				
+				if (lineWidth > area.width())
+				{
+					buffer[lastWord] = '\0';
+					while ( i != lastWord )
+					{
+						lineWidth -= (glyphWidth + spacing);
+						i--;
+						codepointByteCount = 0;
+						codepoint = GetCodepoint(&txt[i], &codepointByteCount);
+						index = GetGlyphIndex(font, codepoint);
+						glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+					}
+					codepoint = GetCodepoint(&txt[i], &codepointByteCount);
+					index = GetGlyphIndex(font, codepoint);
+					glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+					lineWidth -= glyphWidth + spacing * 2;
+					lines.push_back(std::make_tuple(buffer + i + 1, 0));
+					float& prevLineWidth = std::get< float >(lines[counter - 1]);
+					prevLineWidth = lineWidth;
+					lineWidth = 0;
+					counter++;
+				}
+			}
+			else
+			{
+				buffer[lastWord] = '\0';
+				lines.push_back(std::make_tuple(buffer + i + 1, 0));
+				float& prevLineWidth = std::get< float >(lines[counter - 1]);
+				prevLineWidth = lineWidth - spacing;
+				lineWidth = 0;
+				counter++;
+			}
+		}
+		float& lastLineWidth = std::get< float >(lines.back());
+		Vector2 lastLineSize = MeasureTextEx(font, std::get< const char* >(lines.back()), fontSize, spacing);
+		lastLineWidth = lastLineSize.x;
+	}
+	
+	return lines;
+}
+
+std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt, const CText& fmt, const NoGUI::Transform& area)
 {
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
-	Color col = fmt.fill ? fmt.fill->col : WHITE;
-	Vector2 pos = transform.pos(fmt.align);
-	// text rotates around it's position, not the origin funny enough
-	// adjust origin to reposition text while having each line rotate around the same point
-	Vector2 origin = { 0 };
-	Vector2 size = MeasureTextEx(font, txt, fmt.size, fmt.spacing.x);
-	int numLines = 0;
-	const char **lines = TextSplit(txt, '\n', &numLines);
-	Vector2 lineSize = MeasureTextEx(font, lines[0], fmt.size, fmt.spacing.x);
-	switch ( fmt.align.x )
+	
+	return WrapText(txt, font, fmt.size, fmt.spacing.x, area);
+}
+
+Vector2 NoGUI::AlignText(const NoGUI::Align& alignment, const NoGUI::Wrap& wrap, Vector2 lineSize, int lineNum, int numLines, float lineSpacing)
+{
+	Vector2 origin = {0, 0};
+	switch ( alignment.x )
 	{
 		case NoGUI::XAlign::LEFT:
 		{
@@ -234,48 +312,128 @@ void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& trans
 			
 			break;
 		}
-		// TODO: perform this calculation per line
 		case NoGUI::XAlign::CENTER:
 		{
-			origin.x = size.x / 2.0f;
+			origin.x = lineSize.x / 2.0f;
 			
 			break;
 		}
 		
 		case NoGUI::XAlign::RIGHT:
 		{
-			origin.x = size.x;
+			origin.x = lineSize.x;
 			
 			break;
 		}
 	}
-	switch ( fmt.align.y )
+	switch ( alignment.y )
 	{
 		case NoGUI::YAlign::TOP:
 		{
-			origin.y = 0;
+			origin.y = 0 - (lineSize.y + lineSpacing) * lineNum * static_cast< int >(wrap);
 			
 			break;
 		}
 		
 		case NoGUI::YAlign::CENTER:
 		{
-			origin.y = (lineSize.y * numLines + fmt.spacing.y * (numLines - 1)) / 2; // shift origin half of the total size of text
+			if ( wrap == Wrap::UP )
+			{
+				// correct for first line, and then subtract subsequent lines
+				float halfSize = lineSize.y / 2.0f;
+				origin.y = halfSize - (halfSize + lineSpacing) * (numLines - 1) - (lineSize.y + lineSpacing) * lineNum * static_cast< int >(wrap);
+			}
+			else
+			{
+				// shift origin half of the total size of text
+				origin.y = (lineSize.y * numLines + lineSpacing * (numLines - 1)) / 2 - (lineSize.y + lineSpacing) * lineNum * static_cast< int >(wrap);
+			}
 			
 			break;
 		}
 		
 		case NoGUI::YAlign::BOTTOM:
 		{
-			origin.y = lineSize.y; // shift origin 1 line size above position
+			origin.y = lineSize.y * numLines - (lineSize.y + lineSpacing) * lineNum * static_cast< int >(wrap); // shift origin 1 line size above position
 			
 			break;
 		}
 	}
+	
+	return origin;
+}
+
+Vector2 NoGUI::AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum, int numLines)
+{
+	
+	return AlignText(fmt.align, fmt.wrap, lineSize, lineNum, numLines, fmt.spacing.y);
+}
+
+void NoGUI::DrawCTextFormatted(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+{
+	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
+	Color col = fmt.fill ? fmt.fill->col : WHITE;
+	// text rotates around it's position, not the origin funny enough
+	Vector2 pos = transform.pos(fmt.align);
+	// adjust origin to reposition text while having each line rotate around the same point
+	Vector2 origin = { 0 };
+	int numLines = 0;
+	const char **lines = TextSplit(txt, '\n', &numLines);
 	for (int li=0; li < numLines; li++)
 	{
+		if ( fmt.align.y == YAlign::BOTTOM )
+		{
+			// hack to position only the first line to the bottom of the element, and allow the remaining lines to flow past the transform
+			origin = AlignText(fmt.align, fmt.wrap, MeasureTextEx(font, lines[li], fmt.size, fmt.spacing.x), li, 1, fmt.spacing.y);
+		}
+		else
+		{
+			origin = AlignText(fmt.align, fmt.wrap, MeasureTextEx(font, lines[li], fmt.size, fmt.spacing.x), li, numLines, fmt.spacing.y);
+		}
 		DrawTextPro(font, lines[li], pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
-		origin.y -= lineSize.y + fmt.spacing.y; // go down to next line
+	}
+}
+
+void NoGUI::DrawCTextCropped(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+{
+	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
+	Color col = fmt.fill ? fmt.fill->col : WHITE;
+	std::vector< std::tuple< const char*, float > > lines = WrapText(txt, font, fmt.size, fmt.spacing.x, transform);
+	Vector2 pos = transform.pos(fmt.align);
+	Vector2 origin = {0, 0};
+	int counter = 0;
+	for ( auto& x : lines )
+	{
+		const char* lineText = std::get< const char* >(x);
+		origin = AlignText(fmt.align, fmt.wrap, Vector2{std::get< float >(lines[counter]), fmt.size}, counter, lines.size(), fmt.spacing.y);
+		DrawTextPro(font, lineText, pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
+		counter++;
+	}
+}
+
+void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+{
+	switch (fmt.crop)
+	{
+		case Crop::NONE:
+		{
+			DrawCTextFormatted(txt, fmt, transform);
+			
+			break;
+		}
+		
+		case Crop::FIT:
+		{
+			
+			break;
+		}
+		
+		case Crop::CUT:
+		{
+			DrawCTextCropped(txt, fmt, transform);
+			
+			break;
+		}
 	}
 }
 
