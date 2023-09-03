@@ -18,6 +18,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
+	std::shared_ptr< NoGUI::nShape > dataRect = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< Font > font = nullptr;
 	if ( argc > 1 )
 	{
@@ -32,16 +33,39 @@ int main(int argc, char ** argv)
 	NoGUI::Align topLeft = NoGUI::Align(-1, -1);
 	
 	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, center);
+	NoGUI::Transform topLeftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, topLeft);
 
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, topLeftPos, std::make_shared< NoGUI::CContainer >(), "Tip");
 	
 	centerElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, topLeft, NoGUI::Wrap::DOWN, NoGUI::Crop::CUT);
+	dataElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, topLeft);
 	
 	elemVec.push_back(centerElem);
+	elemVec.push_back(dataElem);
 	
 	// main
 	while ( !WindowShouldClose() )
 	{	
+		float translateX = 0.0f;
+		float translateY = 0.0f;
+		float scroll = GetMouseWheelMove();
+		if ( IsKeyDown(KEY_LEFT) )
+		{
+			translateX -= 1.0f;
+		}
+		else if ( IsKeyDown(KEY_RIGHT) )
+		{
+			translateX += 1.0f;
+		}
+		if ( IsKeyDown(KEY_DOWN) )
+		{
+			translateY -= 1.0f;
+		}
+		else if ( IsKeyDown(KEY_UP) )
+		{
+			translateY += 1.0f;
+		}
 		if ( IsKeyPressed(KEY_Z) ) // top left
 		{
 			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(-1, -1);
@@ -78,11 +102,22 @@ int main(int argc, char ** argv)
 		{
 			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(1, 0);
 		}
-
+		dataElem->setInner(TextFormat("Text Size: %01.01f\nHorizontal Spacing: %01.01f\nVertical Spacing: %01.01f", centerElem->components->getComponent< NoGUI::CText >().size, centerElem->components->getComponent< NoGUI::CText >().spacing.x, centerElem->components->getComponent< NoGUI::CText >().spacing.y));
+		
 		BeginDrawing();
 			ClearBackground(BLACK);
 			for ( auto elem : elemVec )
 			{
+				if (!TextIsEqual(elem->getTag(), "Tip"))
+				{
+					NoGUI::CText& txtComp = elem->components->getComponent< NoGUI::CText >();
+					txtComp.spacing.x += translateX;
+					txtComp.spacing.y += translateY;
+					if ( scroll )
+					{
+						txtComp.size += 1.0f * scroll;
+					}
+				}
 				elem->draw();
 			}
 		EndDrawing();
