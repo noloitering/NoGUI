@@ -3,6 +3,8 @@
 #include "Component.h"
 #include "raymath.h"
 
+#include <iostream>
+
 namespace NoGUI
 {
 	class Transform

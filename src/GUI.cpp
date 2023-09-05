@@ -219,10 +219,13 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 	float scaleFactor = fontSize / (float)font.baseSize;
 	int counter = 0;
 	unsigned int lastWord = 0;
+	unsigned int bi = 0;
 	float lineWidth = 0;
 	
+	std::cout << "clearing buffer" << std::endl;
 	static char buffer[NoMAD::INBUFF] = { 0 };
 	memset(buffer, 0, NoMAD::INBUFF);
+	std::cout << "buffer cleared" << std::endl;
 	std::vector< std::tuple< const char*, float > > lines;
 	lines.push_back(std::make_tuple(buffer, lineWidth));
 	
@@ -233,13 +236,13 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
         // Count how many substrings we have on text and point to every one
         for (size_t i = 0; i < NoMAD::INBUFF; i++)
         {
-			buffer[i] = txt[i];
+			buffer[bi] = txt[i];
 			if (buffer[i] == '\0')
 			{	
 				break;
 			}
 			int codepointByteCount = 0;
-			int codepoint = GetCodepoint(&txt[i], &codepointByteCount);
+			int codepoint = GetCodepoint(&buffer[i], &codepointByteCount);
 			int index = GetGlyphIndex(font, codepoint);
 			float glyphWidth = 0;
 			
@@ -255,23 +258,43 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 				
 				if (lineWidth > area.width())
 				{
-					buffer[lastWord] = '\0';
-					while ( i != lastWord )
+					if ( buffer[lastWord] == ' ' || buffer[lastWord] == '\t' || buffer[lastWord] == '\n' )
 					{
-						lineWidth -= (glyphWidth + spacing);
-						i--;
-						codepointByteCount = 0;
+						buffer[lastWord] = '\0';
+						while ( i != lastWord )
+						{
+							lineWidth -= (glyphWidth + spacing);
+							i--;
+							bi--;
+							codepointByteCount = 0;
+							codepoint = GetCodepoint(&txt[i], &codepointByteCount);
+							index = GetGlyphIndex(font, codepoint);
+							glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+						}
 						codepoint = GetCodepoint(&txt[i], &codepointByteCount);
 						index = GetGlyphIndex(font, codepoint);
 						glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+						lineWidth -= glyphWidth + spacing * 2;
+						lines.push_back(std::make_tuple(buffer + i + 1, 0));
+						float& prevLineWidth = std::get< float >(lines[counter - 1]);
+						prevLineWidth = lineWidth;
 					}
-					codepoint = GetCodepoint(&txt[i], &codepointByteCount);
-					index = GetGlyphIndex(font, codepoint);
-					glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
-					lineWidth -= glyphWidth + spacing * 2;
-					lines.push_back(std::make_tuple(buffer + i + 1, 0));
-					float& prevLineWidth = std::get< float >(lines[counter - 1]);
-					prevLineWidth = lineWidth;
+					else
+					{
+						buffer[i] = '\0';
+						lineWidth -= (glyphWidth + spacing);
+						int utf8Size = 0;
+						const char* choppedChar = CodepointToUTF8(codepoint, &utf8Size);
+						std::cout << "last char: " << choppedChar << std::endl;
+						std::cout << "current char: " << txt[i] << std::endl;
+						lines.push_back(std::make_tuple(buffer + i + 1, 0));
+						float& prevLineWidth = std::get< float >(lines[counter - 1]);
+						prevLineWidth = lineWidth;
+						buffer[i + 1] = txt[i];
+						bi++;
+//						buffer[i + 2] = txt[i + 1];
+//						i++;
+					}
 					lineWidth = 0;
 					counter++;
 				}
@@ -285,6 +308,7 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 				lineWidth = 0;
 				counter++;
 			}
+			bi++;
 		}
 		float& lastLineWidth = std::get< float >(lines.back());
 		Vector2 lastLineSize = MeasureTextEx(font, std::get< const char* >(lines.back()), fontSize, spacing);

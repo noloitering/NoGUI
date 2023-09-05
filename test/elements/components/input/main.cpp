@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
 	std::vector< std::shared_ptr< NoGUI::Element > > elemVec;
 	char msg[NoMAD::INBUFF];
 	int msgLength = 0;
-	TextAppend(msg, "test a really long string like a really looong string. Like unbelievably long. Like dang that's some long text being all long and stuff. SUPER long", &msgLength);
+	TextAppend(msg, "Supercalifragilisticexpialidociousdoesthemostest yea yea", &msgLength);
 	
 	InitWindow(window.x, window.y, "test");
 	SetTargetFPS(60);
