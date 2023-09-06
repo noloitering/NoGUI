@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
 	std::vector< std::shared_ptr< NoGUI::Element > > elemVec;
 	char msg[NoMAD::INBUFF];
 	int msgLength = 0;
-	TextAppend(msg, "Supercalifragilisticexpialidociousdoesthemostest yea yea", &msgLength);
+	TextAppend(msg, "yea yea Supercalifragilisticexpialidociousdoesthemostest yea yea", &msgLength);
 	
 	InitWindow(window.x, window.y, "test");
 	SetTargetFPS(60);
@@ -26,7 +26,7 @@ int main(int argc, char ** argv)
 	}
 	else
 	{
-		font = std::make_shared< Font >(GetFontDefault());
+		font = std::make_shared< Font >(GetFontDefault()); 
 	}
 	
 	NoGUI::Align center = NoGUI::Align(0, 0);
