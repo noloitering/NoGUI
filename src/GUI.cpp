@@ -216,24 +216,22 @@ void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShap
 
 std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area)
 {
-	float scaleFactor = fontSize / (float)font.baseSize;
+	float scaleFactor = fontSize / (float)font.baseSize; // for calculating char size
 	int counter = 0;
 	unsigned int lastWord = 0;
-	unsigned int bi = 0;
+	unsigned int bi = 0; // buffer index
 	float lineWidth = 0;
 	
-	std::cout << "clearing buffer" << std::endl;
+	// clear static buffer
 	static char buffer[NoMAD::INBUFF] = { 0 };
 	memset(buffer, 0, NoMAD::INBUFF);
-	std::cout << "buffer cleared" << std::endl;
+	// initialize result
 	std::vector< std::tuple< const char*, float > > lines;
 	lines.push_back(std::make_tuple(buffer, lineWidth));
 	
 	if (txt != NULL)
     {
 		counter = 1;
-
-        // Count how many substrings we have on text and point to every one
         for (size_t i = 0; i < NoMAD::INBUFF; i++)
         {
 			buffer[bi] = txt[i];
@@ -248,7 +246,7 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 			
 			if ((codepoint == ' ') || (codepoint == '\t') || (codepoint == '\n')) 
 			{
-				lastWord = i;
+				lastWord = bi;
 			}
 			
 			if (codepoint != '\n')
@@ -260,8 +258,10 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 				{
 					if ( buffer[lastWord] == ' ' || buffer[lastWord] == '\t' || buffer[lastWord] == '\n' )
 					{
+						// replace space char with terminating char
 						buffer[lastWord] = '\0';
-						while ( i != lastWord )
+						// recalculate lineWidth and move index back
+						while ( bi != lastWord )
 						{
 							lineWidth -= (glyphWidth + spacing);
 							i--;
@@ -275,9 +275,11 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 						index = GetGlyphIndex(font, codepoint);
 						glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
 						lineWidth -= glyphWidth + spacing * 2;
-						lines.push_back(std::make_tuple(buffer + i + 1, 0));
-						float& prevLineWidth = std::get< float >(lines[counter - 1]);
+						// input new line width
+						float& prevLineWidth = std::get< float >(lines[counter]);
 						prevLineWidth = lineWidth;
+						// add next line to result
+						lines.push_back(std::make_tuple(buffer + bi + 1, 0));
 						lineWidth = 0;
 					}
 					else
@@ -285,38 +287,28 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 						// replace current char with terminating character
 						buffer[bi] = '\0';
 						lineWidth -= (glyphWidth + spacing * 2);
-						int utf8Size = 0;
-						const char* choppedChar = CodepointToUTF8(codepoint, &utf8Size);
-//						std::cout << "last char: " << choppedChar << std::endl;
-//						std::cout << "current char: " << txt[i] << std::endl;
 						// input current line width
 						float& prevLineWidth = std::get< float >(lines[counter]);
 						prevLineWidth = lineWidth;
 						// add next line to result
 						lines.push_back(std::make_tuple(buffer + bi + 1, 0));
-						// swap back terminated character into the buffer and increment char position
+						//  increment char position and swap back terminated character into the buffer
 						bi++; // WARNING: DANGEROUS OPERATION! CAN OVERFLOW PAST NoMAD::INBUFF
 						buffer[bi] = txt[i];
-						std::cout << "current line: " << counter - 1 << std::endl;
-						std::cout << std::get< const char* >(lines[counter - 1]) << std::endl;
-						std::cout << "line width: " << lineWidth << std::endl;
-						std::cout << choppedChar << ": " << glyphWidth << std::endl;
-						std::cout << "text index: " << i << std::endl;
-						std::cout << txt[i] << std::endl;
-						std::cout << "buffer index: " << bi << std::endl;
-						std::cout << buffer[bi] << std::endl;
 						lineWidth = glyphWidth + spacing;
 					}
-//					lineWidth = 0;
 					counter++;
 				}
 			}
 			else
 			{
+				// replace newline char with terminating char 
 				buffer[lastWord] = '\0';
-				lines.push_back(std::make_tuple(buffer + i + 1, 0));
-				float& prevLineWidth = std::get< float >(lines[counter - 1]);
+				// input current line width
+				float& prevLineWidth = std::get< float >(lines[counter]);
 				prevLineWidth = lineWidth - spacing;
+				// add next line to result and increment counter
+				lines.push_back(std::make_tuple(buffer + bi + 1, 0));
 				lineWidth = 0;
 				counter++;
 			}
