@@ -101,8 +101,8 @@ namespace NoGUI
 		std::shared_ptr< nShape > shape;
 		Crop crop = Crop::NONE;
 		bool scrollable = false;
-		Vector2 scale = {1, 1};
-		Vector2 scrollPos = {0.5, 0.5};
+		Vector2 scale = {1.0f, 1.0f};
+		Vector2 scrollPos = {0.5f, 0.5f};
 	};
 	
 	class CText : public CInterface
@@ -115,7 +115,8 @@ namespace NoGUI
 		Align align;
 		Crop crop = Crop::NONE;
 		Wrap wrap = Wrap::DOWN;
-		Vector2 spacing = {2, 0};
+		Vector2 spacing = {2.0f, 0.0f};
+		Vector2 scrollAmount = {0.0f, 0.0f};
 		float size = 20.0f;
 		float angle = 0.0f;
 	};

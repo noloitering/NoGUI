@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
-	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
+	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, noFill, outline);
 	std::shared_ptr< NoGUI::nShape > dataRect = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< Font > font = nullptr;
 	if ( argc > 1 )
@@ -50,21 +50,29 @@ int main(int argc, char ** argv)
 		float translateX = 0.0f;
 		float translateY = 0.0f;
 		float scroll = GetMouseWheelMove();
-		if ( IsKeyDown(KEY_LEFT) )
+		if ( IsKeyPressed(KEY_LEFT) )
 		{
 			translateX -= 1.0f;
 		}
-		else if ( IsKeyDown(KEY_RIGHT) )
+		else if ( IsKeyPressed(KEY_RIGHT) )
 		{
 			translateX += 1.0f;
 		}
-		if ( IsKeyDown(KEY_DOWN) )
+		if ( IsKeyPressed(KEY_DOWN) )
 		{
 			translateY -= 1.0f;
 		}
-		else if ( IsKeyDown(KEY_UP) )
+		else if ( IsKeyPressed(KEY_UP) )
 		{
 			translateY += 1.0f;
+		}
+		if ( IsKeyDown(KEY_W) )
+		{
+			centerElem->components->getComponent< NoGUI::CText >().scrollAmount.y -= 1.0f;
+		}
+		else if ( IsKeyDown(KEY_S) )
+		{
+			centerElem->components->getComponent< NoGUI::CText >().scrollAmount.y += 1.0f;
 		}
 		if ( IsKeyPressed(KEY_Z) ) // top left
 		{

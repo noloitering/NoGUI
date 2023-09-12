@@ -427,16 +427,151 @@ void NoGUI::DrawCTextCropped(const char* txt, CText& fmt, const NoGUI::Transform
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	Color col = fmt.fill ? fmt.fill->col : WHITE;
 	std::vector< std::tuple< const char*, float > > lines = WrapText(txt, font, fmt.size, fmt.spacing.x, transform);
-	Vector2 pos = transform.pos(fmt.align);
-	Vector2 origin = {0, 0};
-	int counter = 0;
-	for ( auto& x : lines )
+//	Vector2 pos = transform.pos(fmt.align);
+//	Vector2 origin = {0, 0};
+//	int counter = 0;
+	
+	float scaleFactor = fmt.size / (float)font.baseSize; // for calculating char size
+	float totalHeight = fmt.size * lines.size() + fmt.spacing.y * (lines.size() - 1);
+	float lineOffset = 0.0f;
+	unsigned int lineIndex = 0;
+	Vector2 charPos = transform.pos(NoGUI::Align(-1, -1));
+	
+	if ( totalHeight > transform.height() )
 	{
-		const char* lineText = std::get< const char* >(x);
-		origin = AlignText(fmt.align, fmt.wrap, Vector2{std::get< float >(lines[counter]), fmt.size}, counter, lines.size(), fmt.spacing.y);
-		DrawTextPro(font, lineText, pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
-		counter++;
+		float maxScroll = totalHeight - transform.height();
+		if ( fmt.scrollAmount.y > maxScroll )
+		{
+			fmt.scrollAmount.y = maxScroll;
+		}
+		if ( fmt.scrollAmount.y < 0 )
+		{
+			fmt.scrollAmount.y = 0;
+		}
+		float scrollPos = 0;
+		while ( scrollPos < fmt.scrollAmount.y ) // find which line to start on
+		{
+			scrollPos += fmt.size;
+			if ( scrollPos >= fmt.scrollAmount.y )
+			{
+				
+				break;
+			}
+			else
+			{
+				scrollPos += fmt.spacing.y;
+			}
+			lineIndex++;
+		}
+		lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
+		lineOffset /= scaleFactor;
+		Vector2 scrollPercent = {1.0f, fmt.scrollAmount.y / maxScroll};
+		Vector2 percentShown = {1.0f, transform.height() / totalHeight};
+		DrawScrollBars(nullptr, nullptr, transform, scrollPercent, percentShown, 3);
 	}
+	float txtHeight = 0.0f;
+	while ( lineIndex < lines.size() )
+	{
+		const char* line = std::get< const char* >(lines.at(lineIndex));
+		unsigned int lineLength = TextLength(line); // TODO: add textLength to wrapText
+		for (unsigned int i=0; i < lineLength; i++)
+		{
+			int codepointByteCount = 0;
+			int codepoint = GetCodepoint(&line[i], &codepointByteCount);
+			int index = GetGlyphIndex(font, codepoint);
+			float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;;
+			
+			if ((codepoint != ' ') && (codepoint != '\t'))
+			{
+				// Character destination rectangle on screen
+				// NOTE: We consider glyphPadding on drawing
+				Rectangle dstRec = { charPos.x + font.glyphs[index].offsetX*scaleFactor - (float)font.glyphPadding*scaleFactor,
+                      charPos.y + font.glyphs[index].offsetY*scaleFactor - (float)font.glyphPadding*scaleFactor,
+                      (font.recs[index].width + 2.0f*font.glyphPadding)*scaleFactor,
+                      (font.recs[index].height + 2.0f*font.glyphPadding)*scaleFactor};
+
+				// Character source rectangle from font texture atlas
+				// NOTE: We consider chars padding when drawing, it could be required for outline/glow shader effects
+				Rectangle srcRec = { font.recs[index].x - (float)font.glyphPadding, font.recs[index].y - (float)font.glyphPadding,
+                         font.recs[index].width + 2.0f*font.glyphPadding, font.recs[index].height + 2.0f*font.glyphPadding };
+				
+				if ( lineOffset > 0.0f )
+				{
+					dstRec.height -= lineOffset*scaleFactor;
+					
+					srcRec.y += lineOffset;
+					srcRec.height -= lineOffset;
+				}
+				else
+				{
+					dstRec.height += lineOffset*scaleFactor;
+					
+					srcRec.height += lineOffset;
+				}
+				DrawRectangleLinesEx(dstRec, 1, GRAY);
+				// Draw the character texture on the screen
+				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
+			}
+			charPos.x += glyphWidth + fmt.spacing.x;
+		}
+		txtHeight += fmt.size - lineOffset * scaleFactor;
+		if ( txtHeight > transform.height() )
+		{
+			
+			break;
+		}
+		else
+		{
+			txtHeight += fmt.spacing.y;
+		}
+		if ( txtHeight + fmt.size > transform.height() )
+		{
+			lineOffset = (txtHeight + fmt.size - transform.height()) / scaleFactor * -1;
+		}
+		else
+		{
+			charPos.y -= lineOffset*scaleFactor;
+			lineOffset = 0.0f;
+		}
+		charPos.y += fmt.size + fmt.spacing.y;
+		charPos.x = transform.pos(NoGUI::Align(-1, -1)).x;
+		lineIndex++;
+	}
+	
+	
+	// for ( auto& x : lines )
+	// {
+		// textHeight += fmt.size + fmt.spacing.y;
+		// const char* lineText = std::get< const char* >(x);
+		// origin = AlignText(fmt.align, fmt.wrap, Vector2{std::get< float >(lines[counter]), fmt.size}, counter, lines.size(), fmt.spacing.y);
+		// if ( textHeight > transform.height() )
+		// {
+			// Vector2 percentShown = {1.0f, (float)counter / (float)lines.size()};
+			// DrawScrollBars(nullptr, nullptr, transform, fmt.scrollPos, percentShown, 3);
+			
+			// break;
+		// }
+		// DrawTextPro(font, lineText, pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
+		// counter++;
+	// }
+	
+	// unsigned int counter2 = lines.size() * fmt.scrollPos.y; // something like this
+	// while (counter2 != lines.size())
+	// {
+		// textHeight += fmt.size + fmt.spacing.y;
+		// const char* lineText = std::get< const char* >(lines.at(counter2));
+		// origin = AlignText(fmt.align, fmt.wrap, Vector2{std::get< float >(lines.at(counter)), fmt.size}, counter2, lines.size(), fmt.spacing.y);
+		// if ( textHeight > transform.height() )
+		// {
+			// Vector2 percentShown = {1.0f, (float)counter2 / (float)lines.size()};
+			// DrawScrollBars(nullptr, nullptr, transform, fmt.scrollPos, percentShown, 3);
+			
+			// break;
+		// }
+		// DrawTextPro(font, lineText, pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
+		// std::cout << counter2 << std::endl;
+		// counter2++;
+	// }
 }
 
 void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
