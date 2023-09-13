@@ -108,20 +108,34 @@ namespace NoGUI
 	class CText : public CInterface
 	{
 	public:
-		CText(std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Font > style=nullptr, float big=20.0f, const Align& pos=Align(), const Wrap& wrapping=Wrap::DOWN, const Crop& cropping=Crop::NONE, float rotation=0.0f, const Vector2& space={2,0})
-			:  fill(col), font(style), align(pos), crop(cropping), wrap(wrapping), spacing(space), size(big), angle(rotation) {}
+		CText(std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Font > style=nullptr, float big=20.0f, const Align& pos=Align(), const Wrap& wrapping=Wrap::DOWN, float rotation=0.0f, const Vector2& space={2,0})
+			:  fill(col), font(style), align(pos), wrap(wrapping), spacing(space), size(big), angle(rotation) {}
 		std::shared_ptr< Fill > fill;
 		std::shared_ptr< Font > font;
 		Align align;
-		Crop crop = Crop::NONE;
 		Wrap wrap = Wrap::DOWN;
 		Vector2 spacing = {2.0f, 0.0f};
-		Vector2 scrollAmount = {0.0f, 0.0f};
+//		Vector2 scrollAmount = {0.0f, 0.0f};
 		float size = 20.0f;
 		float angle = 0.0f;
 	};
 	
-	typedef std::tuple< CImage, CText > Components;
+	class CTextBox : public CInterface
+	{
+	public:
+		CTextBox(std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Font > style=nullptr, float big=20.0f, const Align& pos=Align(), const Wrap& wrapping=Wrap::DOWN, const Vector2& space={2,0})
+			:  fill(col), font(style), align(pos), wrap(wrapping), spacing(space), size(big) {}
+		std::shared_ptr< Fill > fill;
+		std::shared_ptr< Font > font;
+		Align align;
+		Wrap wrap = Wrap::DOWN;
+		Vector2 spacing = {2.0f, 0.0f};
+		Vector2 scrollAmount = {0.0f, 0.0f};
+		float size = 20.0f;
+//		float angle = 0.0f;
+	};
+	
+	typedef std::tuple< CImage, CText, CTextBox > Components;
 	
 	class CContainer
 	{

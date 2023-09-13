@@ -23,7 +23,7 @@
 
 # -- CONFIGURATION --
 # paths
-EXE_NAME ?= test_input
+EXE_NAME ?= test_textbox
 DESTDIR ?= ./
 SRC ?= main.cpp ../../../../src/Core.cpp ../../../../src/GUI.cpp
 OBJS = $(patsubst %.c, %.o, $(SRC))

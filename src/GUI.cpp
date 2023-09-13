@@ -397,7 +397,7 @@ Vector2 NoGUI::AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum,
 	return AlignText(fmt.align, fmt.wrap, lineSize, lineNum, numLines, fmt.spacing.y);
 }
 
-void NoGUI::DrawCTextFormatted(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
 {
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	Color col = fmt.fill ? fmt.fill->col : WHITE;
@@ -422,7 +422,7 @@ void NoGUI::DrawCTextFormatted(const char* txt, CText& fmt, const NoGUI::Transfo
 	}
 }
 
-void NoGUI::DrawCTextCropped(const char* txt, CText& fmt, const NoGUI::Transform& transform)
+void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform)
 {
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	Color col = fmt.fill ? fmt.fill->col : WHITE;
@@ -571,32 +571,6 @@ void NoGUI::DrawCTextCropped(const char* txt, CText& fmt, const NoGUI::Transform
 		// std::cout << counter2 << std::endl;
 		// counter2++;
 	// }
-}
-
-void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
-{
-	switch (fmt.crop)
-	{
-		case Crop::NONE:
-		{
-			DrawCTextFormatted(txt, fmt, transform);
-			
-			break;
-		}
-		
-		case Crop::FIT:
-		{
-			
-			break;
-		}
-		
-		case Crop::CUT:
-		{
-			DrawCTextCropped(txt, fmt, transform);
-			
-			break;
-		}
-	}
 }
 
 void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
@@ -1496,6 +1470,7 @@ void NoGUI::DrawElement(Element* elem)
 	{
 		CImage& imgComp = elem->components->getComponent< NoGUI::CImage >();
 		CText& txtComp = elem->components->getComponent< NoGUI::CText >();
+		CTextBox& txtBoxComp =  elem->components->getComponent< NoGUI::CTextBox >();
 		if ( imgComp.active )
 		{
 			if ( imgComp.shape )
@@ -1512,6 +1487,10 @@ void NoGUI::DrawElement(Element* elem)
 		if ( txtComp.active )
 		{
 			DrawCText(elem->getInner(), txtComp, (*elem));
+		}
+		if ( txtBoxComp.active )
+		{
+			DrawCTextBox(elem->getInner(), txtBoxComp, (*elem));
 		}
 	}
 }

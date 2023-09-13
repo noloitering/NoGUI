@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, topLeftPos, std::make_shared< NoGUI::CContainer >(), "Tip");
 	
-	centerElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, topLeft, NoGUI::Wrap::DOWN, NoGUI::Crop::CUT);
+	centerElem->components->addComponent< NoGUI::CTextBox >(nullptr, font, 20, topLeft, NoGUI::Wrap::DOWN);
 	dataElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, topLeft);
 	
 	elemVec.push_back(centerElem);
@@ -68,49 +68,49 @@ int main(int argc, char ** argv)
 		}
 		if ( IsKeyDown(KEY_W) )
 		{
-			centerElem->components->getComponent< NoGUI::CText >().scrollAmount.y -= 1.0f;
+			centerElem->components->getComponent< NoGUI::CTextBox >().scrollAmount.y -= 1.0f;
 		}
 		else if ( IsKeyDown(KEY_S) )
 		{
-			centerElem->components->getComponent< NoGUI::CText >().scrollAmount.y += 1.0f;
+			centerElem->components->getComponent< NoGUI::CTextBox >().scrollAmount.y += 1.0f;
 		}
 		if ( IsKeyPressed(KEY_Z) ) // top left
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(-1, -1);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(-1, -1);
 		}
 		else if ( IsKeyPressed(KEY_X) ) // top right
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(1, -1);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(1, -1);
 		}
 		else if ( IsKeyPressed(KEY_C) ) // center
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(0, 0);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(0, 0);
 		}
 		else if ( IsKeyPressed(KEY_V) ) // top
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(0, -1);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(0, -1);
 		}
 		else if ( IsKeyPressed(KEY_B) ) // bottom
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(0, 1);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(0, 1);
 		}
 		else if ( IsKeyPressed(KEY_N) ) // bottom left
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(-1, 1);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(-1, 1);
 		}
 		else if ( IsKeyPressed(KEY_M) ) // bottom right
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(1, 1);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(1, 1);
 		}
 		else if ( IsKeyPressed(KEY_COMMA) ) // center left
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(-1, 0);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(-1, 0);
 		}
 		else if ( IsKeyPressed(KEY_PERIOD) ) // center right
 		{
-			centerElem->components->getComponent< NoGUI::CText >().align = NoGUI::Align(1, 0);
+			centerElem->components->getComponent< NoGUI::CTextBox >().align = NoGUI::Align(1, 0);
 		}
-		dataElem->setInner(TextFormat("Text Size: %01.01f\nHorizontal Spacing: %01.01f\nVertical Spacing: %01.01f", centerElem->components->getComponent< NoGUI::CText >().size, centerElem->components->getComponent< NoGUI::CText >().spacing.x, centerElem->components->getComponent< NoGUI::CText >().spacing.y));
+		dataElem->setInner(TextFormat("Text Size: %01.01f\nHorizontal Spacing: %01.01f\nVertical Spacing: %01.01f", centerElem->components->getComponent< NoGUI::CTextBox >().size, centerElem->components->getComponent< NoGUI::CTextBox >().spacing.x, centerElem->components->getComponent< NoGUI::CTextBox >().spacing.y));
 		
 		BeginDrawing();
 			ClearBackground(BLACK);
@@ -118,7 +118,7 @@ int main(int argc, char ** argv)
 			{
 				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
-					NoGUI::CText& txtComp = elem->components->getComponent< NoGUI::CText >();
+					NoGUI::CTextBox& txtComp = elem->components->getComponent< NoGUI::CTextBox >();
 					txtComp.spacing.x += translateX;
 					txtComp.spacing.y += translateY;
 					if ( scroll )

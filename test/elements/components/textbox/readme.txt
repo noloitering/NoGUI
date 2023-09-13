@@ -1,4 +1,4 @@
-test_text.exe
+test_textbox.exe
 Tests drawing fonts in 9 different alignments, and manipulation of that font
 
 CONTROLS:

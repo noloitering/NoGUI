@@ -56,8 +56,7 @@ namespace NoGUI
 	std::vector< std::tuple< const char*, float > > WrapText(const char* txt, const NoGUI::CText& fmt, const NoGUI::Transform& area);
 	Vector2 AlignText(const NoGUI::Align& alignment, const NoGUI::Wrap& wrap, Vector2 lineSize, int lineNum, int numLines, float lineSpacing=0);
 	Vector2 AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum, int numLines);
-	void DrawCTextFormatted(const char* txt, CText& fmt, const NoGUI::Transform& transform);
-	void DrawCTextCropped(const char* txt, CText& fmt, const NoGUI::Transform& transform);
+	void DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform);
 	void DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform);
 	void DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
