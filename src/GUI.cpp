@@ -508,7 +508,6 @@ void NoGUI::DrawCTextCropped(const char* txt, CText& fmt, const NoGUI::Transform
 					
 					srcRec.height += lineOffset;
 				}
-				DrawRectangleLinesEx(dstRec, 1, GRAY);
 				// Draw the character texture on the screen
 				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
 			}

@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
-	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, noFill, outline);
+	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
 	std::shared_ptr< NoGUI::nShape > dataRect = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< Font > font = nullptr;
 	if ( argc > 1 )
