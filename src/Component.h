@@ -115,7 +115,6 @@ namespace NoGUI
 		Align align;
 		Wrap wrap = Wrap::DOWN;
 		Vector2 spacing = {2.0f, 0.0f};
-//		Vector2 scrollAmount = {0.0f, 0.0f};
 		float size = 20.0f;
 		float angle = 0.0f;
 	};
@@ -132,7 +131,6 @@ namespace NoGUI
 		Vector2 spacing = {2.0f, 0.0f};
 		Vector2 scrollAmount = {0.0f, 0.0f};
 		float size = 20.0f;
-//		float angle = 0.0f;
 	};
 	
 	typedef std::tuple< CImage, CText, CTextBox > Components;

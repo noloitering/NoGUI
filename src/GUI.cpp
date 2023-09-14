@@ -214,10 +214,11 @@ void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShap
 	}
 }
 
-std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area)
+std::vector< std::tuple< const char*, float, unsigned int > > NoGUI::WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area)
 {
 	float scaleFactor = fontSize / (float)font.baseSize; // for calculating char size
 	int counter = 0;
+	unsigned int charCount = 0;
 	unsigned int lastWord = 0;
 	unsigned int bi = 0; // buffer index
 	float lineWidth = 0;
@@ -226,19 +227,20 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 	static char buffer[NoMAD::INBUFF] = { 0 };
 	memset(buffer, 0, NoMAD::INBUFF);
 	// initialize result
-	std::vector< std::tuple< const char*, float > > lines;
-	lines.push_back(std::make_tuple(buffer, lineWidth));
+	std::vector< std::tuple< const char*, float, unsigned int > > lines;
+	lines.push_back(std::make_tuple(buffer, lineWidth, charCount));
 	
 	if (txt != NULL)
     {
 		counter = 1;
-        for (size_t i = 0; i < NoMAD::INBUFF; i++)
+        for (size_t i = 0; bi < NoMAD::INBUFF; i++)
         {
 			buffer[bi] = txt[i];
 			if (buffer[bi] == '\0')
 			{	
 				break;
 			}
+			charCount++;
 			int codepointByteCount = 0;
 			int codepoint = GetCodepoint(&txt[i], &codepointByteCount);
 			int index = GetGlyphIndex(font, codepoint);
@@ -266,36 +268,46 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 							lineWidth -= (glyphWidth + spacing);
 							i--;
 							bi--;
+							charCount--;
 							codepointByteCount = 0;
 							codepoint = GetCodepoint(&txt[i], &codepointByteCount);
 							index = GetGlyphIndex(font, codepoint);
 							glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
 						}
+						charCount--;
 						codepoint = GetCodepoint(&txt[i], &codepointByteCount);
 						index = GetGlyphIndex(font, codepoint);
 						glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
 						lineWidth -= glyphWidth + spacing * 2;
 						// input new line width
-						float& prevLineWidth = std::get< float >(lines[counter]);
-						prevLineWidth = lineWidth;
+						std::get< float >(lines.at(counter - 1)) = lineWidth;
+						// input new char count
+						std::get< unsigned int >(lines.at(counter - 1)) = charCount;
 						// add next line to result
-						lines.push_back(std::make_tuple(buffer + bi + 1, 0));
-						lineWidth = 0;
+						lineWidth = 0.0f;
+						charCount = 0;
+						lines.push_back(std::make_tuple(buffer + bi + 1, lineWidth, charCount));
 					}
 					else
 					{
 						// replace current char with terminating character
 						buffer[bi] = '\0';
 						lineWidth -= (glyphWidth + spacing * 2);
+						charCount--;
 						// input current line width
-						float& prevLineWidth = std::get< float >(lines[counter]);
-						prevLineWidth = lineWidth;
+						std::get< float >(lines.at(counter - 1)) = lineWidth;
+						// input current char count
+						std::get< unsigned int >(lines.at(counter - 1)) = charCount;
 						// add next line to result
-						lines.push_back(std::make_tuple(buffer + bi + 1, 0));
+						lines.push_back(std::make_tuple(buffer + bi + 1, 0.0f, 0));
 						//  increment char position and swap back terminated character into the buffer
-						bi++; // WARNING: DANGEROUS OPERATION! CAN OVERFLOW PAST NoMAD::INBUFF
-						buffer[bi] = txt[i];
-						lineWidth = glyphWidth + spacing;
+						if ( bi + 1 < NoMAD::INBUFF )
+						{
+							bi++; // WARNING: DANGEROUS OPERATION! CAN OVERFLOW PAST NoMAD::INBUFF
+							buffer[bi] = txt[i];
+							lineWidth = glyphWidth + spacing;
+							charCount = 1;
+						}
 					}
 					counter++;
 				}
@@ -305,24 +317,27 @@ std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt,
 				// replace newline char with terminating char 
 				buffer[lastWord] = '\0';
 				// input current line width
-				float& prevLineWidth = std::get< float >(lines[counter]);
-				prevLineWidth = lineWidth - spacing;
+				std::get< float >(lines.at(counter - 1)) = lineWidth - spacing;
+				// input current char count
+				std::get< unsigned int >(lines.at(counter - 1)) = charCount;
 				// add next line to result and increment counter
-				lines.push_back(std::make_tuple(buffer + bi + 1, 0));
-				lineWidth = 0;
+				lineWidth = 0.0f;
+				charCount = 0;
+				lines.push_back(std::make_tuple(buffer + bi + 1, lineWidth, charCount));
 				counter++;
 			}
 			bi++;
 		}
-		float& lastLineWidth = std::get< float >(lines.back());
-		Vector2 lastLineSize = MeasureTextEx(font, std::get< const char* >(lines.back()), fontSize, spacing);
-		lastLineWidth = lastLineSize.x;
+		const char* lastLine = std::get< const char* >(lines.back());
+		// TODO: the last line will be iterated 3 times here. This can be optimized
+		std::get< float >(lines.back()) = MeasureTextEx(font, lastLine, fontSize, spacing).x;
+		std::get< unsigned int >(lines.back()) = TextLength(lastLine);
 	}
 	
 	return lines;
 }
 
-std::vector< std::tuple< const char*, float > > NoGUI::WrapText(const char* txt, const CText& fmt, const NoGUI::Transform& area)
+std::vector< std::tuple< const char*, float, unsigned int > > NoGUI::WrapText(const char* txt, const CText& fmt, const NoGUI::Transform& area)
 {
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	
@@ -426,7 +441,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 {
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	Color col = fmt.fill ? fmt.fill->col : WHITE;
-	std::vector< std::tuple< const char*, float > > lines = WrapText(txt, font, fmt.size, fmt.spacing.x, transform);
+	std::vector< std::tuple< const char*, float, unsigned int > > lines = WrapText(txt, font, fmt.size, fmt.spacing.x, transform);
 //	Vector2 pos = transform.pos(fmt.align);
 //	Vector2 origin = {0, 0};
 //	int counter = 0;
@@ -473,7 +488,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	while ( lineIndex < lines.size() )
 	{
 		const char* line = std::get< const char* >(lines.at(lineIndex));
-		unsigned int lineLength = TextLength(line); // TODO: add textLength to wrapText
+		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex)); 
 		for (unsigned int i=0; i < lineLength; i++)
 		{
 			int codepointByteCount = 0;
