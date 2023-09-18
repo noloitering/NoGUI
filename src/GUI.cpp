@@ -442,18 +442,17 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	Color col = fmt.fill ? fmt.fill->col : WHITE;
 	std::vector< std::tuple< const char*, float, unsigned int > > lines = WrapText(txt, font, fmt.size, fmt.spacing.x, transform);
-//	Vector2 pos = transform.pos(fmt.align);
-//	Vector2 origin = {0, 0};
-//	int counter = 0;
-	
 	float scaleFactor = fmt.size / (float)font.baseSize; // for calculating char size
 	float totalHeight = fmt.size * lines.size() + fmt.spacing.y * (lines.size() - 1);
-	float lineOffset = 0.0f;
-	unsigned int lineIndex = 0;
-	Vector2 charPos = transform.pos(NoGUI::Align(-1, -1));
-	
+	float lineOffset = 0.0f; // for partial lines when scrolling
+	unsigned int lineIndex = 0; // current line to draw
+	int lineNum = 0; // number of lines drawn
+	Vector2 charPos = transform.pos(fmt.align); // keep track of character positioning
+	Vector2 charOffset = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.front()), fmt.size}, lineNum, (int)lines.size(), fmt.spacing.y); // for aligning text
+	charPos.x -= charOffset.x;
 	if ( totalHeight > transform.height() )
 	{
+		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
 		float maxScroll = totalHeight - transform.height();
 		if ( fmt.scrollAmount.y > maxScroll )
 		{
@@ -480,13 +479,22 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		}
 		lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
 		lineOffset /= scaleFactor;
+		// draw scroll bars
 		Vector2 scrollPercent = {1.0f, fmt.scrollAmount.y / maxScroll};
 		Vector2 percentShown = {1.0f, transform.height() / totalHeight};
 		DrawScrollBars(nullptr, nullptr, transform, scrollPercent, percentShown, 3);
 	}
+	else
+	{
+		charPos.y -= charOffset.y; // align text
+	}
+	
 	float txtHeight = 0.0f;
 	while ( lineIndex < lines.size() )
 	{
+		// align text
+		charPos.x = transform.pos(fmt.align).x;
+		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
 		const char* line = std::get< const char* >(lines.at(lineIndex));
 		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex)); 
 		for (unsigned int i=0; i < lineLength; i++)
@@ -510,14 +518,14 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 				Rectangle srcRec = { font.recs[index].x - (float)font.glyphPadding, font.recs[index].y - (float)font.glyphPadding,
                          font.recs[index].width + 2.0f*font.glyphPadding, font.recs[index].height + 2.0f*font.glyphPadding };
 				
-				if ( lineOffset > 0.0f )
+				if ( lineOffset > 0.0f ) // top line offset
 				{
 					dstRec.height -= lineOffset*scaleFactor;
 					
 					srcRec.y += lineOffset;
 					srcRec.height -= lineOffset;
 				}
-				else
+				else // bottom line offset
 				{
 					dstRec.height += lineOffset*scaleFactor;
 					
@@ -526,7 +534,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 				// Draw the character texture on the screen
 				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
 			}
-			charPos.x += glyphWidth + fmt.spacing.x;
+			charPos.x += glyphWidth + fmt.spacing.x; // move to next character
 		}
 		txtHeight += fmt.size - lineOffset * scaleFactor;
 		if ( txtHeight > transform.height() )
@@ -547,45 +555,10 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 			charPos.y -= lineOffset*scaleFactor;
 			lineOffset = 0.0f;
 		}
-		charPos.y += fmt.size + fmt.spacing.y;
-		charPos.x = transform.pos(NoGUI::Align(-1, -1)).x;
+		lineNum++;
 		lineIndex++;
+		charPos.y += fmt.size + fmt.spacing.y;
 	}
-	
-	
-	// for ( auto& x : lines )
-	// {
-		// textHeight += fmt.size + fmt.spacing.y;
-		// const char* lineText = std::get< const char* >(x);
-		// origin = AlignText(fmt.align, fmt.wrap, Vector2{std::get< float >(lines[counter]), fmt.size}, counter, lines.size(), fmt.spacing.y);
-		// if ( textHeight > transform.height() )
-		// {
-			// Vector2 percentShown = {1.0f, (float)counter / (float)lines.size()};
-			// DrawScrollBars(nullptr, nullptr, transform, fmt.scrollPos, percentShown, 3);
-			
-			// break;
-		// }
-		// DrawTextPro(font, lineText, pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
-		// counter++;
-	// }
-	
-	// unsigned int counter2 = lines.size() * fmt.scrollPos.y; // something like this
-	// while (counter2 != lines.size())
-	// {
-		// textHeight += fmt.size + fmt.spacing.y;
-		// const char* lineText = std::get< const char* >(lines.at(counter2));
-		// origin = AlignText(fmt.align, fmt.wrap, Vector2{std::get< float >(lines.at(counter)), fmt.size}, counter2, lines.size(), fmt.spacing.y);
-		// if ( textHeight > transform.height() )
-		// {
-			// Vector2 percentShown = {1.0f, (float)counter2 / (float)lines.size()};
-			// DrawScrollBars(nullptr, nullptr, transform, fmt.scrollPos, percentShown, 3);
-			
-			// break;
-		// }
-		// DrawTextPro(font, lineText, pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
-		// std::cout << counter2 << std::endl;
-		// counter2++;
-	// }
 }
 
 void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform)
