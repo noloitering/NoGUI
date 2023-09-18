@@ -444,16 +444,17 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	std::vector< std::tuple< const char*, float, unsigned int > > lines = WrapText(txt, font, fmt.size, fmt.spacing.x, transform);
 	float scaleFactor = fmt.size / (float)font.baseSize; // for calculating char size
 	float totalHeight = fmt.size * lines.size() + fmt.spacing.y * (lines.size() - 1);
+	float maxScroll = totalHeight - transform.height();
 	float lineOffset = 0.0f; // for partial lines when scrolling
+	bool scrollBars = totalHeight > transform.height();
 	unsigned int lineIndex = 0; // current line to draw
 	int lineNum = 0; // number of lines drawn
 	Vector2 charPos = transform.pos(fmt.align); // keep track of character positioning
 	Vector2 charOffset = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.front()), fmt.size}, lineNum, (int)lines.size(), fmt.spacing.y); // for aligning text
 	charPos.x -= charOffset.x;
-	if ( totalHeight > transform.height() )
+	if ( scrollBars ) // find which line to start on
 	{
 		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
-		float maxScroll = totalHeight - transform.height();
 		if ( fmt.scrollAmount.y > maxScroll )
 		{
 			fmt.scrollAmount.y = maxScroll;
@@ -479,10 +480,6 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		}
 		lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
 		lineOffset /= scaleFactor;
-		// draw scroll bars
-		Vector2 scrollPercent = {1.0f, fmt.scrollAmount.y / maxScroll};
-		Vector2 percentShown = {1.0f, transform.height() / totalHeight};
-		DrawScrollBars(nullptr, nullptr, transform, scrollPercent, percentShown, 3);
 	}
 	else
 	{
@@ -558,6 +555,13 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		lineNum++;
 		lineIndex++;
 		charPos.y += fmt.size + fmt.spacing.y;
+	}
+	// draw scroll bars
+	if ( scrollBars )
+	{
+		Vector2 scrollPercent = {1.0f, fmt.scrollAmount.y / maxScroll};
+		Vector2 percentShown = {1.0f, transform.height() / totalHeight};
+		DrawScrollBars(nullptr, nullptr, transform, scrollPercent, percentShown, 3);
 	}
 }
 
