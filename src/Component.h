@@ -122,14 +122,15 @@ namespace NoGUI
 	class CTextBox : public CInterface
 	{
 	public:
-		CTextBox(std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Font > style=nullptr, float big=20.0f, const Align& pos=Align(), const Wrap& wrapping=Wrap::DOWN, const Vector2& space={2,0})
-			:  fill(col), font(style), align(pos), wrap(wrapping), spacing(space), size(big) {}
+		CTextBox(std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Font > style=nullptr, float big=20.0f, const Align& pos=Align(), bool wrapText=false, const Vector2& space={2,0})
+			:  fill(col), font(style), align(pos), spacing(space), wrap(wrapText), size(big) {}
 		std::shared_ptr< Fill > fill;
 		std::shared_ptr< Font > font;
 		Align align;
-		Wrap wrap = Wrap::DOWN;
+//		Wrap wrap = Wrap::DOWN;
 		Vector2 spacing = {2.0f, 0.0f};
 		Vector2 scrollAmount = {0.0f, 0.0f};
+		bool wrap = false;
 		float size = 20.0f;
 	};
 	

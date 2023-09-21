@@ -16,6 +16,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(GRAY);
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
+	std::shared_ptr< NoGUI::Fill > toggleFill = std::make_shared< NoGUI::Fill >(RED);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
 	std::shared_ptr< NoGUI::nShape > dataRect = std::make_shared< NoGUI::nShape >(4, noFill);
@@ -34,15 +35,19 @@ int main(int argc, char ** argv)
 	
 	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, center);
 	NoGUI::Transform topLeftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, topLeft);
+	NoGUI::Transform togglePos = NoGUI::Transform((Vector2){0, elemSize.y - 20.0f}, elemSize, topLeft);
 
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, topLeftPos, std::make_shared< NoGUI::CContainer >(), "Tip");
+	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, togglePos, std::make_shared< NoGUI::CContainer >(), "Tip", "WRAP: TRUE");
 	
-	centerElem->components->addComponent< NoGUI::CTextBox >(nullptr, font, 20, topLeft, NoGUI::Wrap::DOWN);
+	centerElem->components->addComponent< NoGUI::CTextBox >(nullptr, font, 20, topLeft);
 	dataElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, topLeft);
+	toggleElem->components->addComponent< NoGUI::CText >(toggleFill, font, 20, topLeft);
 	
 	elemVec.push_back(centerElem);
 	elemVec.push_back(dataElem);
+	elemVec.push_back(toggleElem);
 	
 	// main
 	while ( !WindowShouldClose() )
@@ -50,6 +55,10 @@ int main(int argc, char ** argv)
 		float translateX = 0.0f;
 		float translateY = 0.0f;
 		float scroll = GetMouseWheelMove();
+		if ( IsKeyPressed(KEY_SPACE) )
+		{
+			centerElem->components->getComponent< NoGUI::CTextBox >().wrap = !centerElem->components->getComponent< NoGUI::CTextBox >().wrap;
+		}
 		if ( IsKeyPressed(KEY_LEFT) )
 		{
 			translateX -= 1.0f;
@@ -73,6 +82,14 @@ int main(int argc, char ** argv)
 		else if ( IsKeyDown(KEY_S) )
 		{
 			centerElem->components->getComponent< NoGUI::CTextBox >().scrollAmount.y += 1.0f;
+		}
+		if ( IsKeyDown(KEY_A) )
+		{
+			centerElem->components->getComponent< NoGUI::CTextBox >().scrollAmount.x -= 1.0f;
+		}
+		else if ( IsKeyDown(KEY_D) )
+		{
+			centerElem->components->getComponent< NoGUI::CTextBox >().scrollAmount.x += 1.0f;
 		}
 		if ( IsKeyPressed(KEY_Z) ) // top left
 		{
@@ -124,6 +141,16 @@ int main(int argc, char ** argv)
 					if ( scroll )
 					{
 						txtComp.size += 1.0f * scroll;
+					}
+					if ( txtComp.wrap )
+					{
+						toggleElem->setInner("WRAP: TRUE");
+						toggleFill->col = GREEN; 
+					}
+					else
+					{
+						toggleElem->setInner("WRAP: FALSE");
+						toggleFill->col = RED; 
 					}
 				}
 				elem->draw();

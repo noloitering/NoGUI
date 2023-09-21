@@ -238,6 +238,7 @@ std::vector< std::tuple< const char*, float, unsigned int > > NoGUI::WrapText(co
 			buffer[bi] = txt[i];
 			if (buffer[bi] == '\0')
 			{	
+				
 				break;
 			}
 			charCount++;
@@ -437,7 +438,7 @@ void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& trans
 	}
 }
 
-void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform)
+void NoGUI::DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform)
 {
 	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
 	Color col = fmt.fill ? fmt.fill->col : WHITE;
@@ -561,6 +562,213 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	{
 		Vector2 scrollPercent = {1.0f, fmt.scrollAmount.y / maxScroll};
 		Vector2 percentShown = {1.0f, transform.height() / totalHeight};
+		DrawScrollBars(nullptr, nullptr, transform, scrollPercent, percentShown, 3);
+	}
+}
+
+void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform)
+{
+	Font font = fmt.font ? *(fmt.font) : GetFontDefault();
+	Color col = fmt.fill ? fmt.fill->col : WHITE;
+	float scaleFactor = fmt.size / (float)font.baseSize; // for calculating char size
+	int counter = 0;
+	unsigned int charCount = 0;
+	unsigned int lineIndex = 0;
+	float lineWidth = 0;
+	float maxWidth = 0.0f;
+	
+	// clear static buffer
+	static char buffer[NoMAD::INBUFF] = { 0 };
+	memset(buffer, 0, NoMAD::INBUFF);
+	// initialize result
+	std::vector< std::tuple< const char*, float, unsigned int > > lines;
+	lines.push_back(std::make_tuple(buffer, lineWidth, charCount));
+	
+	if (txt != NULL)
+    {
+		counter = 1;
+        for (size_t i = 0; i < NoMAD::INBUFF; i++)
+        {
+			buffer[i] = txt[i];
+			if (buffer[i] == '\0')
+			{	
+				
+				break;
+			}
+			charCount++;
+			int codepointByteCount = 0;
+			int codepoint = GetCodepoint(&txt[i], &codepointByteCount);
+			int index = GetGlyphIndex(font, codepoint);
+			float glyphWidth = 0;
+			
+			if (codepoint != '\n')
+			{
+				glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+ 				lineWidth += glyphWidth + fmt.spacing.x;
+			}
+			else
+			{
+				// replace newline char with terminating char 
+				buffer[i] = '\0';
+				// input current line width
+				lineWidth -= fmt.spacing.x;
+				std::get< float >(lines.at(counter - 1)) = lineWidth;
+				if ( lineWidth > maxWidth )
+				{
+					maxWidth = lineWidth;
+				}
+				// input current char count
+				std::get< unsigned int >(lines.at(counter - 1)) = charCount;
+				// add next line to result and increment counter
+				lineWidth = 0.0f;
+				charCount = 0;
+				lines.push_back(std::make_tuple(buffer + i + 1, lineWidth, charCount));
+				counter++;
+			}
+		}
+		const char* lastLine = std::get< const char* >(lines.back());
+		// TODO: the last line will be iterated 3 times here. This can be optimized
+		float lineWidth = MeasureTextEx(font, lastLine, fmt.size, fmt.spacing.x).x;
+		std::get< float >(lines.back()) = lineWidth;
+		if ( lineWidth > maxWidth )
+		{
+			maxWidth = lineWidth;
+		}
+		std::get< unsigned int >(lines.back()) = TextLength(lastLine);
+	}
+	
+	float totalHeight = fmt.size * lines.size() + fmt.spacing.y * (lines.size() - 1);
+	Vector2 maxScroll = {maxWidth - transform.width(), totalHeight - transform.height()};
+	Vector2 charPos = transform.pos(NoGUI::Align(-1, -1));
+	bool scrollBars = maxWidth > transform.width() || totalHeight > transform.height();
+//	bool scrollBars = totalHeight > transform.height();
+//	unsigned int lineIndex = 0; // current line to draw
+//	int lineNum = 0; // number of lines drawn
+	if ( scrollBars ) // find which line to start on
+	{
+//		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
+		if ( fmt.scrollAmount.y > maxScroll.y )
+		{
+			fmt.scrollAmount.y = maxScroll.y;
+		}
+		if ( fmt.scrollAmount.y < 0 )
+		{
+			fmt.scrollAmount.y = 0;
+		}
+		if ( fmt.scrollAmount.x > maxScroll.x )
+		{
+			fmt.scrollAmount.x = maxScroll.x;
+		}
+		if ( fmt.scrollAmount.x < 0 )
+		{
+			fmt.scrollAmount.x = 0;
+		}
+		// float scrollPos = 0;
+		// while ( scrollPos < fmt.scrollAmount.y ) // find which line to start on
+		// {
+			// scrollPos += fmt.size;
+			// if ( scrollPos >= fmt.scrollAmount.y )
+			// {
+				
+				// break;
+			// }
+			// else
+			// {
+				// scrollPos += fmt.spacing.y;
+			// }
+			// lineIndex++;
+		// }
+		// lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
+		// lineOffset /= scaleFactor;
+	}
+	lineWidth = 0;
+	float charOffset = 0.0f;
+	while ( lineIndex < lines.size() )
+	{
+		float scroll = fmt.scrollAmount.x;
+		charPos.x = transform.pos(NoGUI::Align(-1, -1)).x;
+		const char* line = std::get< const char* >(lines.at(lineIndex));
+		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex));
+		for (unsigned int i=0; i < lineLength; i++)
+		{
+			int codepointByteCount = 0;
+			int codepoint = GetCodepoint(&line[i], &codepointByteCount);
+			int index = GetGlyphIndex(font, codepoint);
+			float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;;
+			lineWidth += glyphWidth + fmt.spacing.x;
+			
+			if ( scroll > 0 )
+			{
+				charPos.x -= scroll;
+				scroll = 0;
+			}
+			
+			if ((codepoint != ' ') && (codepoint != '\t'))
+			{
+				float diff = transform.pos(NoGUI::Align(-1, -1)).x - charPos.x;
+				if ( diff > 0 )
+				{
+					lineWidth = 0;
+					if ( diff < glyphWidth )
+					{
+						charOffset = diff / scaleFactor;
+					}
+					else
+					{
+						charPos.x += glyphWidth + fmt.spacing.x;
+					
+						continue;
+					}
+				}
+				if ( charPos.x + glyphWidth > transform.pos(NoGUI::Align(1, -1)).x )
+				{
+					charOffset = (charPos.x + glyphWidth - transform.pos(NoGUI::Align(1, -1)).x) / scaleFactor * -1;
+				}
+				// Character destination rectangle on screen
+				// NOTE: We consider glyphPadding on drawing
+				Rectangle dstRec = { charPos.x + font.glyphs[index].offsetX*scaleFactor - (float)font.glyphPadding*scaleFactor,
+                      charPos.y + font.glyphs[index].offsetY*scaleFactor - (float)font.glyphPadding*scaleFactor,
+                      (font.recs[index].width + 2.0f*font.glyphPadding)*scaleFactor,
+                      (font.recs[index].height + 2.0f*font.glyphPadding)*scaleFactor};
+
+				// Character source rectangle from font texture atlas
+				// NOTE: We consider chars padding when drawing, it could be required for outline/glow shader effects
+				Rectangle srcRec = { font.recs[index].x - (float)font.glyphPadding, font.recs[index].y - (float)font.glyphPadding,
+                         font.recs[index].width + 2.0f*font.glyphPadding, font.recs[index].height + 2.0f*font.glyphPadding };
+				
+				if ( charOffset > 0.0f ) // front/left char offset
+				{
+					dstRec.x += charOffset*scaleFactor;
+					dstRec.width -= charOffset*scaleFactor;
+					
+					srcRec.x += charOffset;
+					srcRec.width -= charOffset;
+				}
+				else // back/right char offset
+				{
+					dstRec.width += charOffset*scaleFactor;
+					
+					srcRec.width += charOffset;
+				}
+				
+				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
+				charOffset = 0;
+			}
+			charPos.x += glyphWidth + fmt.spacing.x; // move to next character
+			if ( charPos.x >= transform.pos(NoGUI::Align(1, -1)).x)
+			{
+				
+				break;
+			}
+		}
+		
+		charPos.y += fmt.size + fmt.spacing.y;
+		lineIndex++;
+	}
+	if ( scrollBars )
+	{
+		Vector2 scrollPercent = {fmt.scrollAmount.x / maxScroll.x, fmt.scrollAmount.y / maxScroll.y};
+		Vector2 percentShown = {transform.width() / maxWidth, transform.height() / totalHeight};
 		DrawScrollBars(nullptr, nullptr, transform, scrollPercent, percentShown, 3);
 	}
 }
@@ -1482,7 +1690,14 @@ void NoGUI::DrawElement(Element* elem)
 		}
 		if ( txtBoxComp.active )
 		{
-			DrawCTextBox(elem->getInner(), txtBoxComp, (*elem));
+			if ( txtBoxComp.wrap )
+			{
+				DrawCTextBoxWrapped(elem->getInner(), txtBoxComp, (*elem));
+			}
+			else
+			{
+				DrawCTextBox(elem->getInner(), txtBoxComp, (*elem));
+			}
 		}
 	}
 }

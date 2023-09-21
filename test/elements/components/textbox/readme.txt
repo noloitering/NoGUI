@@ -3,12 +3,15 @@ Tests drawing fonts in 9 different alignments, and manipulation of that font
 
 CONTROLS:
 Scrollwheel: scale text
+SPACEBAR: toggle text wrap
 UP: increase vertical spacing between lines
 LEFT: decrease horizontal spacing between characters
 DOWN: decrease vertical spacing between lines
 RIGHT: increase horizontal spacing between characters
 W: scroll up
+A: scroll backwards
 S: scroll down
+D: scroll forwards
 Z: change origin point to top left corner of element
 X: change origin point to top right corner of element
 C: change origin point to center of element
