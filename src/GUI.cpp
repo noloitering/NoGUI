@@ -320,7 +320,7 @@ std::vector< std::tuple< const char*, float, unsigned int > > NoGUI::WrapText(co
 				// input current line width
 				std::get< float >(lines.at(counter - 1)) = lineWidth - spacing;
 				// input current char count
-				std::get< unsigned int >(lines.at(counter - 1)) = charCount;
+				std::get< unsigned int >(lines.at(counter - 1)) = charCount - 1;
 				// add next line to result and increment counter
 				lineWidth = 0.0f;
 				charCount = 0;
@@ -618,7 +618,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 					maxWidth = lineWidth;
 				}
 				// input current char count
-				std::get< unsigned int >(lines.at(counter - 1)) = charCount;
+				std::get< unsigned int >(lines.at(counter - 1)) = charCount -1;
 				// add next line to result and increment counter
 				lineWidth = 0.0f;
 				charCount = 0;
@@ -638,13 +638,23 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	}
 	
 	float totalHeight = fmt.size * lines.size() + fmt.spacing.y * (lines.size() - 1);
+	float lineOffset = 0.0f;
+	float charOffset = 0.0f;
 	Vector2 maxScroll = {maxWidth - transform.width(), totalHeight - transform.height()};
-	Vector2 charPos = transform.pos(NoGUI::Align(-1, -1));
 	bool scrollBars = maxWidth > transform.width() || totalHeight > transform.height();
-//	bool scrollBars = totalHeight > transform.height();
-//	unsigned int lineIndex = 0; // current line to draw
-//	int lineNum = 0; // number of lines drawn
-	if ( scrollBars ) // find which line to start on
+	if ( maxWidth > transform.width() )
+	{
+		if ( fmt.scrollAmount.x > maxScroll.x )
+		{
+			fmt.scrollAmount.x = maxScroll.x;
+		}
+		if ( fmt.scrollAmount.x < 0 )
+		{
+			fmt.scrollAmount.x = 0;
+		}
+	}
+	
+	if ( totalHeight > transform.height() ) // find which line to start on
 	{
 //		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
 		if ( fmt.scrollAmount.y > maxScroll.y )
@@ -655,34 +665,26 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		{
 			fmt.scrollAmount.y = 0;
 		}
-		if ( fmt.scrollAmount.x > maxScroll.x )
+		float scrollPos = 0;
+		while ( scrollPos < fmt.scrollAmount.y ) // find which line to start on
 		{
-			fmt.scrollAmount.x = maxScroll.x;
-		}
-		if ( fmt.scrollAmount.x < 0 )
-		{
-			fmt.scrollAmount.x = 0;
-		}
-		// float scrollPos = 0;
-		// while ( scrollPos < fmt.scrollAmount.y ) // find which line to start on
-		// {
-			// scrollPos += fmt.size;
-			// if ( scrollPos >= fmt.scrollAmount.y )
-			// {
+			scrollPos += fmt.size;
+			if ( scrollPos >= fmt.scrollAmount.y )
+			{
 				
-				// break;
-			// }
-			// else
-			// {
-				// scrollPos += fmt.spacing.y;
-			// }
-			// lineIndex++;
-		// }
-		// lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
-		// lineOffset /= scaleFactor;
+				break;
+			}
+			else
+			{
+				scrollPos += fmt.spacing.y;
+			}
+			lineIndex++;
+		}
+		lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
+		lineOffset /= scaleFactor;
 	}
-	lineWidth = 0;
-	float charOffset = 0.0f;
+	Vector2 charPos = transform.pos(NoGUI::Align(-1, -1));
+	float txtHeight = 0.0f;
 	while ( lineIndex < lines.size() )
 	{
 		float scroll = fmt.scrollAmount.x;
@@ -694,8 +696,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 			int codepointByteCount = 0;
 			int codepoint = GetCodepoint(&line[i], &codepointByteCount);
 			int index = GetGlyphIndex(font, codepoint);
-			float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;;
-			lineWidth += glyphWidth + fmt.spacing.x;
+			float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
 			
 			if ( scroll > 0 )
 			{
@@ -750,6 +751,19 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 					
 					srcRec.width += charOffset;
 				}
+				if ( lineOffset > 0.0f ) // top line offset
+				{
+					dstRec.height -= lineOffset*scaleFactor;
+					
+					srcRec.y += lineOffset;
+					srcRec.height -= lineOffset;
+				}
+				else // bottom line offset
+				{
+					dstRec.height += lineOffset*scaleFactor;
+					
+					srcRec.height += lineOffset;
+				}
 				
 				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
 				charOffset = 0;
@@ -761,7 +775,25 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 				break;
 			}
 		}
+		txtHeight += fmt.size - lineOffset * scaleFactor;
+		if ( txtHeight > transform.height() )
+		{
 		
+			break;
+		}
+		else
+		{
+			txtHeight += fmt.spacing.y;
+		}
+		if ( txtHeight + fmt.size > transform.height() )
+		{
+			lineOffset = (txtHeight + fmt.size - transform.height()) / scaleFactor * -1;
+		}
+		else
+		{
+			charPos.y -= lineOffset*scaleFactor;
+			lineOffset = 0.0f;
+		}
 		charPos.y += fmt.size + fmt.spacing.y;
 		lineIndex++;
 	}

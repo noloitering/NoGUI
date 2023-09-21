@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
 	std::vector< std::shared_ptr< NoGUI::Element > > elemVec;
 	char msg[NoMAD::INBUFF];
 	int msgLength = 0;
-	TextAppend(msg, "yea yea Supercalifragilisticexpialidociousdoesthemostest yea yea", &msgLength);
+	TextAppend(msg, "RECIPE:\n1 cup milk\n1/3 cup water\n2 tsp sugar\n3/4 tsp salt\n1 tbsp butter\n3 cups flour\n1 tsp yeast\nDIRECTIONS:\nmix it all together (flour last), kneed it, let it rest until it doubles, kneed it again, put it in a lightly greased container and let it rise once more until doubled, then bake in a pre-heated oven at 375 for 25-30 minutes.", &msgLength);
 	
 	InitWindow(window.x, window.y, "test");
 	SetTargetFPS(60);
