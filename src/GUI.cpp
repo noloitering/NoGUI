@@ -451,8 +451,8 @@ void NoGUI::DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Tra
 	unsigned int lineIndex = 0; // current line to draw
 	int lineNum = 0; // number of lines drawn
 	Vector2 charPos = transform.pos(fmt.align); // keep track of character positioning
-	Vector2 charOffset = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.front()), fmt.size}, lineNum, (int)lines.size(), fmt.spacing.y); // for aligning text
-	charPos.x -= charOffset.x;
+	Vector2 charAlign = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.front()), fmt.size}, lineNum, (int)lines.size(), fmt.spacing.y); // for aligning text
+	charPos.x -= charAlign.x;
 	if ( scrollBars ) // find which line to start on
 	{
 		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
@@ -484,17 +484,18 @@ void NoGUI::DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Tra
 	}
 	else
 	{
-		charPos.y -= charOffset.y; // align text
+		charPos.y -= charAlign.y; // align text
 	}
 	
 	float txtHeight = 0.0f;
 	while ( lineIndex < lines.size() )
 	{
+		const char* line = std::get< const char* >(lines.at(lineIndex));
+		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex)); 
 		// align text
 		charPos.x = transform.pos(fmt.align).x;
 		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
-		const char* line = std::get< const char* >(lines.at(lineIndex));
-		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex)); 
+		// draw text
 		for (unsigned int i=0; i < lineLength; i++)
 		{
 			int codepointByteCount = 0;
@@ -640,7 +641,11 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	float totalHeight = fmt.size * lines.size() + fmt.spacing.y * (lines.size() - 1);
 	float lineOffset = 0.0f;
 	float charOffset = 0.0f;
+	int lineNum = 0;
 	Vector2 maxScroll = {maxWidth - transform.width(), totalHeight - transform.height()};
+	Vector2 charPos = transform.pos(fmt.align);
+	Vector2 charAlign = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size());
+	charPos.x -= charAlign.x;
 	bool scrollBars = maxWidth > transform.width() || totalHeight > transform.height();
 	if ( maxWidth > transform.width() )
 	{
@@ -656,7 +661,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	
 	if ( totalHeight > transform.height() ) // find which line to start on
 	{
-//		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
+		charPos.y = transform.pos(NoGUI::Align(-1, -1)).y; // align to top
 		if ( fmt.scrollAmount.y > maxScroll.y )
 		{
 			fmt.scrollAmount.y = maxScroll.y;
@@ -683,14 +688,20 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		lineOffset = fmt.scrollAmount.y - (lineIndex * fmt.size + lineIndex * (fmt.spacing.y - 1));
 		lineOffset /= scaleFactor;
 	}
-	Vector2 charPos = transform.pos(NoGUI::Align(-1, -1));
+	else
+	{
+		charPos.y -= charAlign.y; // align text
+	}
+	
 	float txtHeight = 0.0f;
 	while ( lineIndex < lines.size() )
 	{
-		float scroll = fmt.scrollAmount.x;
-		charPos.x = transform.pos(NoGUI::Align(-1, -1)).x;
 		const char* line = std::get< const char* >(lines.at(lineIndex));
 		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex));
+		float scroll = fmt.scrollAmount.x;
+		// align text
+		charPos.x = transform.pos(fmt.align).x;
+		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
 		for (unsigned int i=0; i < lineLength; i++)
 		{
 			int codepointByteCount = 0;
@@ -796,6 +807,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		}
 		charPos.y += fmt.size + fmt.spacing.y;
 		lineIndex++;
+		lineNum++;
 	}
 	if ( scrollBars )
 	{

@@ -119,6 +119,7 @@ namespace NoGUI
 		float angle = 0.0f;
 	};
 	
+	// TODO: Text flow/direction/wrap and rotation
 	class CTextBox : public CInterface
 	{
 	public:
