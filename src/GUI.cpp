@@ -1705,6 +1705,26 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 	}
 }
 
+void NoGUI::DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes)
+{
+	for ( std::pair< std::shared_ptr< nShape >, Transform > shape : shapes.shapes )
+	{
+		Transform transform = shape.second;
+		Vector2 center = anchor.pos(transform.origin);
+		Vector2 offset = transform.pos();
+		float angle = transform.angle;
+		if ( anchor.angle != 0 )
+		{
+			offset = Vector2Rotate(offset, anchor.angle * DEG2RAD);
+			angle += anchor.angle;
+		}
+		center.x += offset.x;
+		center.y += offset.y;
+		
+		DrawShape(*(shape.first), center, transform.radius, (Vector2){0, 0}, angle);
+	}
+}
+
 // TODO: draw outlines last
 void NoGUI::DrawElement(Element* elem)
 {
@@ -1715,6 +1735,7 @@ void NoGUI::DrawElement(Element* elem)
 		CImage& imgComp = elem->components->getComponent< NoGUI::CImage >();
 		CText& txtComp = elem->components->getComponent< NoGUI::CText >();
 		CTextBox& txtBoxComp =  elem->components->getComponent< NoGUI::CTextBox >();
+		CMultiShape& multiShapeComp = elem->components->getComponent< NoGUI::CMultiShape >();
 		if ( imgComp.active )
 		{
 			if ( imgComp.shape )
@@ -1742,6 +1763,10 @@ void NoGUI::DrawElement(Element* elem)
 			{
 				DrawCTextBox(elem->getInner(), txtBoxComp, (*elem));
 			}
+		}
+		if ( multiShapeComp.active )
+		{
+			DrawCMultiShape(*(elem), multiShapeComp);
 		}
 	}
 }

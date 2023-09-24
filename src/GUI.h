@@ -49,13 +49,16 @@ namespace NoGUI
 		bool getActive();
 		std::shared_ptr< nShape > style(); // TODO: better name
 	};
-	
-	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
-	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
+	// helper functions
 	std::vector< std::tuple< const char*, float, unsigned int > > WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area);
 	std::vector< std::tuple< const char*, float, unsigned int > > WrapText(const char* txt, const NoGUI::CText& fmt, const NoGUI::Transform& area);
 	Vector2 AlignText(const NoGUI::Align& alignment, const NoGUI::Wrap& wrap, Vector2 lineSize, int lineNum, int numLines, float lineSpacing=0);
 	Vector2 AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum, int numLines);
+	// Drawing functions
+	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
+	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
+	void DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const NoGUI::Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size);
+	// Components
 	void DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform);
 	void DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform);
 	void DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform);
@@ -63,6 +66,7 @@ namespace NoGUI
 	void DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std::shared_ptr< nShape > shape);
 	void DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
-	void DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const NoGUI::Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size);
+	void DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes);
+	// Elements
 	void DrawElement(Element* elem);
 }

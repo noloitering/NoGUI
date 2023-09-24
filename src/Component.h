@@ -7,6 +7,7 @@
 
 namespace NoGUI
 {
+	class Transform;
 	enum class Wrap {NONE = 0, DOWN = 1, UP = -1, AROUND = 2};
 	enum class XAlign {LEFT = -1, CENTER = 0, RIGHT = 1};
 	enum class YAlign {TOP = -1, CENTER = 0, BOTTOM = 1};
@@ -135,7 +136,14 @@ namespace NoGUI
 		float size = 20.0f;
 	};
 	
-	typedef std::tuple< CImage, CText, CTextBox > Components;
+	class CMultiShape : public CInterface
+	{
+	public:
+		CMultiShape() {}
+		std::vector< std::pair< std::shared_ptr< nShape >, Transform > > shapes;
+	};
+	
+	typedef std::tuple< CImage, CText, CTextBox, CMultiShape > Components;
 	
 	class CContainer
 	{
