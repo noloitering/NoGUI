@@ -2,25 +2,46 @@
 
 using namespace NoGUI;
 
-void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin, float angle)
+void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin, float angle, bool hovered)
 {
 	switch (shape.n)
 	{
 		case 0:
 		{
-			if (shape.fill)
+			if ( shape.fill )
 			{
-				DrawEllipsePro(center, radius, origin, angle, shape.fill->col);
+				if ( hovered )
+				{
+					DrawEllipsePro(center, radius, origin, angle, shape.fill->hoverCol);
+				}
+				else
+				{
+					DrawEllipsePro(center, radius, origin, angle, shape.fill->col);
+				}
 			}
 			if ( shape.outline )
 			{
-				DrawEllipseLinesPro(center, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
+				if ( hovered )
+				{
+					DrawEllipseLinesPro(center, radius, origin, angle, shape.outline->thick, shape.outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawEllipseLinesPro(center, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
+				}
 			}
 		}
 		
 		case 1:
 		{
-			DrawPixel(center.x, center.y, shape.fill->col);
+			if ( hovered )
+			{
+				DrawPixel(center.x, center.y, shape.fill->hoverCol);
+			}
+			else
+			{
+				DrawPixel(center.x, center.y, shape.fill->col);
+			}
 			
 			break;
 		}
@@ -49,8 +70,14 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 				endPos.x += center.x;
 				endPos.y += center.y;
 			}
-			
-			DrawLineEx(startPos, endPos, radius.y, shape.fill->col);
+			if ( hovered )
+			{
+				DrawLineEx(startPos, endPos, radius.y, shape.fill->hoverCol);
+			}
+			else
+			{
+				DrawLineEx(startPos, endPos, radius.y, shape.fill->col);
+			}
 			
 			break;
 		}
@@ -83,13 +110,27 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 				v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
 			}
 			
-			if (shape.fill)
+			if ( shape.fill )
 			{
-				DrawTriangle(v1, v2, v3, shape.fill->col);
+				if ( hovered )
+				{
+					DrawTriangle(v1, v2, v3, shape.fill->hoverCol);
+				}
+				else
+				{
+					DrawTriangle(v1, v2, v3, shape.fill->col);
+				}
 			}
 			if ( shape.outline )
 			{
-				DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->col);
+				if ( hovered )
+				{
+					DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->col);
+				}
 			}
 			
 			break;
@@ -101,13 +142,27 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 			origin.x += radius.x;
 			origin.y += radius.y;
 			
-			if (shape.fill)
+			if ( shape.fill )
 			{
-				DrawRectanglePro(rect, origin, angle, shape.fill->col);
+				if ( hovered )
+				{
+					DrawRectanglePro(rect, origin, angle, shape.fill->hoverCol);
+				}
+				else
+				{
+					DrawRectanglePro(rect, origin, angle, shape.fill->col);
+				}
 			}
 			if ( shape.outline )
 			{
-				DrawRectangleLinesPro(rect, origin, angle, shape.outline->thick, shape.outline->fill->col);
+				if ( hovered )
+				{
+					DrawRectangleLinesPro(rect, origin, angle, shape.outline->thick, shape.outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawRectangleLinesPro(rect, origin, angle, shape.outline->thick, shape.outline->fill->col);
+				}
 			}
 			
 			break;
@@ -115,13 +170,27 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 		
 		default:
 		{
-			if (shape.fill)
+			if ( shape.fill )
 			{
-				DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->col);
+				if ( hovered )
+				{
+					DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->hoverCol);
+				}
+				else
+				{
+					DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->col);
+				}
 			}
 			if ( shape.outline )
 			{
-				DrawPolyLinesPro(center, shape.n, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
+				if ( hovered )
+				{
+					DrawPolyLinesPro(center, shape.n, radius, origin, angle, shape.outline->thick, shape.outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawPolyLinesPro(center, shape.n, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
+				}
 			}
 			
 			break;
@@ -129,13 +198,13 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 	}
 }
 
-void NoGUI::DrawShape(const nShape& shape, const NoGUI::Transform& transform)
+void NoGUI::DrawShape(const nShape& shape, const NoGUI::Transform& transform, bool hovered)
 {
 	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
 	shapeOrigin.x *= transform.radius.x;
 	shapeOrigin.y *= transform.radius.y;
 	
-	DrawShape(shape, transform.pos(), transform.radius, shapeOrigin, transform.rotation());
+	DrawShape(shape, transform.pos(), transform.radius, shapeOrigin, transform.rotation(), hovered);
 }
 
 void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size)
@@ -411,6 +480,149 @@ Vector2 NoGUI::AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum,
 {
 	
 	return AlignText(fmt.align, fmt.wrap, lineSize, lineNum, numLines, fmt.spacing.y);
+}
+
+bool NoGUI::CheckCollisionPointShape(Vector2 point, int sides, const NoGUI::Transform& area)
+{
+	bool collision = false;
+	
+	switch ( sides )
+	{
+		case 0:
+		{
+			Vector2 center = area.pos(NoGUI::Align(0, 0));
+			if ( area.angle == 0 )
+			{
+				collision = CheckCollisionPointEllipse(point, center, area.radius);
+			}
+			else
+			{
+				float sin = sinf(area.angle * DEG2RAD);
+				float cos = cosf(area.angle * DEG2RAD);
+				float xval = (point.x - center.x) * cos + (point.y - center.y) * sin;
+				xval = xval * xval * (area.radius.y * area.radius.y);
+				float yval = (point.x - center.x) * sin - (point.y - center.y) * cos;
+				yval = yval * yval * (area.radius.x * area.radius.x);
+
+				collision = (xval + yval) <= ((area.radius.x * area.radius.x) * (area.radius.y * area.radius.y));
+			}
+			
+			break;
+		}
+		
+		case 1:
+		{
+			collision = point.x == area.position.x && point.y == area.position.y;
+			
+			break;
+		}
+		
+		case 2:
+		{
+			Vector2 origin = {(float)static_cast< int >(area.origin.x), (float)static_cast< int >(area.origin.y)};
+			float halfHeight = area.radius.y / 2;
+			origin.x *= area.radius.x;
+			origin.y *= halfHeight;
+			
+			if ( area.angle == 0 )
+			{
+				Vector2 startPos = {area.position.x - area.radius.x - origin.x, area.position.y - origin.y};
+				Vector2 endPos = {area.position.x + area.radius.x - origin.x, area.position.y - origin.y};
+				
+				collision = CheckCollisionPointLine(point, startPos, endPos, halfHeight);
+			}
+			else // treat as rectangle
+			{
+				// align to origin
+				Vector2 topLeft = {-area.radius.x - origin.x, -area.radius.y / 2 - origin.y};
+				Vector2 bottomLeft = {-area.radius.x - origin.x, area.radius.y / 2 - origin.y};
+				Vector2 bottomRight = {area.radius.x - origin.x, area.radius.y / 2 - origin.y};
+				Vector2 topRight = {area.radius.x - origin.x, -area.radius.y / 2 - origin.y};
+				// rotate
+				float rads = area.angle * DEG2RAD;
+				topLeft = Vector2Rotate(topLeft, rads);
+				bottomLeft = Vector2Rotate(bottomLeft, rads);
+				bottomRight = Vector2Rotate(bottomRight, rads);
+				topRight = Vector2Rotate(topRight, rads);
+				// translate back
+				topLeft = Vector2Add(area.position, topLeft);
+				bottomLeft = Vector2Add(area.position, bottomLeft);
+				bottomRight = Vector2Add(area.position, bottomRight);
+				topRight = Vector2Add(area.position, topRight);
+				
+				float isLeft1 = (bottomLeft.x - topLeft.x) * (point.y - topLeft.y) - (point.x - topLeft.x) * (bottomLeft.y - topLeft.y);
+				float isLeft2 = (bottomRight.x - bottomLeft.x) * (point.y - bottomLeft.y) - (point.x - bottomLeft.x) * (bottomRight.y - bottomLeft.y);
+				float isLeft3 = (topRight.x - bottomRight.x) * (point.y - bottomRight.y) - (point.x - bottomRight.x) * (topRight.y - bottomRight.y);
+				float isLeft4 = (topLeft.x - topRight.x) * (point.y - topRight.y) - (point.x - topRight.x) * (topLeft.y - topRight.y);
+		
+				collision = isLeft1 < 0 && isLeft2 < 0 && isLeft3 < 0 && isLeft4 < 0;
+			}
+			
+			break;
+		}
+		
+		case 3:
+		{
+			Vector2 p1 = area.pos(NoGUI::Align(-1, 1));
+			Vector2 p2 = area.pos(NoGUI::Align(0, -1));
+			Vector2 p3 = area.pos(NoGUI::Align(1, 1));
+			
+			collision = CheckCollisionPointTriangle(point, p1, p2, p3);
+			
+			break;
+		}
+		
+		case 4:
+		{
+			Vector2 topLeft = area.pos(NoGUI::Align(-1, -1));
+			
+			if ( area.angle == 0 )
+			{
+				Rectangle collider = {topLeft.x, topLeft.y, area.width(), area.height()};
+
+				collision = CheckCollisionPointRec(point, collider);
+			}
+			else
+			{
+				Vector2 bottomLeft = area.pos(NoGUI::Align(-1, 1));
+				Vector2 bottomRight = area.pos(NoGUI::Align(1, 1));
+				Vector2 topRight = area.pos(NoGUI::Align(1, -1));
+		
+				float isLeft1 = (bottomLeft.x - topLeft.x) * (point.y - topLeft.y) - (point.x - topLeft.x) * (bottomLeft.y - topLeft.y);
+				float isLeft2 = (bottomRight.x - bottomLeft.x) * (point.y - bottomLeft.y) - (point.x - bottomLeft.x) * (bottomRight.y - bottomLeft.y);
+				float isLeft3 = (topRight.x - bottomRight.x) * (point.y - bottomRight.y) - (point.x - bottomRight.x) * (topRight.y - bottomRight.y);
+				float isLeft4 = (topLeft.x - topRight.x) * (point.y - topRight.y) - (point.x - topRight.x) * (topLeft.y - topRight.y);
+		
+				collision = isLeft1 < 0 && isLeft2 < 0 && isLeft3 < 0 && isLeft4 < 0;
+			}
+			
+			break;
+		}
+		
+		default:
+		{
+			Vector2 center = area.pos(NoGUI::Align(0, 0));
+			if ( area.angle == 0 )
+			{
+				collision = CheckCollisionPointEllipse(point, area.pos(NoGUI::Align(0, 0)), area.radius);
+			}
+			else
+			{
+				float sin = sinf(area.angle * DEG2RAD);
+				float cos = cosf(area.angle * DEG2RAD);
+				float xval = (point.x - center.x) * cos + (point.y - center.y) * sin;
+				xval = xval * xval * (area.radius.y * area.radius.y);
+				float yval = (point.x - center.x) * sin - (point.y - center.y) * cos;
+				yval = yval * yval * (area.radius.x * area.radius.x);
+
+				collision = (xval + yval) <= ((area.radius.x * area.radius.x) * (area.radius.y * area.radius.y));
+			}
+			
+			break;
+		}
+	}
+	
+	return collision;
 }
 
 void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& transform)
@@ -1729,7 +1941,7 @@ void NoGUI::DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes)
 void NoGUI::DrawElement(Element* elem)
 {
 	std::shared_ptr< NoGUI::nShape > shape = elem->style();
-	DrawShape(*(shape.get()), *(elem));
+	DrawShape(*(shape.get()), *(elem), elem->getHover());
 	if (elem->components)
 	{
 		CImage& imgComp = elem->components->getComponent< NoGUI::CImage >();
@@ -1968,16 +2180,30 @@ void Element::draw()
 	DrawElement(this);
 }
 
-bool Element::getFocus()
+bool Element::isHover()
 {
+	Vector2 mousePos = GetMousePosition();
+	hover = CheckCollisionPointShape(mousePos, shape->n, *(this));
 	
-	return focus;
+	return hover;
 }
 
 bool Element::getActive()
 {
 	
 	return active;
+}
+
+bool Element::getFocus()
+{
+	
+	return focus;
+}
+
+bool Element::getHover()
+{
+	
+	return hover;
 }
 
 std::shared_ptr< nShape > Element::style()

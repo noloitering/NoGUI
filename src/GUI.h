@@ -37,6 +37,7 @@ namespace NoGUI
 	protected:
 		bool active = true; // logic switch
 		bool focus = false; // programmable state
+		bool hover = false; // mouse hover
 		std::shared_ptr< nShape > shape;
 	public:
 		Element(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
@@ -45,8 +46,10 @@ namespace NoGUI
 			: GameObj(num, type, in), Transform(dimension), shape(style), components(c) {}
 		virtual void draw();
 		std::shared_ptr< CContainer > components;
-		bool getFocus(); 
 		bool getActive();
+		bool getFocus(); 
+		bool getHover();
+		bool isHover();
 		std::shared_ptr< nShape > style(); // TODO: better name
 	};
 	// helper functions
@@ -54,9 +57,10 @@ namespace NoGUI
 	std::vector< std::tuple< const char*, float, unsigned int > > WrapText(const char* txt, const NoGUI::CText& fmt, const NoGUI::Transform& area);
 	Vector2 AlignText(const NoGUI::Align& alignment, const NoGUI::Wrap& wrap, Vector2 lineSize, int lineNum, int numLines, float lineSpacing=0);
 	Vector2 AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum, int numLines);
+	bool CheckCollisionPointShape(Vector2 point, int sides, const Transform& area);
 	// Drawing functions
-	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0);
-	void DrawShape(const nShape& shape, const NoGUI::Transform& transform);
+	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0, bool hovered=false);
+	void DrawShape(const nShape& shape, const NoGUI::Transform& transform, bool hovered=false);
 	void DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const NoGUI::Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size);
 	// Components
 	void DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform);
