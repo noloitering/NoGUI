@@ -139,8 +139,10 @@ namespace NoGUI
 	class CMultiShape : public CInterface
 	{
 	public:
-		CMultiShape() {}
+		CMultiShape(bool hoverable=false) 
+			: collision(hoverable) {}
 		std::vector< std::pair< std::shared_ptr< nShape >, Transform > > shapes;
+		bool collision = false;
 	};
 	
 	typedef std::tuple< CImage, CText, CTextBox, CMultiShape > Components;

@@ -1,5 +1,6 @@
 test_hover.exe
 Launching with different arguments should display different shapes in the top left, center, and right. As well as dead center, and bottom left, center, and right
+Hovering an element should turn it green
 
 CONTROLS:
 Left Mouse Button: rotate 1 degree clockwise around origin point

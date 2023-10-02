@@ -70,7 +70,7 @@ namespace NoGUI
 	void DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std::shared_ptr< nShape > shape);
 	void DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
-	void DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes);
+	void DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes, bool hovered=false);
 	// Elements
 	void DrawElement(Element* elem);
 }

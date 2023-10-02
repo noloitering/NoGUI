@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
 	Vector2 baseSize = {50, 25};
 	Vector2 polySize = {75, 75};
 	
-	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(WHITE);
+	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(WHITE, GREEN);
 	std::shared_ptr< NoGUI::Fill > outlineFill = std::make_shared< NoGUI::Fill >(GRAY);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(outlineFill);
 	
@@ -56,11 +56,16 @@ int main(int argc, char ** argv)
 	
 	while ( !WindowShouldClose() )
 	{
+		bool toggleCollision = false;
 		bool rLeft = false;
 		bool rRight = false;
 		float translateX = 0.0f;
 		float translateY = 0.0f;
-		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+		if ( IsKeyPressed( KEY_SPACE ) )
+		{
+			toggleCollision = true;
+		}
+		if ( IsMouseButtonDown(MOUSE_LEFT_BUTTON) )
 		{
 			rLeft = true;
 		}
@@ -89,6 +94,11 @@ int main(int argc, char ** argv)
 			ClearBackground(BLACK);
 			for ( std::shared_ptr< NoGUI::Element > elem : elemVec )
 			{
+				NoGUI::CMultiShape& multiShape = elem->components->getComponent< NoGUI::CMultiShape >();
+				if ( multiShape.active && toggleCollision )
+				{
+					multiShape.collision = !multiShape.collision;
+				}
 				if ( rLeft )
 				{
 					if ( !TextIsEqual(elem->getTag(), "pointRight") )
@@ -120,6 +130,7 @@ int main(int argc, char ** argv)
 					elem->translate(translateX * -1, translateY);
 				}
 				elem->draw();
+				elem->isHover();
 			}
 		EndDrawing();
 	}

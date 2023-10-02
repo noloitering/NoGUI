@@ -1,7 +1,8 @@
 test_multishape.exe
-Tests drawing and rotating Multi Shape Components
+Tests drawing, rotating, and hovering Multi Shape Components
 
 CONTROLS:
+SPACE: toggle collision for multishape components
 Left Mouse Button: rotate 1 degree counter-clockwise
 Right Mouse Button: rotate 1 degree clockwise
 W: move arrows up
