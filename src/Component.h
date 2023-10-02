@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <math.h>
+//#include <math.h>
 #include <vector>
 //#include <variant>
 
@@ -68,6 +68,7 @@ namespace NoGUI
 			: fill(col), offset(pos) {}
 	};
 	
+	// TODO: change n to unsigned int
 	struct nShape
 	{
 		int n = 4;

@@ -2184,32 +2184,37 @@ void Element::draw()
 bool Element::isHover()
 {
 	Vector2 mousePos = GetMousePosition();
-	CMultiShape& multiShapeComp = components->getComponent< NoGUI::CMultiShape >();
 	
-	hover = CheckCollisionPointShape(mousePos, shape->n, *(this));
-	if ( multiShapeComp.active && multiShapeComp.collision )
+	if ( components )
 	{
-		for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
+		NoGUI::CMultiShape& multiShapeComp = components->getComponent< NoGUI::CMultiShape >();
+	
+		if ( multiShapeComp.active && multiShapeComp.collision )
 		{
-			Vector2 center = pos(shape.second.origin);
-			Vector2 offset = shape.second.pos();
-			float angle = shape.second.angle;
-			if ( rotation() != 0 )
+			for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
 			{
-				offset = Vector2Rotate(offset, rotation() * DEG2RAD);
-				angle += rotation();
-			}
-			center.x += offset.x;
-			center.y += offset.y;
-			NoGUI::Transform bbox = NoGUI::Transform(center, shape.second.radius, NoGUI::Align(0, 0), angle);
-			if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
-			{
-				hover = true;
+				Vector2 center = pos(shape.second.origin);
+				Vector2 offset = shape.second.pos();
+				float angle = shape.second.angle;
+				if ( rotation() != 0 )
+				{
+					offset = Vector2Rotate(offset, rotation() * DEG2RAD);
+					angle += rotation();
+				}
+				center.x += offset.x;
+				center.y += offset.y;
+				NoGUI::Transform bbox = NoGUI::Transform(center, shape.second.radius, NoGUI::Align(0, 0), angle);
+				if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
+				{
+					hover = true;
 				
-				return hover;
+					return hover;
+				}
 			}
 		}
 	}
+	
+	hover = CheckCollisionPointShape(mousePos, shape->n, *(this));
 	
 	return hover;
 }
