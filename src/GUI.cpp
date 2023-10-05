@@ -482,6 +482,36 @@ Vector2 NoGUI::AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum,
 	return AlignText(fmt.align, fmt.wrap, lineSize, lineNum, numLines, fmt.spacing.y);
 }
 
+void NoGUI::collectInput(Element* elem)
+{
+	CInput& input = elem->components->getComponent< CInput >();
+	char buffer[input.cap];
+	TextCopy(buffer, elem->getInner());
+	int key = GetCharPressed();
+	while ( key > 0 )
+	{
+		// only allow good inputs
+		if ( (key >= 32) && (key <= 125) && input.i < input.cap )
+		{
+			buffer[input.i] = (char)key;
+			buffer[input.i + 1] = '\0';
+			input.i++;
+		}
+		
+		key = GetCharPressed();
+	}
+	if ( IsKeyPressed(KEY_BACKSPACE) )
+    {
+		if ( input.i > 0 )
+		{
+			input.i--;
+		}
+		buffer[input.i] = '\0';
+	}
+	
+	elem->setInner(buffer);
+}
+
 // TODO: optimize case 3, and 4. transform.pos() will call sinf and cosf each time. Find a better way to determine these points
 bool NoGUI::CheckCollisionPointShape(Vector2 point, int sides, const NoGUI::Transform& area)
 {
@@ -1949,6 +1979,7 @@ void NoGUI::DrawElement(Element* elem)
 		CText& txtComp = elem->components->getComponent< NoGUI::CText >();
 		CTextBox& txtBoxComp =  elem->components->getComponent< NoGUI::CTextBox >();
 		CMultiShape& multiShapeComp = elem->components->getComponent< NoGUI::CMultiShape >();
+		CInput& inputComp = elem->components->getComponent< NoGUI::CInput >();
 		if ( imgComp.active )
 		{
 			if ( imgComp.shape )
@@ -1980,6 +2011,76 @@ void NoGUI::DrawElement(Element* elem)
 		if ( multiShapeComp.active )
 		{
 			DrawCMultiShape(*(elem), multiShapeComp, elem->getHover());
+		}
+		// TODO: align blinkChar in y position
+		if ( inputComp.active && elem->getHover() )
+		{
+			// draw blinkChar if it has been blinkRate time since lastBlink + blinkHold time
+			double currentTime = GetTime();
+			if ( currentTime - inputComp.lastBlink >= inputComp.blinkRate )
+			{
+				if ( currentTime > inputComp.lastBlink + inputComp.blinkHold + inputComp.blinkRate )
+				{
+					inputComp.lastBlink = currentTime;
+				}
+				if ( (inputComp.blinkChar >= 32) && (inputComp.blinkChar <= 125) )
+				{
+					int byteSize = 0;
+					const char* txt = CodepointToUTF8(inputComp.blinkChar, &byteSize);
+					Vector2 blinkPos;
+					Vector2 origin = {0, 0};
+					float angle = 0;
+					float fontSize = 20.0f;
+					Color col = WHITE;
+					if ( txtComp.active )
+					{
+						Font font = (txtComp.font == nullptr) ? GetFontDefault() : *(txtComp.font);
+						// calculate blinkChar size
+						fontSize = txtComp.size;
+						float scaleFactor = fontSize / (float)font.baseSize;
+						int index = GetGlyphIndex(font, inputComp.blinkChar);
+						float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+						// position blinkChar at end of inner
+						origin = AlignText(txtComp, (Vector2){glyphWidth * 2, fontSize}, 0, 1);
+						Vector2 textSize = MeasureTextEx(font, elem->getInner(), fontSize, txtComp.spacing.x);
+						origin.x -= textSize.x;
+						origin.y -= textSize.y - txtComp.size;
+						blinkPos = elem->pos(txtComp.align);
+						angle = elem->angle + txtComp.angle;
+						if ( txtComp.fill )
+						{
+							col = txtComp.fill->hoverCol;
+						}
+					}
+					else if ( txtBoxComp.active )
+					{
+						Font font = (txtBoxComp.font == nullptr) ? GetFontDefault() : *(txtBoxComp.font);
+						// calculate blinkChar size
+						fontSize = txtBoxComp.size;
+						float scaleFactor = fontSize / (float)font.baseSize;
+						int index = GetGlyphIndex(font, inputComp.blinkChar);
+						float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
+						// position blinkChar at end of inner
+						origin = AlignText(txtBoxComp.align, Wrap::DOWN, (Vector2){glyphWidth * 2, fontSize}, 0, 1);
+						origin.x -= MeasureTextEx(font, elem->getInner(), fontSize, txtBoxComp.spacing.x).x;
+						// no overflow
+						if ( origin.x < elem->width() * -1 )
+						{
+							origin.x = elem->width() * -1 + glyphWidth;
+						}
+						blinkPos = elem->pos(txtBoxComp.align);
+						if ( txtBoxComp.fill )
+						{
+							col = txtBoxComp.fill->hoverCol;
+						}
+					}
+					else
+					{
+						blinkPos = elem->pos(NoGUI::Align(-1, 0)); // default position
+					}
+					DrawTextPro(GetFontDefault(), txt, blinkPos, origin, angle, fontSize, 0, col);
+				}
+			}
 		}
 	}
 }
@@ -2184,37 +2285,44 @@ void Element::draw()
 bool Element::isHover()
 {
 	Vector2 mousePos = GetMousePosition();
+	hover = CheckCollisionPointShape(mousePos, shape->n, *(this));
 	
 	if ( components )
 	{
 		NoGUI::CMultiShape& multiShapeComp = components->getComponent< NoGUI::CMultiShape >();
-	
-		if ( multiShapeComp.active && multiShapeComp.collision )
+		NoGUI::CInput& inputComp = components->getComponent< NoGUI::CInput >();
+		
+		if ( !hover )
 		{
-			for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
+			if ( multiShapeComp.active && multiShapeComp.collision )
 			{
-				Vector2 center = pos(shape.second.origin);
-				Vector2 offset = shape.second.pos();
-				float angle = shape.second.angle;
-				if ( rotation() != 0 )
+				for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
 				{
-					offset = Vector2Rotate(offset, rotation() * DEG2RAD);
-					angle += rotation();
-				}
-				center.x += offset.x;
-				center.y += offset.y;
-				NoGUI::Transform bbox = NoGUI::Transform(center, shape.second.radius, NoGUI::Align(0, 0), angle);
-				if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
-				{
-					hover = true;
+					Vector2 center = pos(shape.second.origin);
+					Vector2 offset = shape.second.pos();
+					float angle = shape.second.angle;
+					if ( rotation() != 0 )
+					{
+						offset = Vector2Rotate(offset, rotation() * DEG2RAD);
+						angle += rotation();
+					}
+					center.x += offset.x;
+					center.y += offset.y;
+					NoGUI::Transform bbox = NoGUI::Transform(center, shape.second.radius, NoGUI::Align(0, 0), angle);
+					if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
+					{
+						hover = true;
 				
-					return hover;
+						break;
+					}
 				}
 			}
 		}
+		if ( inputComp.active && hover )
+		{
+			collectInput(this);
+		}
 	}
-	
-	hover = CheckCollisionPointShape(mousePos, shape->n, *(this));
 	
 	return hover;
 }

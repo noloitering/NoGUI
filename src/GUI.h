@@ -58,6 +58,7 @@ namespace NoGUI
 	Vector2 AlignText(const NoGUI::Align& alignment, const NoGUI::Wrap& wrap, Vector2 lineSize, int lineNum, int numLines, float lineSpacing=0);
 	Vector2 AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum, int numLines);
 	bool CheckCollisionPointShape(Vector2 point, int sides, const Transform& area);
+	void collectInput(Element* elem);
 	// Drawing functions
 	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0, bool hovered=false);
 	void DrawShape(const nShape& shape, const NoGUI::Transform& transform, bool hovered=false);

@@ -146,7 +146,22 @@ namespace NoGUI
 		bool collision = false;
 	};
 	
-	typedef std::tuple< CImage, CText, CTextBox, CMultiShape > Components;
+	class CInput : public CInterface
+	{
+	public:	
+		CInput(size_t max=NoMAD::INBUFF, float rateOfBlink=1.5f, float blinkTime=1.0f, int blinkCodepoint='|')
+			: cap(max), blinkChar(blinkCodepoint), blinkRate(rateOfBlink), blinkHold(blinkTime) {}
+		CInput(const char* inner, size_t max=NoMAD::INBUFF, float rateOfBlink=1.5f, float blinkTime=1.0f, int blinkCodepoint='|')
+			: cap(max), blinkChar(blinkCodepoint), blinkRate(rateOfBlink), blinkHold(blinkTime) {i = TextLength(inner);}
+		size_t cap = NoMAD::INBUFF;
+		size_t i = 0;
+		int blinkChar = '|';
+		float blinkRate = 1.5f; // how often to display blinkChar in seconds
+		float blinkHold = 1.0f; // how long to display blinkChar in seconds
+		float lastBlink = 0.0f; // last time blinkChar was displayed
+	};
+	
+	typedef std::tuple< CImage, CText, CTextBox, CMultiShape, CInput > Components;
 	
 	class CContainer
 	{
