@@ -2012,7 +2012,6 @@ void NoGUI::DrawElement(Element* elem)
 		{
 			DrawCMultiShape(*(elem), multiShapeComp, elem->getHover());
 		}
-		// TODO: align blinkChar in y position
 		if ( inputComp.active && elem->getHover() )
 		{
 			// draw blinkChar if it has been blinkRate time since lastBlink + blinkHold time
@@ -2031,22 +2030,66 @@ void NoGUI::DrawElement(Element* elem)
 					Vector2 origin = {0, 0};
 					float angle = 0;
 					float fontSize = 20.0f;
+					float lastLineWidth = 0.0f;
+					float txtHeight = 0.0f;
 					Color col = WHITE;
 					if ( txtComp.active )
 					{
 						Font font = (txtComp.font == nullptr) ? GetFontDefault() : *(txtComp.font);
-						// calculate blinkChar size
 						fontSize = txtComp.size;
-						float scaleFactor = fontSize / (float)font.baseSize;
-						int index = GetGlyphIndex(font, inputComp.blinkChar);
-						float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
-						// position blinkChar at end of inner
-						origin = AlignText(txtComp, (Vector2){glyphWidth * 2, fontSize}, 0, 1);
-						Vector2 textSize = MeasureTextEx(font, elem->getInner(), fontSize, txtComp.spacing.x);
-						origin.x -= textSize.x;
-						origin.y -= textSize.y - txtComp.size;
+						int numLines = 0;
+						const char** lines = TextSplit(elem->getInner(), '\n', &numLines);
+						lastLineWidth = MeasureTextEx(font, lines[numLines - 1], fontSize, txtComp.spacing.x).x;
+						txtHeight = (numLines - 1) * txtComp.size + txtComp.spacing.y * (numLines - 2);
+						// position blinkChar
 						blinkPos = elem->pos(txtComp.align);
+						switch ( txtComp.align.x )
+						{
+							case XAlign::LEFT:
+							{
+								origin.x = lastLineWidth * -1;
+								
+								break;
+							}
+							
+							case XAlign::CENTER:
+							{
+								origin.x = lastLineWidth / -2;
+								
+								break;
+							}
+							
+							case XAlign::RIGHT:
+							{
+								
+								break;
+							}
+						}
+						switch ( txtComp.align.y )
+						{
+							case YAlign::TOP:
+							{
+								origin.y = txtHeight * -1;
+								
+								break;
+							}
+							
+							case YAlign::CENTER:
+							{
+								origin.y = (txtHeight - txtBoxComp.size) / -2;
+								
+								break;
+							}
+							
+							case YAlign::BOTTOM:
+							{
+								origin.y = txtBoxComp.size;
+								
+								break;
+							}
+						}
 						angle = elem->angle + txtComp.angle;
+						// get text colour
 						if ( txtComp.fill )
 						{
 							col = txtComp.fill->hoverCol;
@@ -2055,20 +2098,73 @@ void NoGUI::DrawElement(Element* elem)
 					else if ( txtBoxComp.active )
 					{
 						Font font = (txtBoxComp.font == nullptr) ? GetFontDefault() : *(txtBoxComp.font);
-						// calculate blinkChar size
 						fontSize = txtBoxComp.size;
-						float scaleFactor = fontSize / (float)font.baseSize;
-						int index = GetGlyphIndex(font, inputComp.blinkChar);
-						float glyphWidth = (font.glyphs[index].advanceX == 0) ? font.recs[index].width*scaleFactor : font.glyphs[index].advanceX*scaleFactor;
-						// position blinkChar at end of inner
-						origin = AlignText(txtBoxComp.align, Wrap::DOWN, (Vector2){glyphWidth * 2, fontSize}, 0, 1);
-						origin.x -= MeasureTextEx(font, elem->getInner(), fontSize, txtBoxComp.spacing.x).x;
-						// no overflow
-						if ( origin.x < elem->width() * -1 )
+						if ( txtBoxComp.wrap )
 						{
-							origin.x = elem->width() * -1 + glyphWidth;
+							std::vector< std::tuple< const char*, float, unsigned int > > lines = WrapText(elem->getInner(), font, txtBoxComp.size, txtBoxComp.spacing.x, *(elem));
+							lastLineWidth = std::get< float >(lines.at(lines.size() -  1));
+							txtHeight = (lines.size() - 1) * txtBoxComp.size + txtBoxComp.spacing.y * (lines.size() - 2);
 						}
+						else
+						{
+							int numLines = 0;
+							const char** lines = TextSplit(elem->getInner(), '\n', &numLines);
+							lastLineWidth = MeasureTextEx(font, lines[numLines - 1], fontSize, txtBoxComp.spacing.x).x;
+							txtHeight = (numLines - 1) * txtBoxComp.size + txtBoxComp.spacing.y * (numLines - 2);
+							// no overflow
+							if ( lastLineWidth > elem->width() )
+							{
+								lastLineWidth = elem->width();
+							}
+						}
+						// position blinkChar
 						blinkPos = elem->pos(txtBoxComp.align);
+						switch ( txtBoxComp.align.x )
+						{
+							case XAlign::LEFT:
+							{
+								origin.x = lastLineWidth * -1;
+								
+								break;
+							}
+							
+							case XAlign::CENTER:
+							{
+								origin.x = lastLineWidth / -2;
+								
+								break;
+							}
+							
+							case XAlign::RIGHT:
+							{
+								
+								break;
+							}
+						}
+						switch ( txtBoxComp.align.y )
+						{
+							case YAlign::TOP:
+							{
+								origin.y = txtHeight * -1;
+								
+								break;
+							}
+							
+							case YAlign::CENTER:
+							{
+								origin.y = (txtHeight - txtBoxComp.size) / -2;
+								
+								break;
+							}
+							
+							case YAlign::BOTTOM:
+							{
+								origin.y = txtBoxComp.size;
+								
+								break;
+							}
+						}
+						// get text colour
 						if ( txtBoxComp.fill )
 						{
 							col = txtBoxComp.fill->hoverCol;

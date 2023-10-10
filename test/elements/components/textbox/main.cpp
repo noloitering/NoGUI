@@ -42,6 +42,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, togglePos, std::make_shared< NoGUI::CContainer >(), "Tip", "WRAP: TRUE");
 	
 	centerElem->components->addComponent< NoGUI::CTextBox >(nullptr, font, 20, topLeft);
+	centerElem->components->addComponent< NoGUI::CInput >(centerElem->getInner());
 	dataElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, topLeft);
 	toggleElem->components->addComponent< NoGUI::CText >(toggleFill, font, 20, topLeft);
 	
@@ -135,6 +136,7 @@ int main(int argc, char ** argv)
 			{
 				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
+					elem->isHover();
 					NoGUI::CTextBox& txtComp = elem->components->getComponent< NoGUI::CTextBox >();
 					txtComp.spacing.x += translateX;
 					txtComp.spacing.y += translateY;
