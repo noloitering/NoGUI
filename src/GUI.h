@@ -45,10 +45,12 @@ namespace NoGUI
 		Element(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimension, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
 			: GameObj(num, type, in), Transform(dimension), shape(style), components(c) {}
 		virtual void draw();
+		virtual bool isFocus();
 		std::shared_ptr< CContainer > components;
 		bool getActive();
-		bool getFocus(); 
+		bool getFocus();
 		bool getHover();
+		bool setFocus(bool set);
 		bool isHover();
 		std::shared_ptr< nShape > style(); // TODO: better name
 	};

@@ -8,14 +8,17 @@ int main(int argc, char ** argv)
 	Vector2 elemSize = {100, 100};
 	std::vector< std::shared_ptr< NoGUI::Element > > elemVec;
 	
-	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(WHITE, GREEN);
+	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(RAYWHITE, GRAY);
+	std::shared_ptr< NoGUI::Fill > outFill = std::make_shared< NoGUI::Fill >(BLUE, RED);
+	std::shared_ptr< NoGUI::Fill > focusFill = std::make_shared< NoGUI::Fill >(RED, MAROON);
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
-	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill, nullptr);
-	std::shared_ptr< NoGUI::nShape > ellipse = std::make_shared< NoGUI::nShape >(0, fill, nullptr);
-	std::shared_ptr< NoGUI::nShape > line = std::make_shared< NoGUI::nShape >(2, fill, nullptr);
-	std::shared_ptr< NoGUI::nShape > triangle = std::make_shared< NoGUI::nShape >(3, fill, nullptr);
-	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, nullptr);
-	std::shared_ptr< NoGUI::nShape > octagon = std::make_shared< NoGUI::nShape >(8, fill, nullptr);
+	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(outFill, 3);
+	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill, outline);
+	std::shared_ptr< NoGUI::nShape > ellipse = std::make_shared< NoGUI::nShape >(0, fill, outline);
+	std::shared_ptr< NoGUI::nShape > line = std::make_shared< NoGUI::nShape >(2, fill, outline);
+	std::shared_ptr< NoGUI::nShape > triangle = std::make_shared< NoGUI::nShape >(3, fill, outline);
+	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
+	std::shared_ptr< NoGUI::nShape > octagon = std::make_shared< NoGUI::nShape >(8, fill, outline);
 	
 	NoGUI::Transform leftT = NoGUI::Transform((Vector2){0, 0}, elemSize, NoGUI::Align(-1, -1));
 	NoGUI::Transform topT = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
@@ -42,10 +45,9 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomRT);
 	shapeElem->components->addComponent< NoGUI::CText >();
 	dataElem->components->addComponent< NoGUI::CText >();
-	shapeElem->setInner("");
+	shapeElem->setInner(TextFormat("click the\n%s elements!", argv[1]));
 	if ( argc > 1 )
 	{
-		shapeElem->setInner(argv[1]);
 		if ( strcasecmp(argv[1], "circle") == 0 )
 		{
 			leftT.radius.x = elemSize.y;
@@ -155,12 +157,12 @@ int main(int argc, char ** argv)
 			bottomT.radius.x = elemSize.y;
 			bottomLT.radius.x = elemSize.y;
 			bottomRT.radius.x = elemSize.y;
-			std::shared_ptr< NoGUI::nShape > fivegon = std::make_shared< NoGUI::nShape >(5, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > sixgon = std::make_shared< NoGUI::nShape >(6, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > sevengon = std::make_shared< NoGUI::nShape >(7, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > ninegon = std::make_shared< NoGUI::nShape >(9, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > tengon = std::make_shared< NoGUI::nShape >(10, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > elevengon = std::make_shared< NoGUI::nShape >(11, fill, nullptr);
+			std::shared_ptr< NoGUI::nShape > fivegon = std::make_shared< NoGUI::nShape >(5, fill, outline);
+			std::shared_ptr< NoGUI::nShape > sixgon = std::make_shared< NoGUI::nShape >(6, fill, outline);
+			std::shared_ptr< NoGUI::nShape > sevengon = std::make_shared< NoGUI::nShape >(7, fill, outline);
+			std::shared_ptr< NoGUI::nShape > ninegon = std::make_shared< NoGUI::nShape >(9, fill, outline);
+			std::shared_ptr< NoGUI::nShape > tengon = std::make_shared< NoGUI::nShape >(10, fill, outline);
+			std::shared_ptr< NoGUI::nShape > elevengon = std::make_shared< NoGUI::nShape >(11, fill, outline);
 			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, fivegon, leftT);
 			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sixgon, topT);
 			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, rightT);
@@ -174,12 +176,12 @@ int main(int argc, char ** argv)
 			bottomT.radius.x = bottomT.radius.y * 2;
 			bottomLT.radius.x = bottomT.radius.y * 2;
 			bottomRT.radius.x = bottomT.radius.y * 2;
-			std::shared_ptr< NoGUI::nShape > fivegon = std::make_shared< NoGUI::nShape >(5, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > sixgon = std::make_shared< NoGUI::nShape >(6, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > sevengon = std::make_shared< NoGUI::nShape >(7, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > ninegon = std::make_shared< NoGUI::nShape >(9, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > tengon = std::make_shared< NoGUI::nShape >(10, fill, nullptr);
-			std::shared_ptr< NoGUI::nShape > elevengon = std::make_shared< NoGUI::nShape >(11, fill, nullptr);
+			std::shared_ptr< NoGUI::nShape > fivegon = std::make_shared< NoGUI::nShape >(5, fill, outline);
+			std::shared_ptr< NoGUI::nShape > sixgon = std::make_shared< NoGUI::nShape >(6, fill, outline);
+			std::shared_ptr< NoGUI::nShape > sevengon = std::make_shared< NoGUI::nShape >(7, fill, outline);
+			std::shared_ptr< NoGUI::nShape > ninegon = std::make_shared< NoGUI::nShape >(9, fill, outline);
+			std::shared_ptr< NoGUI::nShape > tengon = std::make_shared< NoGUI::nShape >(10, fill, outline);
+			std::shared_ptr< NoGUI::nShape > elevengon = std::make_shared< NoGUI::nShape >(11, fill, outline);
 			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, fivegon, leftT);
 			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sixgon, topT);
 			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, rightT);
@@ -205,8 +207,9 @@ int main(int argc, char ** argv)
 	SetTargetFPS(60);
 	while ( !WindowShouldClose() )
 	{
-		bool plustate = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
-		bool minustate = IsMouseButtonDown(MOUSE_RIGHT_BUTTON);
+//		bool plustate = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+//		bool minustate = IsMouseButtonDown(MOUSE_RIGHT_BUTTON);
+		float scroll = GetMouseWheelMove();
 		dataElem->setInner(TextFormat("Angle: %03.02f", centerElem->angle));
 		BeginDrawing();
 			ClearBackground(BLACK);
@@ -214,16 +217,23 @@ int main(int argc, char ** argv)
 			{
 				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
-					if ( plustate )
+					elem->rotate(1.0f * scroll, NoGUI::Align(0, 0));
+					if ( elem->isHover() )
 					{
-						elem->rotate(1, elem->origin);
+						if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+						{
+							elem->setFocus(!elem->getFocus());
+						}
 					}
-					else if ( minustate )
+					if ( elem->getFocus() )
 					{
-						elem->rotate(-1, elem->origin);
+						elem->style()->fill = focusFill;
+					}
+					else
+					{
+						elem->style()->fill = fill;
 					}
 				}
-				elem->isHover();
 				elem->draw();
 			}
 		EndDrawing();

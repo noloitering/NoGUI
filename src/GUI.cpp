@@ -2435,6 +2435,19 @@ bool Element::getFocus()
 	return focus;
 }
 
+bool NoGUI::Element::isFocus()
+{
+	
+	return getFocus();
+}
+
+bool Element::setFocus(bool set)
+{
+	focus = set;
+	
+	return focus;
+}
+
 bool Element::getHover()
 {
 	
