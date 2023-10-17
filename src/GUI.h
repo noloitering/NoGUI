@@ -36,24 +36,53 @@ namespace NoGUI
 	{
 	protected:
 		bool active = true; // logic switch
+		bool alive = true; // to be or not to be
 		bool focus = false; // programmable state
 		bool hover = false; // mouse hover
 		std::shared_ptr< nShape > shape;
 	public:
 		Element(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
 			: GameObj(num, type, in), Transform(pos, size, origin, rotation), shape(style), components(c) {}
-		Element(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimension, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: GameObj(num, type, in), Transform(dimension), shape(style), components(c) {}
+		Element(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: GameObj(num, type, in), Transform(dimensions), shape(style), components(c) {}
 		virtual void draw();
 		virtual bool isFocus();
 		std::shared_ptr< CContainer > components;
+		std::shared_ptr< nShape > style(); // TODO: better name
 		bool getActive();
 		bool getFocus();
 		bool getHover();
-		bool setFocus(bool set);
+		bool isAlive();
 		bool isHover();
-		std::shared_ptr< nShape > style(); // TODO: better name
+		bool setActive(bool set);
+		bool setFocus(bool set);
+		void kill();
 	};
+	
+	class Page : public CMap // Container for Elements
+	{
+	protected:
+		std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > elements;
+		std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > toAdd;
+		size_t total = 0; // total amount of elements ever created
+		bool active = true;
+	public:
+		Page(bool init=true)
+			: active(init) {}
+		std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > getBody();
+		std::shared_ptr< Element > getElement(size_t id);
+		std::vector< std::shared_ptr< Element > > getElements(const char* tag);
+		std::vector< std::shared_ptr< Element > > getElements();
+		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="");
+		void removeElement(size_t id);
+		void removeElements(const char* tag);
+		void clearElements();
+		void update();
+		size_t size();
+		bool isActive();
+		bool setActive(bool set);
+	};
+	
 	// helper functions
 	std::vector< std::tuple< const char*, float, unsigned int > > WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area);
 	std::vector< std::tuple< const char*, float, unsigned int > > WrapText(const char* txt, const NoGUI::CText& fmt, const NoGUI::Transform& area);

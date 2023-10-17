@@ -2378,6 +2378,23 @@ void Element::draw()
 	DrawElement(this);
 }
 
+std::shared_ptr< nShape > Element::style()
+{
+	
+	return shape;
+}
+
+void Element::kill()
+{
+	alive = false;
+}
+
+bool Element::isAlive()
+{
+	
+	return alive;
+}
+
 bool Element::isHover()
 {
 	Vector2 mousePos = GetMousePosition();
@@ -2435,11 +2452,19 @@ bool Element::getFocus()
 	return focus;
 }
 
-bool NoGUI::Element::isFocus()
+bool Element::isFocus()
 {
 	
 	return getFocus();
 }
+
+bool Element::setActive(bool set)
+{
+	active = set;
+	
+	return active;
+}
+
 
 bool Element::setFocus(bool set)
 {
@@ -2454,8 +2479,163 @@ bool Element::getHover()
 	return hover;
 }
 
-std::shared_ptr< nShape > Element::style()
+void Page::update()
+{
+	std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > new_map;
+	for (auto it : elements)
+	{
+		for (size_t elemIndex=0; elemIndex < it.second.size(); elemIndex++)
+		{
+			auto elem = it.second.at(elemIndex);
+			if ( elem->isAlive() )
+			{
+				new_map[it.first.tag].push_back(elem);
+			}
+		}
+	}
+	if ( !toAdd.empty() )
+	{
+		for (auto add : toAdd)
+		{
+			if ( !add.second.empty() )
+			{
+				for (auto elem : add.second)
+				{
+					new_map[add.first.tag].push_back(elem);
+				}
+			}
+		}
+		toAdd.clear();
+	}
+	
+	elements = new_map;
+}
+
+bool Page::isActive()
 {
 	
-	return shape;
+	return active;
+}
+
+bool Page::setActive(bool set)
+{
+	active = set;
+	
+	return active;
+}
+
+size_t Page::size()
+{
+	
+	return total;
+}
+
+std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > Page::getBody()
+{
+	
+	return elements;
+}
+
+std::shared_ptr< Element > Page::getElement(size_t id)
+{
+	for (auto it=elements.begin(); it != elements.end(); it++)
+	{
+		for (size_t elemIndex=0; elemIndex < it->second.size(); elemIndex++)
+		{
+			if ( it->second.at(elemIndex)->getId() == id )
+			{
+				
+				return it->second[elemIndex];
+			}
+		}
+	}
+	
+	return nullptr;
+}
+
+std::vector< std::shared_ptr< Element > > Page::getElements(const char* tag)
+{
+	// don't make a new entry by using [] operator, and don't throw exception if tag is not in map
+	// simply return empty vector if tag is not in map
+	for (auto it=elements.begin(); it != elements.end(); it++)
+	{
+		int compare = strcmp(it->first.tag, tag);
+		if ( compare == 0 )
+		{
+			
+			return it->second;
+		}
+	}
+	
+	return std::vector< std::shared_ptr< Element > >();
+}
+
+// TODO: gotta be a better way to do this
+std::vector< std::shared_ptr< Element > > Page::getElements()
+{
+	std::vector< std::shared_ptr< Element > > elems(total);
+	for (auto it=elements.begin(); it != elements.end(); it++) // order by id
+	{
+		for (std::shared_ptr< Element > elem : it->second)
+		{
+			elems.at(elem->getId()) = elem;
+		}
+	}
+	
+	std::vector< std::shared_ptr< Element > > result;
+	for (std::shared_ptr< Element > elem : elems) // remove dead elements
+	{
+		if ( elem )
+		{
+			result.push_back(elem);
+		}
+	}
+	
+	return result;
+}
+
+void Page::removeElement(size_t id)
+{
+	for (auto it=elements.begin(); it != elements.end(); it++)
+	{
+		for (std::shared_ptr< Element > elem : it->second)
+		{
+			if ( elem->getId() == id )
+			{
+				elem->kill();
+				
+				return;
+			}
+		}
+	}
+}
+
+void Page::removeElements(const char* tag)
+{
+	elements.erase(tag);
+}
+
+void Page::clearElements()
+{
+	for (auto it=elements.begin(); it != elements.end(); it++)
+	{
+		for (std::shared_ptr< Element > elem : it->second)
+		{
+			elem->kill();
+		}
+	}
+	total = 0;
+}
+
+std::shared_ptr< Element > Page::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag, const char* inner)
+{
+	std::shared_ptr< CContainer > components = getComponents(tag);
+	if ( components == nullptr )
+	{
+		components = addComponents(tag);
+	}
+	auto elem = std::shared_ptr< Element >(new Element(total++, style, dimensions, components, tag, inner));
+	toAdd[tag].push_back(elem);
+	
+	return elem;
 }

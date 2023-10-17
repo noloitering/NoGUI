@@ -3,6 +3,7 @@
 #include <memory>
 //#include <math.h>
 #include <vector>
+#include <map>
 //#include <variant>
 
 namespace NoGUI
@@ -215,6 +216,68 @@ namespace NoGUI
 		{
 			
 			return getComponent< C >().active;
+		}
+	};
+	
+	class CMap
+	{
+	protected:
+		std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > cmap;
+	public:
+		CMap() {}
+		CMap(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > compMap)
+			: cmap(compMap) {}
+		CMap(const char* key, std::shared_ptr< CContainer > value=nullptr)
+		{
+			if ( value == nullptr )
+			{
+				value = std::make_shared< CContainer >();
+			}
+			
+			cmap[key] = value;
+		}
+		virtual ~CMap() {}
+		
+		std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > getMap()
+		{
+			
+			return cmap;
+		}
+		
+		std::shared_ptr< CContainer > getComponents(const char* key)
+		{
+			for (auto it=cmap.begin(); it != cmap.end(); it++)
+			{
+				int compare = strcmp(it->first.tag, key);
+				if ( compare == 0 )
+				{
+			
+					return it->second;
+				}
+			}
+	
+			return nullptr;
+		}
+		
+		std::shared_ptr< CContainer > addComponents(const char* key, std::shared_ptr< CContainer > comps)
+		{
+			cmap[key] = comps;
+			
+			return cmap[key];
+		}
+		
+		std::shared_ptr< CContainer > addComponents(const char* key, Components comps)
+		{
+			cmap[key] = std::make_shared< CContainer >(comps);
+			
+			return cmap[key];
+		}
+		
+		std::shared_ptr< CContainer > addComponents(const char* key)
+		{
+			cmap[key] = std::make_shared< CContainer >();
+			
+			return cmap[key];
 		}
 	};
 }
