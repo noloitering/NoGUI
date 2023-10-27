@@ -487,18 +487,21 @@ void NoGUI::collectInput(Element* elem)
 	CInput& input = elem->components->getComponent< CInput >();
 	char buffer[input.cap];
 	TextCopy(buffer, elem->getInner());
-	int key = GetCharPressed();
-	while ( key > 0 )
+	input.i = TextLength(buffer);
+	if ( input.i < input.cap )
 	{
-		// only allow good inputs
-		if ( (key >= 32) && (key <= 125) && input.i < input.cap )
+		int key = GetCharPressed();
+		while ( key > 0 )
 		{
-			buffer[input.i] = (char)key;
-			buffer[input.i + 1] = '\0';
-			input.i++;
+			// only allow good inputs
+			if ( (key >= 32) && (key <= 125) && input.i < input.cap )
+			{
+				buffer[input.i] = (char)key;
+				buffer[input.i + 1] = '\0';
+				input.i++;
+			}
+			key = GetCharPressed();
 		}
-		
-		key = GetCharPressed();
 	}
 	if ( IsKeyPressed(KEY_BACKSPACE) )
     {
@@ -677,7 +680,7 @@ void NoGUI::DrawCText(const char* txt, CText& fmt, const NoGUI::Transform& trans
 		{
 			origin = AlignText(fmt.align, fmt.wrap, MeasureTextEx(font, lines[li], fmt.size, fmt.spacing.x), li, numLines, fmt.spacing.y);
 		}
-		DrawTextPro(font, lines[li], pos, origin, transform.angle + fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
+		DrawTextPro(font, lines[li], pos, origin, fmt.angle, fmt.size, fmt.spacing.x, col); // draw line
 	}
 }
 
@@ -1971,7 +1974,7 @@ void NoGUI::DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes, 
 // TODO: draw outlines last
 void NoGUI::DrawElement(Element* elem)
 {
-	std::shared_ptr< NoGUI::nShape > shape = elem->style();
+	std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
 	DrawShape(*(shape.get()), *(elem), elem->getHover());
 	if ( elem->components )
 	{
@@ -1989,7 +1992,7 @@ void NoGUI::DrawElement(Element* elem)
 			else
 			{
 				std::shared_ptr< NoGUI::Fill > imgFill = std::make_shared< NoGUI::Fill >();
-				std::shared_ptr< NoGUI::nShape > imgShape =  std::make_shared< NoGUI::nShape >(elem->style()->n, imgFill, nullptr); // ehhh, not the greatest solution
+				std::shared_ptr< NoGUI::nShape > imgShape =  std::make_shared< NoGUI::nShape >(elem->getShape()->n, imgFill, nullptr); // ehhh, not the greatest solution
 				DrawCImage(imgComp, imgShape, (*elem));
 			}
 		}
@@ -2378,8 +2381,15 @@ void Element::draw()
 	DrawElement(this);
 }
 
-std::shared_ptr< nShape > Element::style()
+std::shared_ptr< nShape > Element::getShape()
 {
+	
+	return shape;
+}
+
+std::shared_ptr< nShape > Element::setShape(std::shared_ptr< nShape > set)
+{
+	shape = set;
 	
 	return shape;
 }
@@ -2638,4 +2648,103 @@ std::shared_ptr< Element > Page::addElement(std::shared_ptr< nShape > style, con
 	toAdd[tag].push_back(elem);
 	
 	return elem;
+}
+
+//std::shared_ptr< Element > GUIManager::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0)
+//{
+//	
+//	return pages.at(pageIndex)->addElement(style, dimensions, tag, inner);
+//}
+
+std::shared_ptr< Page > GUIManager::addPage(std::shared_ptr< Page > pg)
+{
+	pages.push_back(pg);
+	
+	return pages.back();
+}
+
+std::shared_ptr< Page > GUIManager::addPage(bool active)
+{
+	std::shared_ptr< Page > pg = std::shared_ptr< Page >(new Page(active));
+	
+	return addPage(pg);
+}
+
+std::shared_ptr< Page > GUIManager::addPage(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool active)
+{
+	std::shared_ptr< Page > pg = std::shared_ptr< Page >(new Page(comps, active));
+	
+	return addPage(pg);
+}
+
+std::shared_ptr< Page > GUIManager::getPage(size_t pageIndex)
+{
+	
+	return pages.at(pageIndex);
+}
+
+std::vector< std::shared_ptr< Page > > GUIManager::getPages()
+{
+	
+	return pages;
+}
+
+size_t GUIManager::size()
+{
+	
+	return pages.size();
+}
+
+void GUIManager::removePage(size_t pageIndex)
+{
+	pages.erase(pages.begin() + pageIndex - 1);
+}
+
+//void GUIManager::removeElement(size_t id, size_t pageIndex)
+//{
+//	
+//}
+
+void GUIManager::clear()
+{
+	pages.clear();
+}
+
+void GUIManager::update()
+{
+	for (auto page : pages)
+	{
+		page->update();
+		if ( page->isActive() )
+		{
+			for (auto elem : page->getElements())
+			{
+				//elem->isHover();
+				elem->isFocus();
+			}
+		}
+	}
+}
+
+void GUIManager::render()
+{
+	for (auto page : pages)
+	{
+		if ( page->isActive() )
+		{
+			for (auto elem : page->getElements())
+			{
+				elem->draw();
+			}
+		}
+	}
+}
+
+void GUIManager::setActive(size_t index)
+{
+	for (auto page : pages)
+	{
+		page->setActive(false);
+	}
+	pages.at(index)->setActive(true);
 }

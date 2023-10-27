@@ -48,7 +48,8 @@ namespace NoGUI
 		virtual void draw();
 		virtual bool isFocus();
 		std::shared_ptr< CContainer > components;
-		std::shared_ptr< nShape > style(); // TODO: better name
+		std::shared_ptr< nShape > getShape();
+		std::shared_ptr< nShape > setShape(std::shared_ptr< nShape > set);
 		bool getActive();
 		bool getFocus();
 		bool getHover();
@@ -69,6 +70,8 @@ namespace NoGUI
 	public:
 		Page(bool init=true)
 			: active(init) {}
+		Page(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool init=true)
+			: CMap(comps), active(init) {}
 		std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > getBody();
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const char* tag);
@@ -81,6 +84,39 @@ namespace NoGUI
 		size_t size();
 		bool isActive();
 		bool setActive(bool set);
+	};
+	
+	class GUIManager // Container for Pages
+	{
+	private:
+		std::vector< std::shared_ptr< Page > > pages;
+	public:
+		GUIManager(bool withPg=true)
+		{
+			if ( withPg )
+			{
+				addPage(true);
+			}
+		}
+		GUIManager(std::shared_ptr< Page > pg)
+		{
+			addPage(pg);
+		}
+		GUIManager(std::vector< std::shared_ptr< Page > > pgs)
+			: pages(pgs) {}
+//		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0);
+		std::shared_ptr< Page > addPage(bool active=false);
+		std::shared_ptr< Page > addPage(std::shared_ptr< Page > pg);
+		std::shared_ptr< Page > addPage(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool active=false);
+		std::shared_ptr< Page > getPage(size_t pageIndex=0);
+		std::vector< std::shared_ptr< Page > > getPages();
+		size_t size();
+//		void removeElement(size_t id, size_t pageIndex=0);
+		void removePage(size_t pageIndex);
+		void clear();
+		void update();
+		void render();
+		void setActive(size_t index);
 	};
 	
 	// helper functions
