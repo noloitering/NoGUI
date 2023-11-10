@@ -2399,7 +2399,7 @@ void Element::kill()
 	alive = false;
 }
 
-bool Element::isAlive()
+bool Element::getAlive()
 {
 	
 	return alive;
@@ -2497,7 +2497,7 @@ void Page::update()
 		for (size_t elemIndex=0; elemIndex < it.second.size(); elemIndex++)
 		{
 			auto elem = it.second.at(elemIndex);
-			if ( elem->isAlive() )
+			if ( elem->getAlive() )
 			{
 				new_map[it.first.tag].push_back(elem);
 			}
@@ -2521,7 +2521,7 @@ void Page::update()
 	elements = new_map;
 }
 
-bool Page::isActive()
+bool Page::getActive()
 {
 	
 	return active;
@@ -2697,7 +2697,7 @@ size_t GUIManager::size()
 
 void GUIManager::removePage(size_t pageIndex)
 {
-	pages.erase(pages.begin() + pageIndex - 1);
+	pages.erase(pages.begin() + pageIndex);
 }
 
 //void GUIManager::removeElement(size_t id, size_t pageIndex)
@@ -2715,7 +2715,7 @@ void GUIManager::update()
 	for (auto page : pages)
 	{
 		page->update();
-		if ( page->isActive() )
+		if ( page->getActive() )
 		{
 			for (auto elem : page->getElements())
 			{
@@ -2730,7 +2730,7 @@ void GUIManager::render()
 {
 	for (auto page : pages)
 	{
-		if ( page->isActive() )
+		if ( page->getActive() )
 		{
 			for (auto elem : page->getElements())
 			{

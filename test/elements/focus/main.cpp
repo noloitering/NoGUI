@@ -227,11 +227,11 @@ int main(int argc, char ** argv)
 					}
 					if ( elem->getFocus() )
 					{
-						elem->style()->fill = focusFill;
+						elem->getShape()->fill = focusFill;
 					}
 					else
 					{
-						elem->style()->fill = fill;
+						elem->getShape()->fill = fill;
 					}
 				}
 				elem->draw();

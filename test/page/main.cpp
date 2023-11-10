@@ -101,13 +101,13 @@ int main(int argc, char ** argv)
 			for (auto elem : elemPg.getElements())
 			{
 				elem->isHover();
-				if ( elemPg.isActive() )
+				if ( elemPg.getActive() )
 				{
 					if ( TextIsEqual(elem->getTag(), "addTag") )
 					{
 						if ( elem->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 						{
-							inputPg.setActive(!inputPg.isActive());
+							inputPg.setActive(!inputPg.getActive());
 						}
 					}
 					else if ( TextIsEqual(elem->getInner(), "+") )
@@ -123,7 +123,7 @@ int main(int argc, char ** argv)
 					{
 						if ( elem->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 						{
-							if ( !popPg.isActive() )
+							if ( !popPg.getActive() )
 							{
 								popPg.setActive(true);
 								toDel = elem->getId();
@@ -134,7 +134,7 @@ int main(int argc, char ** argv)
 				}
 				elem->draw();
 			}
-			if ( inputPg.isActive() )
+			if ( inputPg.getActive() )
 			{
 				elemPg.setActive(false);
 				for (auto elem : inputPg.getElements())
@@ -168,7 +168,7 @@ int main(int argc, char ** argv)
 								buttonPos.translate(newPos.width() + 20, 0);
 								std::shared_ptr< NoGUI::Element > newButton = elemPg.addElement(button, buttonPos, newTag, "+");
 								// reset
-								tagInput->style()->fill = buttonFill;
+								tagInput->getShape()->fill = buttonFill;
 								addTag->translate(0, addTag->height() + 20);
 								tagInput->setInner("");
 								tagInput->components->getComponent< NoGUI::CInput >().i = 0;
@@ -177,7 +177,7 @@ int main(int argc, char ** argv)
 							}
 							else
 							{
-								tagInput->style()->fill = badEntryFill;
+								tagInput->getShape()->fill = badEntryFill;
 								box->setInner("Tags MUST be unique!");
 							}
 						}
@@ -193,7 +193,7 @@ int main(int argc, char ** argv)
 					elem->draw();
 				}
 			}
-			if ( popPg.isActive() )
+			if ( popPg.getActive() )
 			{
 				elemPg.setActive(false);
 				for (auto elem : popPg.getElements())

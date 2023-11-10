@@ -1,8 +1,7 @@
 #include "../../src/GUI.h"
 
-#include <iostream>
-
 Vector2 window = {1280, 720};
+enum class TransformState {IDLE, REPOSITION, SCALEX, SCALEY, SCALEXY, ROTATE};
 
 void DrawGrid(int cellSize, Rectangle area)
 {
@@ -16,7 +15,156 @@ void DrawGrid(int cellSize, Rectangle area)
 	}
 }
 
-void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr< NoGUI::Page > colpg, std::shared_ptr< NoGUI::Page > shapepg)
+void SnapToGrid(int cellSize, NoGUI::Transform& transform)
+{
+	transform.position.x = (int)transform.position.x;
+	transform.position.y = (int)transform.position.y;
+	float remX = (int)transform.position.x % cellSize;
+	float remY = (int)transform.position.y % cellSize;
+	switch (transform.origin.x)
+	{
+		case NoGUI::XAlign::LEFT:
+		{
+			if ( remX != 0 )
+			{
+				transform.position.x -= remX;
+			}
+			
+			break;
+		}
+		
+		case NoGUI::XAlign::CENTER:
+		{
+			if ( remX != 0 )
+			{
+				transform.position.x -= remX;
+			}
+			
+			break;
+		}
+		
+		case NoGUI::XAlign::RIGHT:
+		{
+			if ( remX != 0 )
+			{
+				transform.position.x += remX;
+			}
+			
+			break;
+		}
+	}
+	switch (transform.origin.y)
+	{
+		case NoGUI::YAlign::TOP:
+		{
+			if ( remY != 0 )
+			{
+				transform.position.y -= remY;
+			}
+			
+			break;
+		}
+		
+		case NoGUI::YAlign::CENTER:
+		{
+			if ( remY != 0 )
+			{
+				transform.position.y -= remY;
+			}
+			
+			break;
+		}
+		
+		case NoGUI::YAlign::BOTTOM:
+		{
+			if ( remY != 0 )
+			{
+				transform.position.y += remY;
+			}
+			
+			break;
+		}
+	}
+}
+
+void DrawHandles(const NoGUI::Transform& transform)
+{
+	float circRadius = 6;
+	Color handlesCol = BLUE;
+	DrawCircleV(transform.pos(NoGUI::Align(-1, -1)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(-1, 0)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(-1, 1)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(0, 1)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(1, 1)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(1, 0)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(1, -1)), circRadius, handlesCol);
+	DrawCircleV(transform.pos(NoGUI::Align(0, -1)), circRadius, handlesCol);
+}
+
+Vector2 GetHandlesCollision(Vector2 point, const NoGUI::Transform& transform)
+{
+	float circRadius = 9;
+	if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(-1, -1)), circRadius) )
+	{
+		
+		return (Vector2){-transform.radius.x, -transform.radius.y};
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(-1, 0)), circRadius) )
+	{
+		
+		return (Vector2){-transform.radius.x, 0.0f};
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(-1, 1)), circRadius) )
+	{
+		
+		return (Vector2){-transform.radius.x, transform.radius.y};;
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(0, 1)), circRadius) )
+	{
+		
+		return (Vector2){0, transform.radius.y};
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(1, 1)), circRadius) )
+	{
+		
+		return (Vector2){transform.radius.x, transform.radius.y};
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(1, 0)), circRadius) )
+	{
+		
+		return (Vector2){transform.radius.x, 0.0f};
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(1, -1)), circRadius) )
+	{
+		
+		return (Vector2){transform.radius.x, -transform.radius.y};;
+	}
+	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(0, -1)), circRadius) )
+	{
+		
+		return (Vector2){0.0f, -transform.radius.y};
+	}
+	
+	
+	return (Vector2){0.0f, 0.0f};
+}
+
+bool CheckCollisionPointRotationCircle(Vector2 point, const NoGUI::Transform& transform)
+{
+	bool collision = false;
+	Vector2 centerPos = transform.pos(NoGUI::Align(0, 0));
+	// create ring around element based on its radius
+	float innerRadius = (transform.radius.x > transform.radius.y) ? transform.radius.x * 2 : transform.radius.y * 2;
+	float outerRadius = (transform.radius.x > transform.radius.y) ? transform.radius.x * 3 : transform.radius.y * 3;
+	if ( !CheckCollisionPointCircle(point, centerPos, innerRadius) && CheckCollisionPointCircle(point, centerPos, outerRadius) )
+	{
+		collision = true;
+	}
+	
+	return collision;
+}
+
+void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr< NoGUI::Page > colpg, std::shared_ptr< NoGUI::Page > shapepg, std::shared_ptr< NoGUI::Page > elempg)
 {
 	// TODO: simplify this
 	std::vector< std::shared_ptr< NoGUI::Element > > propertyToggles = properties->getElements("Tab");
@@ -40,9 +188,12 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	}
 	std::shared_ptr< NoGUI::Element > addCol = colpg->getElements("Add").front();
 	std::shared_ptr< NoGUI::Element > addShape = shapepg->getElements("Add").front();
+	std::shared_ptr< NoGUI::Element > addElem = elempg->getElements("Add").front();
 	if ( coloursButton->getFocus() )
 	{
+		// display user colours
 		colpg->setActive(true);
+		// position buttons
 		if ( shapesButton->getFocus() || elementsButton->getFocus() )
 		{
 			shapesButton->position.y = addCol->pos(NoGUI::Align(0, 1)).y + addCol->getShape()->outline->thick + shapesButton->getShape()->outline->thick;
@@ -59,7 +210,9 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	}
 	if ( shapesButton->getFocus() )
 	{
+		// display user shapes
 		shapepg->setActive(true);
+		// position info
 		std::vector< std::shared_ptr< NoGUI::Element > > previews = shapepg->getElements("Shape");
 		std::vector< std::shared_ptr< NoGUI::Element > > containers = shapepg->getElements("Container");
 		std::vector< std::shared_ptr< NoGUI::Element > > labels = shapepg->getElements("Label");
@@ -117,20 +270,68 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	}
 	if ( elementsButton->getFocus() )
 	{
+		// display user elements
+		elempg->setActive(true);
+		// position info
+		std::vector< std::shared_ptr< NoGUI::Element > > labels = elempg->getElements("Label");
+		std::vector< std::shared_ptr< NoGUI::Element > > shapes = elempg->getElements("DropDown");
+		std::vector< std::shared_ptr< NoGUI::Element > > inputs = elempg->getElements("Input");
+		std::vector< std::shared_ptr< NoGUI::Element > > containers = elempg->getElements("Container");
+		std::vector< std::shared_ptr< NoGUI::Element > > previews = elempg->getElements("Preview");
+		std::vector< std::shared_ptr< NoGUI::Element > > values = elempg->getElements("Value");
+		float containerY = elementsButton->pos(NoGUI::Align(0, 1)).y + 8;
+		float labelY = elementsButton->pos(NoGUI::Align(0, -1)).y + 4 - labels.front()->height();
 		
-		
+		for (size_t i=0; i < values.size(); i++)
+		{
+			values.at(i)->repos((Vector2){values.at(i)->position.x, containerY + values.at(i)->height() + 2});
+			if ( i % 2 == 0 )
+			{
+				std::shared_ptr< NoGUI::Element > container = containers.at(i / 2);
+				std::shared_ptr< NoGUI::Element > preview = previews.at(i / 2);
+				container->repos((Vector2){container->position.x, containerY});
+				preview->repos((Vector2){preview->position.x, container->pos(NoGUI::Align(0, 0)).y});
+			}
+			else
+			{
+				labelY += containers.at(i / 2)->height() + 4;
+				containerY += containers.at(i / 2)->height() + 4;
+			}
+		}
+		Vector2 inputPos = {window.x - 300, labelY + labels.front()->height()};
+		for (size_t i=0; i < labels.size(); i++)
+		{
+			if ( i % 3 == 0 )
+			{
+				labelY += labels.at(i)->height() * 2;
+			}
+			labels.at(i)->repos((Vector2){labels.at(i)->position.x, labelY});
+		}
+		for (size_t i=0; i < shapes.size(); i++)
+		{
+			shapes.at(i)->repos((Vector2){inputPos.x, inputPos.y + shapes.at(i)->height() * (i + 2)});
+		}
+		for (size_t i=0; i < inputs.size(); i++)
+		{
+			if ( i % 2 == 0 )
+			{
+				inputPos.x = window.x - inputs.at(i)->width() * 2;
+				inputPos.y += inputs.at(i)->height() * 2;
+			}
+			inputs.at(i)->repos(inputPos);
+			inputPos.x += inputs.at(i)->width();
+		}
+		addElem->repos((Vector2){window.x - 150, inputPos.y + labels.front()->height() + 8});
 	}
 	else
 	{
-	
+		elempg->setActive(false);
 		if ( shapesButton->getFocus() || coloursButton->getFocus() )
 		{
 			elementsButton->position.y = window.y - (elementsButton->height() + elementsButton->getShape()->outline->thick) * (propertyToggles.size() - (elementsButton->getId() - coloursButton->getId()));
 		}
 	}
 }
-
-//void setActivePage(size_t index, std::vector< std::shared_ptr<  > >)
 
 int main(int argc, char ** argv)
 {
@@ -142,6 +343,8 @@ int main(int argc, char ** argv)
 	size_t colCounter = 0;
 	size_t colIndex = 0;
 	size_t shapeCounter = 0;
+	size_t shapeIndex = 0;
+	TransformState action = TransformState::IDLE;
 	if ( argc > 1 )
 	{
 		cellSize = TextToInteger(argv[1]);
@@ -150,6 +353,7 @@ int main(int argc, char ** argv)
 	std::vector< std::shared_ptr< NoGUI::Fill > > userCols;
 	std::vector< std::shared_ptr< NoGUI::nShape > > userShapes;
 	
+	// UI Colours
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){1, 1, 1, 1});
 	std::shared_ptr< NoGUI::Fill > textFill = std::make_shared< NoGUI::Fill >(WHITE);
 	std::shared_ptr< NoGUI::Fill > containerGray = std::make_shared< NoGUI::Fill >((Color){100, 100, 100, 200});
@@ -159,7 +363,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > colourGreen = std::make_shared< NoGUI::Fill >(LIME, DARKGREEN);
 	std::shared_ptr< NoGUI::Fill > shapeBlue = std::make_shared< NoGUI::Fill >(SKYBLUE, DARKBLUE);
 	std::shared_ptr< NoGUI::Fill > elementYellow = std::make_shared< NoGUI::Fill >(GOLD, ORANGE);
-	
+	// UI Outlines
 	std::shared_ptr< NoGUI::Outline > UIOutline = std::make_shared< NoGUI::Outline >(outlineRed, 4);
 	std::shared_ptr< NoGUI::Outline > pageButtonOutline = std::make_shared< NoGUI::Outline >(containerGray, 2);
 	std::shared_ptr< NoGUI::Outline > pageSelectOutline = std::make_shared< NoGUI::Outline >(containerGray, 4);
@@ -167,7 +371,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Outline > shapeOutline = std::make_shared< NoGUI::Outline >(shapeBlue, 4, NoGUI::Wrap::DOWN);
 	std::shared_ptr< NoGUI::Outline > elementOutline = std::make_shared< NoGUI::Outline >(elementYellow, 4, NoGUI::Wrap::DOWN);
 	std::shared_ptr< NoGUI::Outline > propertyOutline = std::make_shared< NoGUI::Outline >(outlineBlack, 1);
-	
+	// UI Shapes
 	std::shared_ptr< NoGUI::nShape > UIRect = std::make_shared< NoGUI::nShape >(4, containerGray, UIOutline);
 	std::shared_ptr< NoGUI::nShape > pageRect = std::make_shared< NoGUI::nShape >(4, innerGray, pageButtonOutline);
 	std::shared_ptr< NoGUI::nShape > pageRectSelect = std::make_shared< NoGUI::nShape >(4, innerGray, pageSelectOutline);
@@ -176,7 +380,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > shapeShape = std::make_shared< NoGUI::nShape >(4, containerGray, shapeOutline);
 	std::shared_ptr< NoGUI::nShape > elementShape = std::make_shared< NoGUI::nShape >(4, containerGray, elementOutline);
 	std::shared_ptr< NoGUI::nShape > propertyRect = std::make_shared< NoGUI::nShape >(4, containerGray, propertyOutline);
-	
+	// UI Transforms
 	NoGUI::Transform pagesPos = NoGUI::Transform((Vector2){-200, 0}, (Vector2){100, window.y / 2}, NoGUI::Align(-1, -1));
 	NoGUI::Transform pagesTogglePos = NoGUI::Transform((Vector2){pagesPos.pos(NoGUI::Align(1, 0)).x, pagesPos.pos(NoGUI::Align(1, 0)).y}, (Vector2){25, 50}, NoGUI::Align(-1, 0));
 	NoGUI::Transform initialPagePos = NoGUI::Transform((Vector2){pagesPos.pos(NoGUI::Align(0, 0)).x, 20}, (Vector2){64, 64}, NoGUI::Align(0, -1));
@@ -196,10 +400,15 @@ int main(int argc, char ** argv)
 	NoGUI::Transform colBPos = NoGUI::Transform((Vector2){colBLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){20, colPos.radius.y}, NoGUI::Align(-1, -1));
 	NoGUI::Transform colALabelPos = NoGUI::Transform((Vector2){colBPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){12, colPos.radius.y}, NoGUI::Align(-1, -1));
 	NoGUI::Transform colAPos = NoGUI::Transform((Vector2){colALabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){20, colPos.radius.y}, NoGUI::Align(-1, -1));
-//	NoGUI::Transform shapeContainerPos = NoGUI::Transform(window, (Vector2){propertyButtonRadius.x, window.y}, NoGUI::Align(1, -1));
 	NoGUI::Transform shapePos = NoGUI::Transform((Vector2){colRLabelPos.position.x - 12, colPos.pos(NoGUI::Align(0, 1)).y + shapeButtonPos.height()}, (Vector2){30, colPos.radius.y * 2}, NoGUI::Align(-1, -1));
+	NoGUI::Transform elemShapePos = NoGUI::Transform((Vector2){colRLabelPos.position.x, shapePos.pos(NoGUI::Align(0, 1)).y + elementButtonPos.height()}, shapeLabelRadius, NoGUI::Align(-1, -1));
+	NoGUI::Transform elemTagPos = NoGUI::Transform((Vector2){elemShapePos.position.x + elemShapePos.width(), elemShapePos.position.y}, elemShapePos.radius, elemShapePos.origin);
+	NoGUI::Transform elemInnerPos = NoGUI::Transform((Vector2){elemTagPos.position.x + elemTagPos.width(), elemTagPos.position.y}, elemTagPos.radius, elemTagPos.origin);
+	NoGUI::Transform addElemPos = NoGUI::Transform(colPos.position, shapePos.radius, NoGUI::Align(0, -1));
 	
 	NoGUI::GUIManager gui = NoGUI::GUIManager(false);
+	NoGUI::GUIManager userGUI = NoGUI::GUIManager(true);
+	// page manager
 	std::shared_ptr< NoGUI::Page > pagepg = gui.addPage(true);
 	std::shared_ptr< NoGUI::CContainer > pageToggleComps = pagepg->addComponents("Button");
 	std::shared_ptr< NoGUI::CContainer > pageLabelComps = pagepg->addComponents("Label");
@@ -212,17 +421,15 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > initialPage = pagepg->addElement(pageRectSelect, initialPagePos, "Page", "0");
 	std::shared_ptr< NoGUI::Element > initialPageLabel = pagepg->addElement(labelShape, pageLabelPos, "Label", "Page 0");
 	std::shared_ptr< NoGUI::Element > addPage = pagepg->addElement(pageRect, addPagePos, "Page", "+");
-	
+	// editor buttons
 	std::shared_ptr< NoGUI::Page > builderpg = gui.addPage(true);
 	std::shared_ptr< NoGUI::CContainer > builderToggleComps = builderpg->addComponents("Tab");
 	builderToggleComps->addComponent< NoGUI::CText >(textFill);
 	std::shared_ptr< NoGUI::Element > coloursContainer = builderpg->addElement(propertyRect, propertyPos, "Colours");
-//	std::shared_ptr< NoGUI::Element > shapesContainer = builderpg->addElement(labelShape, shapeContainerPos, "Shapes");
-//	std::shared_ptr< NoGUI::Element > elementsContainer = builderpg->addElement(propertyRect, propertyPos, "Elements");
 	std::shared_ptr< NoGUI::Element > coloursButton = builderpg->addElement(colourShape, colourButtonPos, "Tab", "Colours");
 	std::shared_ptr< NoGUI::Element > shapesButton = builderpg->addElement(shapeShape, shapeButtonPos, "Tab", "Shapes");
 	std::shared_ptr< NoGUI::Element > elementsButton = builderpg->addElement(elementShape, elementButtonPos, "Tab", "Elements");
-	
+	// colours editor
 	std::shared_ptr< NoGUI::Page > colpg = gui.addPage(false);
 	std::shared_ptr< NoGUI::CContainer > addColComps = colpg->addComponents("Add");
 	std::shared_ptr< NoGUI::CContainer > colLabelComps = colpg->addComponents("Label");
@@ -243,7 +450,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Element > aLabel = colpg->addElement(labelShape, colALabelPos, "Label", "a:");
 	std::shared_ptr< NoGUI::Element > aInput = colpg->addElement(pageRect, colAPos, "Input", "255");
 	std::shared_ptr< NoGUI::Element > addCol = colpg->addElement(pageRect, colPos, "Add", "+");
-	
+	// shapes editor
 	std::shared_ptr< NoGUI::Page > shapepg = gui.addPage(false);
 	std::shared_ptr< NoGUI::CContainer > shapeLabelComps = shapepg->addComponents("Label");
 	std::shared_ptr< NoGUI::CContainer > shapeInputComps = shapepg->addComponents("Input");
@@ -260,14 +467,42 @@ int main(int argc, char ** argv)
 	nameComps->addComponent< NoGUI::CText >(textFill, nullptr, 20.0f, NoGUI::Align(-1, 0));
 	nameComps->addComponent< NoGUI::CInput >(NoMAD::TAGBUFF);
 	std::shared_ptr< NoGUI::Element > addShape = shapepg->addElement(pageRect, shapePos, "Add", "+");
-	
-	std::shared_ptr< NoGUI::Page > colSelector = gui.addPage(false);
-	
-	std::shared_ptr< NoGUI::Page > contextMenu = gui.addPage(false);
-	std::shared_ptr< NoGUI::CContainer > optionComps = contextMenu->addComponents("Option");
+	// elements editor
+	std::shared_ptr< NoGUI::Page > elempg = gui.addPage(false);
+	std::shared_ptr< NoGUI::CContainer > elemLabelComps = elempg->addComponents("Label");
+	std::shared_ptr< NoGUI::CContainer > elemShapeComps = elempg->addComponents("DropDown");
+	std::shared_ptr< NoGUI::CContainer > elemInputComps = elempg->addComponents("Input");
+	std::shared_ptr< NoGUI::CContainer > addElemComps = elempg->addComponents("Add");
+	std::shared_ptr< NoGUI::CContainer > elemNameComps = elempg->addComponents("Name");
+	std::shared_ptr< NoGUI::CContainer > elemValueComps = elempg->addComponents("Value");
+	elemLabelComps->addComponent< NoGUI::CText >(textFill, nullptr, 20.0f, NoGUI::Align(-1, 0));
+	elemInputComps->addComponent< NoGUI::CText >(textFill);
+	elemShapeComps->addComponent< NoGUI::CText >(textFill);
+	elemInputComps->addComponent< NoGUI::CInput >(NoMAD::TAGBUFF);
+	addElemComps->addComponent< NoGUI::CText >(textFill);
+	elemNameComps->addComponent< NoGUI::CText >(textFill, nullptr, 20.0f, NoGUI::Align(-1, 0));
+	elemValueComps->addComponent< NoGUI::CText >(textFill, nullptr, 20.0f, NoGUI::Align(-1, 0));
+	elempg->addElement(labelShape, elemShapePos, "Label", "Shape:");
+	std::shared_ptr< NoGUI::Element > shapeSelection = elempg->addElement(pageRect, elemShapePos, "DropDown");
+	elempg->addElement(labelShape, elemTagPos, "Label", "Tag:");
+	elempg->addElement(pageRect, elemTagPos, "Input", "Default");
+	elempg->addElement(labelShape, elemInnerPos, "Label", "Inner:");
+	elempg->addElement(pageRect, elemInnerPos, "Input");
+	std::shared_ptr< NoGUI::Element > addElem = elempg->addElement(pageRect, addElemPos, "Add", "+");
+	// colours dropdown
+	std::shared_ptr< NoGUI::Page > colSelector = std::make_shared< NoGUI::Page >(false);
+	gui.addPage(colSelector);
+	// shapes dropdown
+	std::shared_ptr< NoGUI::Page > shapeSelector = std::make_shared< NoGUI::Page >(false);
+	gui.addPage(shapeSelector);
+	// Page options
+	std::shared_ptr< NoGUI::CContainer > optionComps = std::make_shared< NoGUI::CContainer >();
 	optionComps->addComponent< NoGUI::CText >(textFill);
+	NoGUI::CMap contextComps = NoGUI::CMap("Option", optionComps);
+	std::shared_ptr< NoGUI::Page > contextMenu = gui.addPage(contextComps.getMap());
 	NoGUI::Transform optionPos = NoGUI::Transform(window, shapeLabelRadius, NoGUI::Align(-1, -1));
 	std::shared_ptr< NoGUI::Element > deleteOption = contextMenu->addElement(pageRect, optionPos, "Option", "delete");
+	std::shared_ptr< NoGUI::Element > clearOption = contextMenu->addElement(pageRect, optionPos, "Option", "clear");
 	
 	InitWindow(window.x, window.y, "test");
 	SetTargetFPS(60);
@@ -277,6 +512,8 @@ int main(int argc, char ** argv)
 			ClearBackground(RAYWHITE);
 			DrawGrid(cellSize, screenSpace);
 			gui.update();
+			userGUI.update();
+			userGUI.render();
 			std::vector< std::shared_ptr< NoGUI::Element > > pageElems = pagepg->getElements("Page");
 			std::vector< std::shared_ptr< NoGUI::Element > > propertyToggles = builderpg->getElements("Tab");
 			if ( pagesToggle->isHover() && IsMouseButtonReleased(MOUSE_LEFT_BUTTON) )
@@ -304,8 +541,11 @@ int main(int argc, char ** argv)
 					{
 						if ( TextIsEqual("+", elem->getInner()) )
 						{
+							// add page
 							size_t pageNum = pageElems.size() - 1;
 							currPage = pageNum;
+							userGUI.addPage();
+							userGUI.setActive(currPage);
 							std::shared_ptr< NoGUI::Element > newPage = pagepg->addElement(pageRectSelect, *(addPage), "Page", TextFormat("%i", pageNum));
 							addPage->translate(0, newPage->height() + pageLabelPos.height());
 							NoGUI::Transform newTransform = NoGUI::Transform(newPage->pos(NoGUI::Align(0, 1)), labelRadius, NoGUI::Align(0, -1));
@@ -313,13 +553,16 @@ int main(int argc, char ** argv)
 						}
 						else
 						{
+							// set active page
 							size_t pageNum = TextToInteger(elem->getInner());
 							currPage = pageNum;
+							userGUI.setActive(currPage);
 							elem->setShape(pageRectSelect);
 						}
 					}
 					else if ( IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) )
 					{
+						// page options/context menu
 						if ( !TextIsEqual("+", elem->getInner()) )
 						{
 							contextMenu->setActive(true);
@@ -331,12 +574,9 @@ int main(int argc, char ** argv)
 						}
 					}
 				}
-				// if ( elem->isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
-				// {
-					
-				// }
 				if ( TextToInteger(elem->getInner()) != (int)currPage )
 				{
+					// not active shape
 					elem->setShape(pageRect);
 				}
 			}
@@ -346,7 +586,7 @@ int main(int argc, char ** argv)
 				if ( toggle->isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 				{
 					toggle->setFocus(!toggle->getFocus());
-					onPropertyPress(builderpg, colpg, shapepg);
+					onPropertyPress(builderpg, colpg, shapepg, elempg);
 				}
 				if ( toggle->isFocus() )
 				{
@@ -355,6 +595,7 @@ int main(int argc, char ** argv)
 			}
 			if ( dropdown )
 			{
+				// pop out editor
 				coloursContainer->position.y = window.y;
 				for (auto elem : builderpg->getElements())
 				{
@@ -363,13 +604,14 @@ int main(int argc, char ** argv)
 			}
 			else
 			{
+				// pop in editor
 				coloursContainer->position.y = 0;
 				for (auto elem : builderpg->getElements())
 				{
 					elem->resize((Vector2){propertyButtonRadius.x, elem->radius.y});
 				}
 			}
-			if ( colpg->isActive() )
+			if ( colpg->getActive() )
 			{
 				for (auto elem : colpg->getElements())
 				{
@@ -378,12 +620,12 @@ int main(int argc, char ** argv)
 					{
 						if ( elem->getActive() && elem->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 						{
+							// Remove Colour
 							size_t index = TextToInteger(elem->getTag());
 							std::shared_ptr< NoGUI::Fill > colToDel = userCols.at(index);
 							std::vector< std::shared_ptr< NoGUI::Element > > colours = colpg->getElements("Colour");
 							std::vector< std::shared_ptr< NoGUI::Element > > names = colpg->getElements("Name");
 							std::vector< std::shared_ptr< NoGUI::Element > > options = colSelector->getElements();
-//							std::vector< std::shared_ptr< NoGUI::Element > > colElems = colpg->getElements();
 							for (size_t i=0; i < colours.size(); i++)
 							{
 								if ( colours[i]->getShape()->fill == colToDel )
@@ -423,7 +665,7 @@ int main(int argc, char ** argv)
 									break;
 								}
 							}
-							if ( shapepg->isActive() )
+							if ( shapepg->getActive() )
 							{
 								shapesButton->translate(0, (addCol->height() + 4) * -1);
 								for (auto elem : shapepg->getElements())
@@ -431,14 +673,14 @@ int main(int argc, char ** argv)
 									elem->translate(0, (addCol->height() + 4) * -1);
 								}
 							}
-		//					if ( elementpg->isActive() )
-//							{
-//								elementButton->translate(0, addCol->height() + 4);
-							// for (auto elem : elementpg->getElements())
-							// {
-							// elem->translate(0, addCol->height() + 4);
-							// }
-//							}
+							if ( elempg->getActive() )
+							{
+								elementsButton->translate(0, addCol->height() + 4);
+								for (auto elem : elempg->getElements())
+								{
+									elem->translate(0, addCol->height() + 4);
+								}
+							}
 						}
 					}
 					// reactivate delete buttons
@@ -449,12 +691,14 @@ int main(int argc, char ** argv)
 				{
 					if ( colNames[i]->getHover() )
 					{
+						// update colours dropdown
 						std::vector< std::shared_ptr< NoGUI::Element > > options = colSelector->getElements();
 						options.at(i)->setInner(colNames[i]->getInner());
 					}
 				}
 				if ( addCol->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 				{
+					// add colour
 					unsigned char red = TextToInteger(rInput->getInner());
 					unsigned char green = TextToInteger(gInput->getInner());
 					unsigned char blue = TextToInteger(bInput->getInner());
@@ -469,6 +713,7 @@ int main(int argc, char ** argv)
 					colpg->addElement(labelShape, namePos, "Name", TextFormat("Colour%i", colCounter));
 					std::shared_ptr< NoGUI::Element > delButton = colpg->addElement(pageRect, deletePos, TextFormat("%i", colCounter), "x");
 					delButton->components = addColComps;
+					// translate inputs down
 					for (auto label : colpg->getElements("Label"))
 					{
 						label->translate(0, label->height() + 4);
@@ -488,7 +733,7 @@ int main(int argc, char ** argv)
 						}
 					}
 					addCol->translate(0, addCol->height() + 4);
-					if ( shapepg->isActive() )
+					if ( shapepg->getActive() || elempg->getActive() )
 					{
 						shapesButton->translate(0, addCol->height() + 4);
 						for (auto elem : shapepg->getElements())
@@ -496,21 +741,22 @@ int main(int argc, char ** argv)
 							elem->translate(0, addCol->height() + 4);
 						}
 					}
-//					if ( elementpg->isActive() )
-//					{
-//						elementButton->translate(0, addCol->height() + 4);
-						// for (auto elem : elementpg->getElements())
-						// {
-							// elem->translate(0, addCol->height() + 4);
-						// }
-//					}
+					if ( elempg->getActive() )
+					{
+						// translate elements down
+						elementsButton->translate(0, addCol->height() + 4);
+						for (auto elem : elempg->getElements())
+						{
+							elem->translate(0, addCol->height() + 4);
+						}
+					}
 					NoGUI::Transform selectPos = NoGUI::Transform(window, shapeLabelRadius, NoGUI::Align(-1, -1));
 					std::shared_ptr< NoGUI::Element > selection = colSelector->addElement(pageRect, selectPos, TextFormat("%i", colSelector->size()), TextFormat("Colour%i", colCounter));
 					selection->components = shapeColComps;
 					colCounter++;
 				}
 			}
-			if ( shapepg->isActive() )
+			if ( shapepg->getActive() )
 			{
 				for (auto elem : shapepg->getElements())
 				{
@@ -530,8 +776,9 @@ int main(int argc, char ** argv)
 						}
 					}
 				}
+				// colour dropdown
 				bool makeSelection = false;
-				if ( colSelector->isActive() )
+				if ( colSelector->getActive() )
 				{
 					for (auto selection : colSelector->getElements())
 					{
@@ -559,13 +806,6 @@ int main(int argc, char ** argv)
 				std::vector< std::shared_ptr< NoGUI::Element > > inputs = shapepg->getElements("Input");
 				std::vector< std::shared_ptr< NoGUI::Element > > colours = shapepg->getElements("DropDown");
 				std::vector< std::shared_ptr< NoGUI::Element > > names = shapepg->getElements("Name");
-//				for (auto name : names)
-//				{
-//					if ( name->getHover() )
-//					{
-//						for ()
-//					}
-//				}
 				for (size_t i=0; i < colours.size(); i++)
 				{
 					std::shared_ptr< NoGUI::Element > colour = colours.at(i);
@@ -600,12 +840,18 @@ int main(int argc, char ** argv)
 							preview->setInner("+");
 							if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 							{
+								// add shape
 								preview->setFocus(true);
 								std::shared_ptr< NoGUI::Element > container = shapepg->getElement(preview->getId() - 1);
 								NoGUI::Transform namePos = NoGUI::Transform((Vector2){shapesButton->pos(NoGUI::Align()).x + container->radius.x + 16, preview->position.y}, (Vector2){shapesButton->radius.x - container->radius.x - 8, shapesButton->radius.y}, NoGUI::Align(0, 0));
 								std::shared_ptr< NoGUI::Element > newName = shapepg->addElement(labelShape, namePos, "Name", TextFormat("Shape%i", shapeCounter));
 								container->setInner(TextFormat("%i", newName->getId()));
+								userShapes.push_back(preview->getShape());
+								NoGUI::Transform selectPos = NoGUI::Transform(window, shapeLabelRadius, NoGUI::Align(-1, -1));
+								std::shared_ptr< NoGUI::Element > selection = shapeSelector->addElement(pageRect, selectPos, TextFormat("%i", shapeSelector->size()), TextFormat("Shape%i", shapeCounter));
+								selection->components = shapeColComps;
 								shapeCounter++;
+								// remove inputs
 								shapepg->removeElement(preview->getId() - 2);
 								shapepg->removeElement(preview->getId() - 3);
 								shapepg->removeElement(preview->getId() - 4);
@@ -627,6 +873,7 @@ int main(int argc, char ** argv)
 						std::shared_ptr< NoGUI::Element > input = inputs.at(i);
 						if ( input->getHover() )
 						{
+							// adjust preview
 							if ( i % 2 == 0 ) // nInput
 							{
 								std::shared_ptr< NoGUI::Element > preview = shapepg->getElement(input->getId() + 6);
@@ -638,6 +885,16 @@ int main(int argc, char ** argv)
 								preview->getShape()->outline->thick = TextToInteger(input->getInner());
 							}
 						}
+					}
+				}
+				std::vector< std::shared_ptr< NoGUI::Element > > shapeNames = shapepg->getElements("Name");
+				for (size_t i=0; i < shapeNames.size(); i++)
+				{
+					if ( shapeNames[i]->getHover() )
+					{
+						// update shapes dropdown
+						std::vector< std::shared_ptr< NoGUI::Element > > options = shapeSelector->getElements();
+						options.at(i)->setInner(shapeNames[i]->getInner());
 					}
 				}
 				if ( addShape->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
@@ -670,9 +927,117 @@ int main(int argc, char ** argv)
 					NoGUI::Transform previewPos = NoGUI::Transform(addShape->pos(NoGUI::Align(0, 0)), (Vector2){addShape->radius.x / 1.5f, addShape->radius.x / 1.5f}, NoGUI::Align(0, 0));
 					shapepg->addElement(shapePreview, previewPos, "Shape");
 					addShape->translate(0, addShape->height() + 4);
+					if ( elempg->getActive() )
+					{
+						elementsButton->translate(0, addShape->height() + 4);
+						for (auto elem : elempg->getElements())
+						{
+							elem->translate(0, addShape->height() + 4);
+						}
+					}
 				}
 			}
-			if ( contextMenu->isActive() )
+			if ( elempg->getActive() )
+			{
+				for (auto elem : elempg->getElements())
+				{
+					elem->isHover();
+				}
+				if ( shapeSelection->getHover() )
+				{
+					if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+					{
+						shapeSelection->setFocus(true);
+					}
+				}
+				else
+				{
+					shapeSelection->setFocus(false);
+				}
+				// Shape dropdown
+				bool makeSelection = false;
+				if ( shapeSelector->getActive() )
+				{
+					for (size_t i=0; i < shapeSelector->getElements().size(); i++)
+					{
+						std::shared_ptr< NoGUI::Element > selection = shapeSelector->getElements().at(i);
+						if ( selection->isHover() )
+						{
+							makeSelection = true;
+							if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+							{
+								shapeIndex = i;
+								shapeSelection->setInner(selection->getInner());
+							}
+						}
+					}
+				}
+				std::vector< std::shared_ptr< NoGUI::Element > > shapes = elempg->getElements("DropDown");
+				for (size_t i=0; i < shapes.size(); i++)
+				{
+					std::shared_ptr< NoGUI::Element > shape = shapes.at(i);
+					if ( shape->getFocus() )
+					{
+						shapeSelector->setActive(true);
+						makeSelection = true;
+						std::vector< std::shared_ptr< NoGUI::Element > > options = shapeSelector->getElements();
+						for (size_t option=0; option < options.size(); option++)
+						{
+							options.at(option)->repos((Vector2){shape->position.x, shape->pos(NoGUI::Align(0, -1)).y + shape->height() * (option + 1)});
+						}
+					
+						break;
+					}
+				}
+				if ( !makeSelection )
+				{
+					shapeSelector->setActive(false);
+				}
+				for (auto preview : elempg->getElements("Preview"))
+				{
+					if ( preview->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+					{
+						// add to userGUI
+						if ( userGUI.size() > currPage )
+						{
+							NoGUI::Transform newPos = NoGUI::Transform(GetMousePosition(), (Vector2){cellSize * 2.0f, cellSize * 2.0f}, NoGUI::Align(0, 0));
+							std::shared_ptr< NoGUI::Page > activePage = userGUI.getPage(currPage);
+							for (auto pageElem : activePage->getElements())
+							{
+								pageElem->setFocus(false);
+							}
+							std::shared_ptr< NoGUI::Element > newElem = activePage->addElement(preview->getShape(), newPos, preview->getTag(), preview->getInner());
+							newElem->setFocus(true);
+							action = TransformState::REPOSITION;
+						}
+					}
+				}
+				if ( addElem->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+				{
+					Vector2 containerSize = {30, (propertyButtonRadius.y + 4) * 2};
+					// replace shape label and dropdown with preview
+					NoGUI::Transform containerPos = NoGUI::Transform(window, containerSize, NoGUI::Align(-1, -1));
+					for (auto label : elempg->getElements("Label"))
+					{
+						if (label->getInner()[0] == 'S')
+						{
+							containerPos.repos(label->pos(NoGUI::Align(-1, -1)));
+							shapeSelection->translate(0, containerSize.y * 2 + 4);
+						}
+						label->translate(0, containerSize.y * 2 + 4);
+					}
+					for (auto input : elempg->getElements("Input"))
+					{
+						elempg->addElement(labelShape, *(input), "Value", input->getInner());
+						input->translate(0, containerSize.y * 2 + 4);
+					}
+					elempg->addElement(pageRect, containerPos, "Container", TextFormat("%i", shapeIndex));
+					NoGUI::Transform previewPos = NoGUI::Transform(containerPos.pos(NoGUI::Align(0, 0)), (Vector2){containerPos.radius.x / 1.5f, containerPos.radius.x / 1.5f}, NoGUI::Align(0, 0));
+					elempg->addElement(userShapes.at(shapeIndex), previewPos, "Preview", TextFormat("%i", shapeIndex));
+					addElem->translate(0, containerSize.y * 2 + 4);
+				}
+			}
+			if ( contextMenu->getActive() )
 			{
 				for (auto elem : contextMenu->getElements())
 				{
@@ -680,42 +1045,267 @@ int main(int argc, char ** argv)
 				}
 				if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 				{
-					contextMenu->setActive(false);
+					// get context
+					std::shared_ptr< NoGUI::Element > context = nullptr;
+					std::shared_ptr< NoGUI::Element > frontOption = contextMenu->getElements().front();
+					Vector2 frontOptionTopLeft = frontOption->pos(NoGUI::Align(-1, -1));
+					Rectangle frontOptionBBox = {frontOptionTopLeft.x, frontOptionTopLeft.y, frontOption->width(), frontOption->height()};
+					for (auto page : pageElems)
+					{
+						if ( context == nullptr )
+						{
+							Vector2 pageTopLeft = page->pos(NoGUI::Align(-1, -1));
+							Rectangle PageBBox = {pageTopLeft.x, pageTopLeft.y, page->width(), page->height()};
+							if ( CheckCollisionRecs(PageBBox, frontOptionBBox) )
+							{
+								context = page;
+								
+								break;
+							}
+						}
+					}
 					for (auto elem : contextMenu->getElements())
 					{
 						if ( elem->getHover() )
 						{
 							if ( TextIsEqual("delete", elem->getInner()) )
 							{
-								bool foundPage = false;
-								for (auto page : pageElems)
+								// delete page
+								if ( context->getInner()[0] != '+' )
 								{
-									if ( !foundPage )
+									for (auto page : pageElems)
 									{
-										Vector2 pageTopLeft = page->pos(NoGUI::Align(-1, -1));
-										Rectangle PageBBox = {pageTopLeft.x, pageTopLeft.y, page->width(), page->height()};
-										Vector2 optionTopLeft = elem->pos(NoGUI::Align(-1, -1));
-										Rectangle optionBBox = {optionTopLeft.x, optionTopLeft.y, elem->width(), elem->height()};
-										if ( CheckCollisionRecs(PageBBox, optionBBox) )
+										if ( page->getInner()[0] != '+' && page->getId() > context->getId() )
 										{
-											page->kill();
-											foundPage = true;
-											for (auto label : pagepg->getElements("Label"))
-											{
-												const char* labelText = label->getInner();
-												if ( labelText[6] > TextToInteger(page->getInner()) )
-												{
-													label->kill();
-												}
-											}
+											page->setInner(TextFormat("%i", TextToInteger(page->getInner()) - 1));
+											page->translate(0, (page->height() + pageLabelPos.height()) * -1);
 										}
 									}
-									else if (!TextIsEqual("+", page->getInner()))
+									context->kill();
+									userGUI.removePage(TextToInteger(context->getInner()));
+									pagepg->getElements("Label").back()->kill();
+									// translate addPage button
+									addPage->translate(0, (pageElems.at(1)->height() + pageLabelPos.height()) * -1);
+								}
+							}
+							else if ( TextIsEqual("clear", elem->getInner()) )
+							{
+								// clear elements in page
+								if ( context->getInner()[0] != '+' )
+								{
+									userGUI.getPage(TextToInteger(context->getInner()))->clearElements();
+									userGUI.getPage(TextToInteger(context->getInner()))->update();
+								}
+							}
+						}
+					}
+					contextMenu->setActive(false);
+				}
+			}
+			for (auto pg : userGUI.getPages())
+			{
+				if ( pg->getActive() )
+				{	
+					SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+					// find currently selected element
+					std::shared_ptr< NoGUI::Element > actionElem = nullptr;
+					for (auto elem : pg->getElements())
+					{
+						elem->isHover();
+						if ( elem->getFocus() )
+						{
+							actionElem = elem;
+						}
+						else if ( elem->getHover() )
+						{
+							SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+						}
+					}
+					// update currently selected element on mouse click
+					if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+					{
+						for (auto elem : pg->getElements())
+						{
+							elem->setFocus(false);
+							if ( elem->getHover() )
+							{
+								elem->setFocus(true);
+								actionElem = elem;
+							}
+						}
+					}
+					if ( actionElem )
+					{
+						// mouse cursor stuff
+						Vector2 mousePos = GetMousePosition();
+						Vector2 handlePoint = GetHandlesCollision(mousePos, *(actionElem));
+						bool rotateCollider = CheckCollisionPointRotationCircle(mousePos, *(actionElem));
+						if (handlePoint.x > 0 )
+						{
+							if ( handlePoint.y > 0)
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_NWSE);
+							}
+							else if ( handlePoint.y < 0 )
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_NESW);
+							}
+							else
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+							}
+						}
+						else if (handlePoint.x < 0)
+						{
+							if ( handlePoint.y > 0)
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_NESW);
+							}
+							else if ( handlePoint.y < 0 )
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_NWSE);
+							}
+							else
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+							}
+						}
+						else if (handlePoint.y != 0)
+						{
+							SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
+						}
+						if ( rotateCollider )
+						{
+							SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
+						}
+						// update action state
+						if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+						{
+							if ( handlePoint.x != 0 )
+							{
+								actionElem->setFocus(true);
+								action = TransformState::SCALEX;
+								if ( handlePoint.y != 0 )
+								{
+									action = TransformState::SCALEXY;
+								}
+							}
+							else if ( handlePoint.y != 0 )
+							{
+								actionElem->setFocus(true);
+								action = TransformState::SCALEY;
+							}
+							else if ( actionElem->getHover() )
+							{
+								action = TransformState::REPOSITION;
+							}
+							else if ( rotateCollider )
+							{
+								actionElem->setFocus(true);
+								action = TransformState::ROTATE;
+							}
+							else
+							{
+								action = TransformState::IDLE;
+							}
+						}
+						if ( IsMouseButtonReleased(MOUSE_LEFT_BUTTON) )
+						{
+							action = TransformState::IDLE;
+						}
+						// perform action depending on state
+						switch (action)
+						{
+							case TransformState::IDLE:
+							{
+								DrawHandles(*(actionElem));
+								
+								break;
+							}
+							
+							case TransformState::REPOSITION:
+							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);
+								actionElem->repos(GetMousePosition());
+								SnapToGrid(cellSize, *(actionElem));
+								
+								break;
+							}
+							
+							case TransformState::SCALEX:
+							{
+								Vector2 mousePos =  GetMousePosition();
+								Vector2 centerPos = actionElem->pos(NoGUI::Align(0, 0));
+								if ( mousePos.x > centerPos.x )
+								{
+									actionElem->radius.x = mousePos.x - centerPos.x;
+								}
+								else
+								{
+									actionElem->radius.x = centerPos.x - mousePos.x;
+								}
+								
+								break;
+							}
+							
+							case TransformState::SCALEY:
+							{
+								Vector2 mousePos =  GetMousePosition();
+								Vector2 centerPos = actionElem->pos(NoGUI::Align(0, 0));
+								if ( mousePos.y > centerPos.y )
+								{
+									actionElem->radius.y = mousePos.y - centerPos.y;
+								}
+								else
+								{
+									actionElem->radius.y = centerPos.y - mousePos.y;
+								}
+								
+								break;
+							}
+							
+							case TransformState::SCALEXY:
+							{
+								Vector2 mousePos =  GetMousePosition();
+								Vector2 centerPos = actionElem->pos(NoGUI::Align(0, 0));
+								if ( mousePos.x > centerPos.x )
+								{
+									actionElem->radius.x = mousePos.x - centerPos.x;
+								}
+								else
+								{
+									actionElem->radius.x = centerPos.x - mousePos.x;
+								}
+								if ( mousePos.y > centerPos.y )
+								{
+									actionElem->radius.y = mousePos.y - centerPos.y;
+								}
+								else
+								{
+									actionElem->radius.y = centerPos.y - mousePos.y;
+								}
+								
+								break;
+							}
+							
+							case TransformState::ROTATE:
+							{
+								SetMouseCursor(MOUSE_CURSOR_ARROW);
+								Vector2 vec = Vector2Subtract(mousePos, actionElem->pos());
+								float angle = RAD2DEG * atan2(vec.y, vec.x) + 90;
+								if ( IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT) )
+								{
+									if ( (int)angle % 10 == 0 )
 									{
-										page->setInner(TextFormat("%i", TextToInteger(page->getInner()) - 1));
-										page->translate(0, (page->height() + pageLabelPos.height()) * -1);
+										actionElem->angle = angle;
 									}
 								}
+								else
+								{
+									actionElem->angle = angle;
+								}
+								
+								break;
 							}
 						}
 					}

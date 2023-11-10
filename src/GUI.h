@@ -8,7 +8,7 @@ namespace NoGUI
 	class Transform
 	{
 	public:
-		Transform(const Vector2& p, const Vector2& radi, const Align& a, float r=0)
+		Transform(const Vector2& p=(Vector2){0, 0}, const Vector2& radi=(Vector2){0, 0}, const Align& a=Align(), float r=0)
 			: position(p), radius(radi), origin(a), angle(r) {}
 		Vector2 position;
 		Vector2 radius;
@@ -53,7 +53,7 @@ namespace NoGUI
 		bool getActive();
 		bool getFocus();
 		bool getHover();
-		bool isAlive();
+		bool getAlive();
 		bool isHover();
 		bool setActive(bool set);
 		bool setFocus(bool set);
@@ -82,7 +82,7 @@ namespace NoGUI
 		void clearElements();
 		void update();
 		size_t size();
-		bool isActive();
+		bool getActive();
 		bool setActive(bool set);
 	};
 	
@@ -104,6 +104,7 @@ namespace NoGUI
 		}
 		GUIManager(std::vector< std::shared_ptr< Page > > pgs)
 			: pages(pgs) {}
+		virtual void render();
 //		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0);
 		std::shared_ptr< Page > addPage(bool active=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > pg);
@@ -115,7 +116,6 @@ namespace NoGUI
 		void removePage(size_t pageIndex);
 		void clear();
 		void update();
-		void render();
 		void setActive(size_t index);
 	};
 	
