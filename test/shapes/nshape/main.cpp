@@ -12,15 +12,12 @@ int main(int argc, char ** argv)
 	std::cout << "id: " << testObj.getId() << " (" << testObj.getTag() << ")" << std::endl;
 	std::cout << testObj.getInner() << std::endl;
 	// setters
-	testObj.setTag("Test");
+//	testObj.setTag("Test");
 	testObj.setInner("Test Object");
 	std::cout << "id: " << testObj.getId() << " (" << testObj.getTag() << ")" << std::endl;
 	std::cout << testObj.getInner() << std::endl;
 	// overflow
-	testObj.setTag("THIS STRING OF CHARACTERS IS OVER 50 CHARACTERS LONG MY GUY");
-	std::cout << testObj.getTag() << std::endl;
-	// id counter
-	NoMAD::GameObj newObj = NoMAD::GameObj();
+	NoMAD::GameObj newObj = NoMAD::GameObj(NoMAD::OBJCOUNT, "THIS STRING OF CHARACTERS IS OVER 50 CHARACTERS LONG MY GUY");
 	std::cout << "id: " << newObj.getId() << " (" << newObj.getTag() << ")" << std::endl;
 	std::cout << newObj.getInner() << std::endl;
 	// shapes
