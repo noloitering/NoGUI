@@ -60,6 +60,56 @@ namespace NoGUI
 		void kill();
 	};
 	
+	class Button : public Element
+	{
+	public:
+		Button(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
+		Button(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, dimensions,  c, type, in) {}
+		bool isFocus();
+	};
+	
+	class Hoverable : public Element
+	{
+	public:
+		Hoverable(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
+		Hoverable(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, dimensions,  c, type, in) {}
+		bool isFocus();
+	};
+	
+	class Toggle : public Element
+	{
+	public:
+		Toggle(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
+		Toggle(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, dimensions,  c, type, in) {}
+		bool isFocus();
+	};
+	
+	class Trigger : public Element
+	{
+	public:
+		Trigger(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
+		Trigger(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Element(num, style, dimensions,  c, type, in) {}
+		bool isFocus();
+	};
+	
+	class CheckBox : public Toggle
+	{
+	public:
+		CheckBox(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Toggle(num, style, pos, size, rotation, origin, c, type, in) {}
+		CheckBox(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Toggle(num, style, dimensions,  c, type, in) {}
+		void draw();
+	};
+	
 	class Page : public CMap // Container for Elements
 	{
 	protected:

@@ -2489,6 +2489,81 @@ bool Element::getHover()
 	return hover;
 }
 
+bool Button::isFocus()
+{
+	if ( active )
+	{
+		focus = isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+		
+		return focus;
+	}
+	else
+	{
+		
+		return false;
+	}
+}
+
+bool Hoverable::isFocus()
+{
+	if ( active )
+	{
+		focus = isHover();
+		
+		return focus;
+	}
+	else
+	{
+		
+		return false;
+	}
+}
+
+bool Toggle::isFocus()
+{
+	if ( active )
+	{
+		if ( isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+		{
+			focus = !focus;
+		}
+		
+		return focus;
+	}
+	else
+	{
+		
+		return false;
+	}
+}
+
+bool Trigger::isFocus()
+{
+	if ( active )
+	{
+		focus = isHover() && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+		
+		return focus;
+	}
+	else
+	{
+		
+		return false;
+	}
+}
+
+void CheckBox::draw()
+{
+	if ( getFocus() )
+	{
+		DrawElement(this);
+	}
+	else
+	{
+		DrawShape(*(shape), *(this), hover);
+	}
+}
+
 void Page::update()
 {
 	std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > new_map;

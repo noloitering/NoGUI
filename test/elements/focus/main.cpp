@@ -12,6 +12,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > outFill = std::make_shared< NoGUI::Fill >(BLUE, RED);
 	std::shared_ptr< NoGUI::Fill > focusFill = std::make_shared< NoGUI::Fill >(RED, MAROON);
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > textFill = std::make_shared< NoGUI::Fill >(DARKGRAY);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(outFill, 3);
 	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill, outline);
 	std::shared_ptr< NoGUI::nShape > ellipse = std::make_shared< NoGUI::nShape >(0, fill, outline);
@@ -34,17 +35,19 @@ int main(int argc, char ** argv)
 	bottomLT.radius.x = elemSize.y;
 	bottomRT.radius.x = elemSize.y;
 	
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip");
-	std::shared_ptr< NoGUI::Element > shapeElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, std::make_shared< NoGUI::CContainer >(), "Tip");
-	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT);
-	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, topT);
-	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightT);
-	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, centerT);
-	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, bottomT);
-	std::shared_ptr< NoGUI::Element > bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLT);
-	std::shared_ptr< NoGUI::Element > bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomRT);
-	shapeElem->components->addComponent< NoGUI::CText >();
-	dataElem->components->addComponent< NoGUI::CText >();
+	std::shared_ptr< NoGUI::CContainer > dataComps = std::make_shared< NoGUI::CContainer >();
+	std::shared_ptr< NoGUI::CContainer > shapeComps = std::make_shared< NoGUI::CContainer >();
+	dataComps->addComponent< NoGUI::CText >();
+	shapeComps->addComponent< NoGUI::CText >(textFill);
+	std::shared_ptr< NoGUI::Toggle > dataElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, tipShape, centerLeftT, dataComps, "Tip");
+	std::shared_ptr< NoGUI::Toggle > shapeElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, tipShape, centerRightT, dataComps, "Tip");
+	std::shared_ptr< NoGUI::Button > leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, ellipse, leftT, shapeComps, "Shape", "Button");
+	std::shared_ptr< NoGUI::Hoverable > topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, line, topT, shapeComps, "Shape", "Hoverable");
+	std::shared_ptr< NoGUI::Toggle > rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, rightT, shapeComps, "Shape", "Toggle");
+	std::shared_ptr< NoGUI::Trigger > centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, triangle, centerT, shapeComps, "Shape", "Trigger");
+	std::shared_ptr< NoGUI::Toggle > bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, octagon, bottomT, shapeComps, "Shape", "Toggle");
+	std::shared_ptr< NoGUI::Toggle > bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomLT, shapeComps, "Shape", "Toggle");
+	std::shared_ptr< NoGUI::Toggle > bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomRT, shapeComps, "Shape", "Toggle");
 	shapeElem->setInner(TextFormat("click the\n%s elements!", argv[1]));
 	if ( argc > 1 )
 	{
@@ -57,36 +60,36 @@ int main(int argc, char ** argv)
 			bottomT.radius.x = elemSize.y;
 			bottomLT.radius.x = elemSize.y;
 			bottomRT.radius.x = elemSize.y;
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, ellipse, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, ellipse, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, ellipse, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "ellipse") == 0 )
 		{
 			bottomT.radius.x = bottomT.radius.y * 2;
 			bottomLT.radius.x = bottomT.radius.y * 2;
 			bottomRT.radius.x = bottomT.radius.y * 2;
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, ellipse, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, ellipse, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, ellipse, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "line") == 0 )
 		{
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, line, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, line, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, line, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, line, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, line, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, line, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, line, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, line, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "tri") == 0 )
 		{
@@ -97,26 +100,26 @@ int main(int argc, char ** argv)
 			bottomT.radius.x = elemSize.y;
 			bottomLT.radius.x = elemSize.y;
 			bottomRT.radius.x = elemSize.y;
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, triangle, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, triangle, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, triangle, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "triangle") == 0 )
 		{
 			bottomT.radius.x = bottomT.radius.y * 2;
 			bottomLT.radius.x = bottomT.radius.y * 2;
 			bottomRT.radius.x = bottomT.radius.y * 2;
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, triangle, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, triangle, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, triangle, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "square") == 0 )
 		{
@@ -127,26 +130,26 @@ int main(int argc, char ** argv)
 			bottomT.radius.x = elemSize.y;
 			bottomLT.radius.x = elemSize.y;
 			bottomRT.radius.x = elemSize.y;
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, rect, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, rect, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, rect, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "rectangle") == 0 )
 		{
 			bottomT.radius.x = bottomT.radius.y * 2;
 			bottomLT.radius.x = bottomT.radius.y * 2;
 			bottomRT.radius.x = bottomT.radius.y * 2;
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, rect, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, rect, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, rect, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "poly") == 0 )
 		{
@@ -163,13 +166,13 @@ int main(int argc, char ** argv)
 			std::shared_ptr< NoGUI::nShape > ninegon = std::make_shared< NoGUI::nShape >(9, fill, outline);
 			std::shared_ptr< NoGUI::nShape > tengon = std::make_shared< NoGUI::nShape >(10, fill, outline);
 			std::shared_ptr< NoGUI::nShape > elevengon = std::make_shared< NoGUI::nShape >(11, fill, outline);
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, fivegon, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sixgon, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ninegon, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tengon, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, elevengon, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, fivegon, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, sixgon, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, sevengon, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, octagon, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ninegon, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, tengon, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, elevengon, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 		else if ( strcasecmp(argv[1], "polygon") == 0 )
 		{
@@ -182,13 +185,13 @@ int main(int argc, char ** argv)
 			std::shared_ptr< NoGUI::nShape > ninegon = std::make_shared< NoGUI::nShape >(9, fill, outline);
 			std::shared_ptr< NoGUI::nShape > tengon = std::make_shared< NoGUI::nShape >(10, fill, outline);
 			std::shared_ptr< NoGUI::nShape > elevengon = std::make_shared< NoGUI::nShape >(11, fill, outline);
-			leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, fivegon, leftT);
-			topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sixgon, topT);
-			rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, rightT);
-			centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, centerT);
-			bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ninegon, bottomT);
-			bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tengon, bottomLT);
-			bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, elevengon, bottomRT);
+			leftElem = std::make_shared< NoGUI::Button >(NoMAD::OBJCOUNT, fivegon, leftT, shapeComps, "Shape", "Button");
+			topElem = std::make_shared< NoGUI::Hoverable >(NoMAD::OBJCOUNT, sixgon, topT, shapeComps, "Shape", "Hoverable");
+			rightElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, sevengon, rightT, shapeComps, "Shape", "Toggle");
+			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, octagon, centerT, shapeComps, "Shape", "Trigger");
+			bottomElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ninegon, bottomT, shapeComps, "Shape", "Toggle");
+			bottomLElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, tengon, bottomLT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, elevengon, bottomRT, shapeComps, "Shape", "Toggle");
 		}
 	}
 	
@@ -207,8 +210,6 @@ int main(int argc, char ** argv)
 	SetTargetFPS(60);
 	while ( !WindowShouldClose() )
 	{
-//		bool plustate = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
-//		bool minustate = IsMouseButtonDown(MOUSE_RIGHT_BUTTON);
 		float scroll = GetMouseWheelMove();
 		dataElem->setInner(TextFormat("Angle: %03.02f", centerElem->angle));
 		BeginDrawing();
@@ -217,14 +218,8 @@ int main(int argc, char ** argv)
 			{
 				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
+					elem->isFocus();
 					elem->rotate(1.0f * scroll, NoGUI::Align(0, 0));
-					if ( elem->isHover() )
-					{
-						if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
-						{
-							elem->setFocus(!elem->getFocus());
-						}
-					}
 					if ( elem->getFocus() )
 					{
 						elem->getShape()->fill = focusFill;
