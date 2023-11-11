@@ -1234,15 +1234,22 @@ int main(int argc, char ** argv)
 							
 							case TransformState::SCALEX:
 							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
 								Vector2 mousePos =  GetMousePosition();
 								Vector2 centerPos = actionElem->pos(NoGUI::Align(0, 0));
+								int newRadius = actionElem->radius.x;
 								if ( mousePos.x > centerPos.x )
 								{
-									actionElem->radius.x = mousePos.x - centerPos.x;
+									newRadius = mousePos.x - centerPos.x;
 								}
 								else
 								{
-									actionElem->radius.x = centerPos.x - mousePos.x;
+									newRadius = centerPos.x - mousePos.x;
+								}
+								
+								if ( newRadius % cellSize == 0 )
+								{
+									actionElem->radius.x = newRadius;
 								}
 								
 								break;
@@ -1250,15 +1257,22 @@ int main(int argc, char ** argv)
 							
 							case TransformState::SCALEY:
 							{
+								SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
 								Vector2 mousePos =  GetMousePosition();
 								Vector2 centerPos = actionElem->pos(NoGUI::Align(0, 0));
+								int newRadius = actionElem->radius.y;
 								if ( mousePos.y > centerPos.y )
 								{
-									actionElem->radius.y = mousePos.y - centerPos.y;
+									newRadius = mousePos.y - centerPos.y;
 								}
 								else
 								{
-									actionElem->radius.y = centerPos.y - mousePos.y;
+									newRadius = centerPos.y - mousePos.y;
+								}
+								
+								if ( newRadius % cellSize == 0 )
+								{
+									actionElem->radius.y = newRadius;
 								}
 								
 								break;
@@ -1266,23 +1280,39 @@ int main(int argc, char ** argv)
 							
 							case TransformState::SCALEXY:
 							{
+								unsigned int cursor = 0;
+								int cursorDeterminant = 1;
 								Vector2 mousePos =  GetMousePosition();
 								Vector2 centerPos = actionElem->pos(NoGUI::Align(0, 0));
+								Vector2 newRadius = actionElem->radius;
 								if ( mousePos.x > centerPos.x )
 								{
-									actionElem->radius.x = mousePos.x - centerPos.x;
+									cursor = 7;
+									newRadius.x = mousePos.x - centerPos.x;
 								}
 								else
 								{
-									actionElem->radius.x = centerPos.x - mousePos.x;
+									cursor = 8;
+									cursorDeterminant *= -1;
+									newRadius.x = centerPos.x - mousePos.x;
 								}
 								if ( mousePos.y > centerPos.y )
 								{
-									actionElem->radius.y = mousePos.y - centerPos.y;
+									newRadius.y = mousePos.y - centerPos.y;
 								}
 								else
 								{
-									actionElem->radius.y = centerPos.y - mousePos.y;
+									cursor += cursorDeterminant;
+									newRadius.y = centerPos.y - mousePos.y;
+								}
+								SetMouseCursor(cursor);
+								if ( (int)newRadius.x % cellSize == 0 )
+								{
+									actionElem->radius.x = newRadius.x;
+								}
+								if ( (int)newRadius.y % cellSize == 0 )
+								{
+									actionElem->radius.y = newRadius.y;
 								}
 								
 								break;

@@ -1,5 +1,5 @@
 test_manager.exe
-A primitive editor for the GUIManager class
+A primitive editor for the GUIManager class. Envoking with an argument will set the grid size to the integer value of that argument
 
 CONTROLS:
 PAGES TAB: Click "Pages" on the left hand side to pull out a visual representation of all the currently used Pages within the editor. Click again to hide
