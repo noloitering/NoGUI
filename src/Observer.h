@@ -6,7 +6,7 @@
 namespace NoGUI
 {
 	class Element;
-
+	
 	class Listener
 	{
 	public:

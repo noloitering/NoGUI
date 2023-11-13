@@ -2787,14 +2787,17 @@ void GUIManager::clear()
 
 void GUIManager::update()
 {
-	for (auto page : pages)
+	for (auto pageIt=pages.rbegin(); pageIt != pages.rend(); pageIt++)
 	{
+		std::shared_ptr< Page > page = *(pageIt);
 		page->update();
 		if ( page->getActive() )
 		{
-			for (auto elem : page->getElements())
+			std::vector< std::shared_ptr< NoGUI::Element > > elements;
+			for (auto elemIt=elements.rbegin(); elemIt != elements.rend(); elemIt++)
 			{
 				//elem->isHover();
+				std::shared_ptr< Element > elem = *(elemIt);
 				elem->isFocus();
 			}
 		}

@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Component.h"
+#include "Observer.h"
 #include "raymath.h"
 
 namespace NoGUI
