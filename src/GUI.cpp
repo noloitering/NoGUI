@@ -2725,11 +2725,11 @@ std::shared_ptr< Element > Page::addElement(std::shared_ptr< nShape > style, con
 	return elem;
 }
 
-//std::shared_ptr< Element > GUIManager::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0)
-//{
-//	
-//	return pages.at(pageIndex)->addElement(style, dimensions, tag, inner);
-//}
+// std::shared_ptr< Element > GUIManager::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0)
+// {
+	
+	// return pages.at(pageIndex)->addElement(style, dimensions, tag, inner);
+// }
 
 std::shared_ptr< Page > GUIManager::addPage(std::shared_ptr< Page > pg)
 {
@@ -2793,7 +2793,7 @@ void GUIManager::update()
 		page->update();
 		if ( page->getActive() )
 		{
-			std::vector< std::shared_ptr< NoGUI::Element > > elements;
+			std::vector< std::shared_ptr< NoGUI::Element > > elements = page->getElements();
 			for (auto elemIt=elements.rbegin(); elemIt != elements.rend(); elemIt++)
 			{
 				//elem->isHover();
