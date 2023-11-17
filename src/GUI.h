@@ -127,7 +127,6 @@ namespace NoGUI
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const char* tag);
 		std::vector< std::shared_ptr< Element > > getElements();
-		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="");
 		void removeElement(size_t id);
 		void removeElements(const char* tag);
 		void clearElements();
@@ -135,6 +134,20 @@ namespace NoGUI
 		size_t size();
 		bool getActive();
 		bool setActive(bool set);
+		
+		template <class C=Element>
+		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="")
+		{
+			std::shared_ptr< CContainer > components = getComponents(tag);
+			if ( components == nullptr )
+			{
+				components = addComponents(tag);
+			}
+			auto elem = std::shared_ptr< Element >(new C(total++, style, dimensions, components, tag, inner));
+			toAdd[tag].push_back(elem);
+	
+			return elem;
+		}
 	};
 	
 	class GUIManager // Container for Pages

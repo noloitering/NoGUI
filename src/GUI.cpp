@@ -2712,19 +2712,6 @@ void Page::clearElements()
 	total = 0;
 }
 
-std::shared_ptr< Element > Page::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag, const char* inner)
-{
-	std::shared_ptr< CContainer > components = getComponents(tag);
-	if ( components == nullptr )
-	{
-		components = addComponents(tag);
-	}
-	auto elem = std::shared_ptr< Element >(new Element(total++, style, dimensions, components, tag, inner));
-	toAdd[tag].push_back(elem);
-	
-	return elem;
-}
-
 // std::shared_ptr< Element > GUIManager::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0)
 // {
 	

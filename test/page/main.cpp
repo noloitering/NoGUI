@@ -4,7 +4,7 @@ int main(int argc, char ** argv)
 {
 	Vector2 window = {1280, 720};
 	Vector2 elemSize = {75, 75};
-	std::vector< const char* > stringsEntered{"+"};
+	std::vector< const char* > stringsEntered = {"+"};
 	size_t tagInputID;
 	size_t addTagID;
 	size_t toDel;
@@ -162,7 +162,7 @@ int main(int argc, char ** argv)
 								NoGUI::Transform newPos = *(elemPg.getElement(addTagID));
 								elemPg.addComponents(newTag, components);
 								std::shared_ptr< NoGUI::Element > newTagElem = elemPg.addElement(button, newPos, newTag, newTag);
-								stringsEntered.push_back(tagInput->getInner());
+								stringsEntered.push_back(newTagElem->getInner());
 								// create new button
 								NoGUI::Transform buttonPos = newPos;
 								buttonPos.translate(newPos.width() + 20, 0);
@@ -171,6 +171,7 @@ int main(int argc, char ** argv)
 								tagInput->getShape()->fill = buttonFill;
 								addTag->translate(0, addTag->height() + 20);
 								tagInput->setInner("");
+								textBox->setInner("Enter new tag for map entry:");
 								tagInput->components->getComponent< NoGUI::CInput >().i = 0;
 								inputPg.setActive(false);
 								elemPg.setActive(true);
@@ -178,7 +179,7 @@ int main(int argc, char ** argv)
 							else
 							{
 								tagInput->getShape()->fill = badEntryFill;
-								box->setInner("Tags MUST be unique!");
+								textBox->setInner("Tags MUST be unique!");
 							}
 						}
 					}
