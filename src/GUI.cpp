@@ -2493,7 +2493,7 @@ bool Button::isFocus()
 {
 	if ( active )
 	{
-		focus = isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+		focus = getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 		
 		return focus;
 	}
@@ -2508,7 +2508,7 @@ bool Hoverable::isFocus()
 {
 	if ( active )
 	{
-		focus = isHover();
+		focus = getHover();
 		
 		return focus;
 	}
@@ -2523,7 +2523,7 @@ bool Toggle::isFocus()
 {
 	if ( active )
 	{
-		if ( isHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+		if ( getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 		{
 			focus = !focus;
 		}
@@ -2541,7 +2541,7 @@ bool Trigger::isFocus()
 {
 	if ( active )
 	{
-		focus = isHover() && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+		focus = getHover() && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
 		
 		return focus;
 	}
@@ -2718,46 +2718,46 @@ void Page::clearElements()
 	// return pages.at(pageIndex)->addElement(style, dimensions, tag, inner);
 // }
 
-std::shared_ptr< Page > GUIManager::addPage(std::shared_ptr< Page > pg)
+std::shared_ptr< Page > Manager::addPage(std::shared_ptr< Page > pg)
 {
 	pages.push_back(pg);
 	
 	return pages.back();
 }
 
-std::shared_ptr< Page > GUIManager::addPage(bool active)
+std::shared_ptr< Page > Manager::addPage(bool active)
 {
 	std::shared_ptr< Page > pg = std::shared_ptr< Page >(new Page(active));
 	
 	return addPage(pg);
 }
 
-std::shared_ptr< Page > GUIManager::addPage(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool active)
+std::shared_ptr< Page > Manager::addPage(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool active)
 {
 	std::shared_ptr< Page > pg = std::shared_ptr< Page >(new Page(comps, active));
 	
 	return addPage(pg);
 }
 
-std::shared_ptr< Page > GUIManager::getPage(size_t pageIndex)
+std::shared_ptr< Page > Manager::getPage(size_t pageIndex)
 {
 	
 	return pages.at(pageIndex);
 }
 
-std::vector< std::shared_ptr< Page > > GUIManager::getPages()
+std::vector< std::shared_ptr< Page > > Manager::getPages()
 {
 	
 	return pages;
 }
 
-size_t GUIManager::size()
+size_t Manager::size()
 {
 	
 	return pages.size();
 }
 
-void GUIManager::removePage(size_t pageIndex)
+void Manager::removePage(size_t pageIndex)
 {
 	pages.erase(pages.begin() + pageIndex);
 }
@@ -2767,12 +2767,12 @@ void GUIManager::removePage(size_t pageIndex)
 //	
 //}
 
-void GUIManager::clear()
+void Manager::clear()
 {
 	pages.clear();
 }
 
-void GUIManager::update()
+void Manager::update()
 {
 	for (auto pageIt=pages.rbegin(); pageIt != pages.rend(); pageIt++)
 	{
@@ -2787,6 +2787,7 @@ void GUIManager::update()
 				std::shared_ptr< Element > elem = *(elemIt);
 //				bool prevHover = elem->getHover();
 				bool prevFocus = elem->getFocus();
+				elem->isHover();
 				elem->isFocus();
 				int event = 0;
 				if ( !prevFocus )
@@ -2821,7 +2822,7 @@ void GUIManager::update()
 	onFocus = false;
 }
 
-void GUIManager::render()
+void Manager::render()
 {
 	for (auto page : pages)
 	{
@@ -2835,7 +2836,7 @@ void GUIManager::render()
 	}
 }
 
-void GUIManager::setActive(size_t index)
+void Manager::setActive(size_t index)
 {
 	for (auto page : pages)
 	{

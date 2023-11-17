@@ -406,8 +406,8 @@ int main(int argc, char ** argv)
 	NoGUI::Transform elemInnerPos = NoGUI::Transform((Vector2){elemTagPos.position.x + elemTagPos.width(), elemTagPos.position.y}, elemTagPos.radius, elemTagPos.origin);
 	NoGUI::Transform addElemPos = NoGUI::Transform(colPos.position, shapePos.radius, NoGUI::Align(0, -1));
 	
-	NoGUI::GUIManager gui = NoGUI::GUIManager(false);
-	NoGUI::GUIManager userGUI = NoGUI::GUIManager(true);
+	NoGUI::Manager gui = NoGUI::Manager(false);
+	NoGUI::Manager userGUI = NoGUI::Manager(true);
 	// page manager
 	std::shared_ptr< NoGUI::Page > pagepg = gui.addPage(true);
 	std::shared_ptr< NoGUI::CContainer > pageToggleComps = pagepg->addComponents("Button");

@@ -150,24 +150,24 @@ namespace NoGUI
 		}
 	};
 	
-	class GUIManager : public Notifier // Container for Pages
+	class Manager : public Notifier // Container for Pages
 	{
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
 		bool onFocus = false;
 	public:
-		GUIManager(bool withPg=true)
+		Manager(bool withPg=true)
 		{
 			if ( withPg )
 			{
 				addPage(true);
 			}
 		}
-		GUIManager(std::shared_ptr< Page > pg)
+		Manager(std::shared_ptr< Page > pg)
 		{
 			addPage(pg);
 		}
-		GUIManager(std::vector< std::shared_ptr< Page > > pgs)
+		Manager(std::vector< std::shared_ptr< Page > > pgs)
 			: pages(pgs) {}
 		virtual void render();
 //		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0);

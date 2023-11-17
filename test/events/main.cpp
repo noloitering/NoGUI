@@ -28,7 +28,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > buttonShape = std::make_shared< NoGUI::nShape >(4, buttonFill, outline);
 	NoGUI::Transform buttonPos = NoGUI::Transform(center, buttonSize, NoGUI::Align(0, 0));
 	
-	NoGUI::GUIManager gui = NoGUI::GUIManager(true);
+	NoGUI::Manager gui = NoGUI::Manager(true);
 	std::shared_ptr< NoGUI::CContainer > components = std::make_shared< NoGUI::CContainer >();
 	components->addComponent< NoGUI::CText >(textFill, nullptr, 20, NoGUI::Align(-1, 0));
 	gui.getPage(0)->addComponents("Button", components);
