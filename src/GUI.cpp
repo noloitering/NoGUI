@@ -2785,10 +2785,40 @@ void GUIManager::update()
 			{
 				//elem->isHover();
 				std::shared_ptr< Element > elem = *(elemIt);
+//				bool prevHover = elem->getHover();
+				bool prevFocus = elem->getFocus();
 				elem->isFocus();
+				int event = 0;
+				if ( !prevFocus )
+				{
+					if ( elem->getFocus() )
+					{
+						if ( !onFocus )
+						{
+							event = ONFOCUS;
+							onFocus = true;
+						}
+					}
+				}
+				else
+				{
+					if ( elem->getFocus() )
+					{
+						event = FOCUSING;
+					}
+					else
+					{
+						event = OFFFOCUS;
+					}
+				}
+				if ( event )
+				{
+					notify(elem, static_cast<Event>(event));
+				}
 			}
 		}
 	}
+	onFocus = false;
 }
 
 void GUIManager::render()

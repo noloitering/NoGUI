@@ -150,10 +150,11 @@ namespace NoGUI
 		}
 	};
 	
-	class GUIManager // Container for Pages
+	class GUIManager : public Notifier // Container for Pages
 	{
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
+		bool onFocus = false;
 	public:
 		GUIManager(bool withPg=true)
 		{
