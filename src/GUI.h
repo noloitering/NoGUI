@@ -152,6 +152,7 @@ namespace NoGUI
 	
 	class Manager : public Notifier // Container for Pages
 	{
+//	friend class ManagerGrid;
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
 		bool onFocus = false;
@@ -203,7 +204,12 @@ namespace NoGUI
 	void DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
 	void DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std::shared_ptr< nShape > shape);
 	void DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform);
+	void DrawCInput(CInput& input, std::shared_ptr< Font > font, float fontSize, const char* txt, const Color& col, const Vector2& spacing, const Align& txtAlign, const Transform& transform, const Crop& cropping=Crop::NONE, float angle=0);
+	void DrawCInput(CInput& input, CText& fmt, const char* txt, const NoGUI::Transform& transform);
+	void DrawCInput(CInput& input, CTextBox& fmt, const char* txt, const NoGUI::Transform& transform);
 	void DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes, bool hovered=false);
+	void DrawComponents(Components& components, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform, const char* inner, bool hovered=false);
+	void DrawComponents(Element* elem);
 	// Elements
 	void DrawElement(Element* elem);
 }

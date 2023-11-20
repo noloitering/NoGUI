@@ -1951,6 +1951,132 @@ void NoGUI::DrawCImage(CImage& img, std::shared_ptr< nShape > shape, const NoGUI
 	}
 }
 
+void NoGUI::DrawCInput(CInput& input, std::shared_ptr< Font > font, float fontSize, const char* txt, const Color& col, const Vector2& spacing, const Align& txtAlign, const Transform& transform, const Crop& cropping, float angle)
+{
+	// draw blinkChar if it has been blinkRate time since lastBlink + blinkHold time
+	double currentTime = GetTime();
+	if ( currentTime - input.lastBlink >= input.blinkRate )
+	{
+		double timeGate = input.lastBlink + input.blinkHold + input.blinkRate;
+		if ( currentTime > timeGate )
+		{
+			input.lastBlink = currentTime;
+		}
+		if ( (input.blinkChar >= 32) && (input.blinkChar <= 125) )
+		{
+			int byteSize = 0;
+			const char* toDraw = CodepointToUTF8(input.blinkChar, &byteSize);
+			Font drawFont = (font) ? *(font) : GetFontDefault();
+			Vector2 blinkPos = transform.pos(txtAlign);
+			Vector2 origin = {0, 0};
+			float lastLineWidth = 0.0f;
+			float txtHeight = 0.0f;
+			int numLines = 0;
+			switch (cropping)
+			{
+				case Crop::NONE:
+				{
+					const char** lines = TextSplit(txt, '\n', &numLines);
+					lastLineWidth = MeasureTextEx(drawFont, lines[numLines - 1], fontSize, spacing.x).x;
+					txtHeight = (numLines - 1) * fontSize + spacing.y * (numLines - 2);
+					
+					break;
+				}
+				
+				case Crop::FIT:
+				{
+					std::vector< std::tuple< const char*, float, unsigned int > > lines = WrapText(txt, drawFont, fontSize, spacing.x, transform);
+					lastLineWidth = std::get< float >(lines.at(lines.size() -  1));
+					txtHeight = (lines.size() - 1) * fontSize + spacing.y * (lines.size() - 2);
+					
+					break;
+				}
+				
+				case Crop::CUT:
+				{
+					const char** lines = TextSplit(txt, '\n', &numLines);
+					lastLineWidth = MeasureTextEx(drawFont, lines[numLines - 1], fontSize, spacing.x).x;
+					if ( lastLineWidth > transform.width() )
+					{
+						lastLineWidth = transform.width();
+					}
+					txtHeight = (numLines - 1) * fontSize + spacing.y * (numLines - 2);
+					
+					break;
+				}
+			}
+			switch ( txtAlign.x )
+			{
+				case XAlign::LEFT:
+				{
+					origin.x = lastLineWidth * -1;
+					
+					break;
+				}
+				
+				case XAlign::CENTER:
+				{
+					origin.x = lastLineWidth / -2;
+					
+					break;
+				}
+				
+				case XAlign::RIGHT:
+				{
+					
+					break;
+				}
+			}
+			switch ( txtAlign.y )
+			{
+				case YAlign::TOP:
+				{
+					origin.y = txtHeight * -1;
+					
+					break;
+				}
+				
+				case YAlign::CENTER:
+				{
+					origin.y = (txtHeight - fontSize) / -2;
+					
+					break;
+				}
+				
+				case YAlign::BOTTOM:
+				{
+					origin.y = fontSize;
+					
+					break;
+				}
+			}
+			
+			DrawTextPro(drawFont, toDraw, blinkPos, origin, angle, fontSize, 0, col);
+		}
+	}
+}
+
+void NoGUI::DrawCInput(CInput& input, CText& fmt, const char* txt, const NoGUI::Transform& transform)
+{
+	Color col = WHITE;
+	if ( fmt.fill )
+	{
+		col = fmt.fill->hoverCol;
+	}
+	DrawCInput(input, fmt.font, fmt.size, txt, col, fmt.spacing, fmt.align, transform, Crop::NONE, fmt.angle);
+}
+
+void NoGUI::DrawCInput(CInput& input, CTextBox& fmt, const char* txt, const NoGUI::Transform& transform)
+{
+	Color col = WHITE;
+	if ( fmt.fill )
+	{
+		col = fmt.fill->hoverCol;
+	}
+	Crop cropping = (fmt.wrap) ? Crop::FIT : Crop::CUT;
+	DrawCInput(input, fmt.font, fmt.size, txt, col, fmt.spacing, fmt.align, transform, cropping, 0);
+}
+
 void NoGUI::DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes, bool hovered)
 {
 	for ( std::pair< std::shared_ptr< nShape >, Transform > shape : shapes.shapes )
@@ -1971,6 +2097,63 @@ void NoGUI::DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes, 
 	}
 }
 
+void NoGUI::DrawComponents(Components& components, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform, const char* inner, bool hovered)
+{
+	CImage& imgComp = std::get< CImage >(components);
+	CText& txtComp = std::get< CText >(components);
+	CTextBox& txtBoxComp =  std::get< CTextBox >(components);
+	CMultiShape& multiShapeComp = std::get< CMultiShape >(components);
+	CInput& inputComp = std::get< CInput >(components);
+	if ( imgComp.active )
+	{
+		if ( imgComp.shape )
+		{
+			DrawCImage(imgComp, imgComp.shape, transform);
+		}
+		else
+		{
+			std::shared_ptr< NoGUI::Fill > imgFill = std::make_shared< NoGUI::Fill >();
+			std::shared_ptr< NoGUI::nShape > imgShape =  std::make_shared< NoGUI::nShape >(shape->n, imgFill, nullptr); // ehhh, not the greatest solution
+			DrawCImage(imgComp, imgShape, transform);
+		}
+	}
+	if ( txtComp.active )
+	{
+		DrawCText(inner, txtComp, transform);
+	}
+	if ( txtBoxComp.active )
+	{
+		if ( txtBoxComp.wrap )
+		{
+			DrawCTextBoxWrapped(inner, txtBoxComp, transform);
+		}
+		else
+		{
+			DrawCTextBox(inner, txtBoxComp, transform);
+		}
+	}
+	if ( multiShapeComp.active )
+	{
+		DrawCMultiShape(transform, multiShapeComp, hovered);
+	}
+	if ( inputComp.active && hovered )
+	{
+		if ( txtComp.active )
+		{
+			DrawCInput(inputComp, txtComp, inner, transform);
+		}
+		else if ( txtBoxComp.active )
+		{
+			DrawCInput(inputComp, txtBoxComp, inner, transform);
+		}
+	}
+}
+
+void NoGUI::DrawComponents(Element* elem)
+{
+	DrawComponents(elem->components->getComponents(), elem->getShape(), *(elem), elem->getInner(), elem->getHover());
+}
+
 // TODO: draw outlines last
 void NoGUI::DrawElement(Element* elem)
 {
@@ -1978,209 +2161,7 @@ void NoGUI::DrawElement(Element* elem)
 	DrawShape(*(shape.get()), *(elem), elem->getHover());
 	if ( elem->components )
 	{
-		CImage& imgComp = elem->components->getComponent< NoGUI::CImage >();
-		CText& txtComp = elem->components->getComponent< NoGUI::CText >();
-		CTextBox& txtBoxComp =  elem->components->getComponent< NoGUI::CTextBox >();
-		CMultiShape& multiShapeComp = elem->components->getComponent< NoGUI::CMultiShape >();
-		CInput& inputComp = elem->components->getComponent< NoGUI::CInput >();
-		if ( imgComp.active )
-		{
-			if ( imgComp.shape )
-			{
-				DrawCImage(imgComp, imgComp.shape, (*elem));
-			}
-			else
-			{
-				std::shared_ptr< NoGUI::Fill > imgFill = std::make_shared< NoGUI::Fill >();
-				std::shared_ptr< NoGUI::nShape > imgShape =  std::make_shared< NoGUI::nShape >(elem->getShape()->n, imgFill, nullptr); // ehhh, not the greatest solution
-				DrawCImage(imgComp, imgShape, (*elem));
-			}
-		}
-		if ( txtComp.active )
-		{
-			DrawCText(elem->getInner(), txtComp, (*elem));
-		}
-		if ( txtBoxComp.active )
-		{
-			if ( txtBoxComp.wrap )
-			{
-				DrawCTextBoxWrapped(elem->getInner(), txtBoxComp, (*elem));
-			}
-			else
-			{
-				DrawCTextBox(elem->getInner(), txtBoxComp, (*elem));
-			}
-		}
-		if ( multiShapeComp.active )
-		{
-			DrawCMultiShape(*(elem), multiShapeComp, elem->getHover());
-		}
-		if ( inputComp.active && elem->getHover() )
-		{
-			// draw blinkChar if it has been blinkRate time since lastBlink + blinkHold time
-			double currentTime = GetTime();
-			if ( currentTime - inputComp.lastBlink >= inputComp.blinkRate )
-			{
-				if ( currentTime > inputComp.lastBlink + inputComp.blinkHold + inputComp.blinkRate )
-				{
-					inputComp.lastBlink = currentTime;
-				}
-				if ( (inputComp.blinkChar >= 32) && (inputComp.blinkChar <= 125) )
-				{
-					int byteSize = 0;
-					const char* txt = CodepointToUTF8(inputComp.blinkChar, &byteSize);
-					Vector2 blinkPos;
-					Vector2 origin = {0, 0};
-					float angle = 0;
-					float fontSize = 20.0f;
-					float lastLineWidth = 0.0f;
-					float txtHeight = 0.0f;
-					Color col = WHITE;
-					if ( txtComp.active )
-					{
-						Font font = (txtComp.font == nullptr) ? GetFontDefault() : *(txtComp.font);
-						fontSize = txtComp.size;
-						int numLines = 0;
-						const char** lines = TextSplit(elem->getInner(), '\n', &numLines);
-						lastLineWidth = MeasureTextEx(font, lines[numLines - 1], fontSize, txtComp.spacing.x).x;
-						txtHeight = (numLines - 1) * txtComp.size + txtComp.spacing.y * (numLines - 2);
-						// position blinkChar
-						blinkPos = elem->pos(txtComp.align);
-						switch ( txtComp.align.x )
-						{
-							case XAlign::LEFT:
-							{
-								origin.x = lastLineWidth * -1;
-								
-								break;
-							}
-							
-							case XAlign::CENTER:
-							{
-								origin.x = lastLineWidth / -2;
-								
-								break;
-							}
-							
-							case XAlign::RIGHT:
-							{
-								
-								break;
-							}
-						}
-						switch ( txtComp.align.y )
-						{
-							case YAlign::TOP:
-							{
-								origin.y = txtHeight * -1;
-								
-								break;
-							}
-							
-							case YAlign::CENTER:
-							{
-								origin.y = (txtHeight - txtBoxComp.size) / -2;
-								
-								break;
-							}
-							
-							case YAlign::BOTTOM:
-							{
-								origin.y = txtBoxComp.size;
-								
-								break;
-							}
-						}
-						angle = elem->angle + txtComp.angle;
-						// get text colour
-						if ( txtComp.fill )
-						{
-							col = txtComp.fill->hoverCol;
-						}
-					}
-					else if ( txtBoxComp.active )
-					{
-						Font font = (txtBoxComp.font == nullptr) ? GetFontDefault() : *(txtBoxComp.font);
-						fontSize = txtBoxComp.size;
-						if ( txtBoxComp.wrap )
-						{
-							std::vector< std::tuple< const char*, float, unsigned int > > lines = WrapText(elem->getInner(), font, txtBoxComp.size, txtBoxComp.spacing.x, *(elem));
-							lastLineWidth = std::get< float >(lines.at(lines.size() -  1));
-							txtHeight = (lines.size() - 1) * txtBoxComp.size + txtBoxComp.spacing.y * (lines.size() - 2);
-						}
-						else
-						{
-							int numLines = 0;
-							const char** lines = TextSplit(elem->getInner(), '\n', &numLines);
-							lastLineWidth = MeasureTextEx(font, lines[numLines - 1], fontSize, txtBoxComp.spacing.x).x;
-							txtHeight = (numLines - 1) * txtBoxComp.size + txtBoxComp.spacing.y * (numLines - 2);
-							// no overflow
-							if ( lastLineWidth > elem->width() )
-							{
-								lastLineWidth = elem->width();
-							}
-						}
-						// position blinkChar
-						blinkPos = elem->pos(txtBoxComp.align);
-						switch ( txtBoxComp.align.x )
-						{
-							case XAlign::LEFT:
-							{
-								origin.x = lastLineWidth * -1;
-								
-								break;
-							}
-							
-							case XAlign::CENTER:
-							{
-								origin.x = lastLineWidth / -2;
-								
-								break;
-							}
-							
-							case XAlign::RIGHT:
-							{
-								
-								break;
-							}
-						}
-						switch ( txtBoxComp.align.y )
-						{
-							case YAlign::TOP:
-							{
-								origin.y = txtHeight * -1;
-								
-								break;
-							}
-							
-							case YAlign::CENTER:
-							{
-								origin.y = (txtHeight - txtBoxComp.size) / -2;
-								
-								break;
-							}
-							
-							case YAlign::BOTTOM:
-							{
-								origin.y = txtBoxComp.size;
-								
-								break;
-							}
-						}
-						// get text colour
-						if ( txtBoxComp.fill )
-						{
-							col = txtBoxComp.fill->hoverCol;
-						}
-					}
-					else
-					{
-						blinkPos = elem->pos(NoGUI::Align(-1, 0)); // default position
-					}
-					DrawTextPro(GetFontDefault(), txt, blinkPos, origin, angle, fontSize, 0, col);
-				}
-			}
-		}
+		DrawComponents(elem);
 	}
 }
 

@@ -218,6 +218,7 @@ int main(int argc, char ** argv)
 			{
 				if (!TextIsEqual(elem->getTag(), "Tip"))
 				{
+					elem->isHover();
 					elem->isFocus();
 					elem->rotate(1.0f * scroll, NoGUI::Align(0, 0));
 					if ( elem->getFocus() )

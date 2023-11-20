@@ -69,10 +69,9 @@ namespace NoGUI
 			: fill(col), offset(pos) {}
 	};
 	
-	// TODO: change n to unsigned int
 	struct nShape
 	{
-		int n = 4;
+		unsigned int n = 4;
 		std::shared_ptr< Fill > fill;
 		std::shared_ptr< Outline > outline;
 		nShape(int sides=4, std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Outline > out=nullptr)
@@ -173,7 +172,7 @@ namespace NoGUI
 		CContainer(Components c)
 			: components(c) {}
 		
-		Components getComponents()
+		Components& getComponents()
 		{
 			
 			return components;
