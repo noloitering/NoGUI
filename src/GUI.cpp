@@ -2,46 +2,584 @@
 
 using namespace NoGUI;
 
+void NoGUI::DrawEllipseFill(std::shared_ptr< Fill > fill, Vector2 center, Vector2 radius, Vector2 origin, float angle, bool hovered)
+{
+	if ( fill )
+	{
+		if ( hovered )
+		{
+			DrawEllipsePro(center, radius, origin, angle, fill->hoverCol);
+		}
+		else
+		{
+			DrawEllipsePro(center, radius, origin, angle, fill->col);
+		}
+	}
+}	
+
+void NoGUI::DrawEllipseFill(std::shared_ptr< Fill > fill, const Transform& transform, bool hovered)
+{
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	DrawEllipseFill(fill, transform.pos(), transform.radius, shapeOrigin, transform.angle, hovered);
+}
+
+void NoGUI::DrawPixelFill(std::shared_ptr< Fill > fill, Vector2 pos, bool hovered)
+{
+	if ( fill )
+	{
+		if ( hovered )
+		{
+			DrawPixel(pos.x, pos.y, fill->hoverCol);
+		}
+		else
+		{
+			DrawPixel(pos.x, pos.y, fill->col);
+		}
+	}
+}
+
+void NoGUI::DrawPixelFill(std::shared_ptr< Fill > fill, const Transform& transform, bool hovered)
+{
+	DrawPixelFill(fill, transform.pos(), hovered);
+}
+
+void NoGUI::DrawLineFill(std::shared_ptr< Fill > fill, const Vector2& start, const Vector2& end, float thickness, bool hovered)
+{
+	if ( fill )
+	{
+		if ( hovered )
+		{
+			DrawLineEx(start, end, thickness, fill->hoverCol);
+		}
+		else
+		{
+			DrawLineEx(start, end, thickness, fill->col);
+		}
+	}
+}
+
+void NoGUI::DrawLineFill(std::shared_ptr< Fill > fill, const Transform& transform, bool hovered)
+{
+	Vector2 start;
+	Vector2 end;
+	Vector2 origin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	origin.x *= transform.radius.x;
+	origin.y *= transform.radius.y;
+	Vector2 center = transform.pos();
+	if ( transform.angle == 0.0f )
+	{
+		start = {center.x - transform.radius.x - origin.x, center.y - origin.y / 2};
+		end = {center.x + transform.radius.x - origin.x, center.y - origin.y / 2};
+	}
+	else
+	{
+		float rads = transform.angle * DEG2RAD;
+		// align to origin
+		Vector2 leftPos = {-transform.radius.x - origin.x, -origin.y / 2};
+		Vector2 rightPos = {transform.radius.x - origin.x, -origin.y / 2};
+		// rotate
+		start = Vector2Rotate(leftPos, rads);
+		end = Vector2Rotate(rightPos, rads);
+		// translate back
+		start.x += center.x;
+		start.y += center.y;
+		end.x += center.x;
+		end.y += center.y;
+	}
+	DrawLineFill(fill, start, end, transform.radius.y, hovered);
+}
+
+void NoGUI::DrawTriangleFill(std::shared_ptr< Fill > fill, const Vector2& v1, const Vector2& v2, const Vector2& v3, bool hovered)
+{
+	if ( fill )
+	{
+		if ( hovered )
+		{
+			DrawTriangle(v1, v2, v3, fill->hoverCol);
+		}
+		else
+		{
+			DrawTriangle(v1, v2, v3, fill->col);
+		}
+	}
+}
+
+void NoGUI::DrawTriangleFill(std::shared_ptr< Fill > fill, const Transform& transform, bool hovered)
+{
+	Vector2 v1;
+	Vector2 v2;
+	Vector2 v3;
+	Vector2 origin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	origin.x *= transform.radius.x;
+	origin.y *= transform.radius.y;
+	Vector2 center = transform.pos();
+	if ( transform.angle == 0 )
+	{
+		v1 = {center.x - origin.x, center.y - origin.y - transform.radius.y};
+		v2 = {center.x - origin.x - transform.radius.x, center.y - origin.y + transform.radius.y};
+		v3 = {center.x - origin.x + transform.radius.x, center.y - origin.y + transform.radius.y};
+	}
+	else
+	{
+		float rads = transform.angle * DEG2RAD;
+		// align to origin
+		Vector2 o1 = {-origin.x, -origin.y - transform.radius.y};
+		Vector2 o2 = {-origin.x - transform.radius.x, -origin.y + transform.radius.y};
+		Vector2 o3 = {-origin.x + transform.radius.x, -origin.y + transform.radius.y};
+		// rotate
+		Vector2 v1Rotate = Vector2Rotate(o1, rads);
+		Vector2 v2Rotate = Vector2Rotate(o2, rads);
+		Vector2 v3Rotate = Vector2Rotate(o3, rads);
+		// translate back
+		v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+		v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+		v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
+	}
+	DrawTriangleFill(fill, v1, v2, v3, hovered);
+}
+
+void NoGUI::DrawRectangleFill(std::shared_ptr< Fill > fill, const Rectangle& rect, const Vector2& origin, float angle, bool hovered)
+{
+	if ( fill )
+	{
+		if ( hovered )
+		{
+			DrawRectanglePro(rect, origin, angle, fill->hoverCol);
+		}
+		else
+		{
+			DrawRectanglePro(rect, origin, angle, fill->col);
+		}
+	}
+}
+
+void NoGUI::DrawRectangleFill(std::shared_ptr< Fill > fill, const Transform& transform, bool hovered)
+{
+	Vector2 origin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	origin.x *= transform.radius.x;
+	origin.y *= transform.radius.y;
+	Vector2 center = transform.pos();
+	Rectangle rect = {center.x, center.y, transform.radius.x * 2, transform.radius.y * 2};
+	origin.x += transform.radius.x;
+	origin.y += transform.radius.y;
+	DrawRectangleFill(fill, rect, origin, transform.angle, hovered);
+}
+
+void NoGUI::DrawPolyFill(std::shared_ptr< Fill > fill, unsigned int n, const Vector2& center, const Vector2& radius, const Vector2& origin, float angle, bool hovered)
+{
+	if ( fill )
+	{
+		if ( hovered )
+		{
+			DrawPolyPro(center, n, radius, origin, angle, fill->hoverCol);
+		}
+		else
+		{
+			DrawPolyPro(center, n, radius, origin, angle, fill->col);
+		}
+	}
+}
+
+void NoGUI::DrawPolyFill(std::shared_ptr< Fill > fill, unsigned int n, const Transform& transform, bool hovered)
+{
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	DrawPolyFill(fill, n, transform.pos(), transform.radius, shapeOrigin, transform.angle, hovered);
+}
+
+void NoGUI::DrawShapeFill(unsigned int n, std::shared_ptr< Fill > fill, Vector2 center, Vector2 radius, Vector2 origin, float angle, bool hovered)
+{
+	switch ( n )
+	{
+		case 0:
+		{
+			DrawEllipseFill(fill, center, radius, origin, angle, hovered);
+			
+			break;
+		}
+		
+		case 1:
+		{
+			if ( fill )
+			{
+				DrawPixelFill(fill, Vector2Add(center, origin), hovered);
+			}
+			
+			break;
+		}
+		
+		case 2:
+		{
+			if ( fill )
+			{
+				Vector2 startPos;
+				Vector2 endPos;
+				if ( angle == 0.0f )
+				{
+					startPos = {center.x - radius.x - origin.x, center.y - origin.y / 2};
+					endPos = {center.x + radius.x - origin.x, center.y - origin.y / 2};
+				}
+				else
+				{
+					float rads = angle * DEG2RAD;
+					// align to origin
+					Vector2 leftPos = {-radius.x - origin.x, -origin.y / 2};
+					Vector2 rightPos = {radius.x - origin.x, -origin.y / 2};
+					// rotate
+					startPos = Vector2Rotate(leftPos, rads);
+					endPos = Vector2Rotate(rightPos, rads);
+					// translate back
+					startPos.x += center.x;
+					startPos.y += center.y;
+					endPos.x += center.x;
+					endPos.y += center.y;
+				}
+				DrawLineFill(fill, startPos, endPos, radius.y, hovered);
+			}
+			
+			break;
+		}
+		
+		case 3:
+		{	
+			if ( fill )
+			{
+				Vector2 v1;
+				Vector2 v2;
+				Vector2 v3;
+				if ( angle == 0 )
+				{
+					v1 = {center.x - origin.x, center.y - origin.y - radius.y};
+					v2 = {center.x - origin.x - radius.x, center.y - origin.y + radius.y};
+					v3 = {center.x - origin.x + radius.x, center.y - origin.y + radius.y};
+				}
+				else
+				{
+					float rads = angle * DEG2RAD;
+					// align to origin
+					Vector2 o1 = {-origin.x, -origin.y - radius.y};
+					Vector2 o2 = {-origin.x - radius.x, -origin.y + radius.y};
+					Vector2 o3 = {-origin.x + radius.x, -origin.y + radius.y};
+					// rotate
+					Vector2 v1Rotate = Vector2Rotate(o1, rads);
+					Vector2 v2Rotate = Vector2Rotate(o2, rads);
+					Vector2 v3Rotate = Vector2Rotate(o3, rads);
+					// translate back
+					v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+					v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+					v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
+				}
+				DrawTriangleFill(fill, v1, v2, v3, hovered);
+			}
+			
+			break;
+		}
+		
+		case 4:
+		{
+			if ( fill )
+			{
+				Rectangle rect = {center.x, center.y, radius.x * 2, radius.y * 2};
+				origin.x += radius.x;
+				origin.y += radius.y;
+				DrawRectangleFill(fill, rect, origin, angle, hovered);
+			}
+			
+			break;
+		}
+		
+		default:
+		{
+			DrawPolyFill(fill, n, center, radius, origin, angle, hovered);
+			
+			break;
+		}
+	}
+}
+
+void NoGUI::DrawShapeFill(unsigned int n, std::shared_ptr< NoGUI::Fill > fill, const NoGUI::Transform& transform, bool hovered)
+{
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	DrawShapeFill(n, fill, transform.pos(), transform.radius, shapeOrigin, transform.angle, hovered);
+}
+
+void NoGUI::DrawEllipseOutline(std::shared_ptr< Outline > outline, Vector2 center, Vector2 radius, Vector2 origin, float angle, bool hovered)
+{
+	if ( outline )
+	{
+		if ( outline->fill )
+		{
+			if ( hovered )
+			{
+				DrawEllipseLinesPro(center, radius, origin, angle, outline->thick, outline->fill->hoverCol);
+			}
+			else
+			{
+				DrawEllipseLinesPro(center, radius, origin, angle, outline->thick, outline->fill->col);
+			}
+		}
+	}
+}
+
+void NoGUI::DrawEllipseOutline(std::shared_ptr< Outline > outline, const Transform& transform, bool hovered)
+{
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	DrawEllipseOutline(outline, transform.pos(), transform.radius, shapeOrigin, transform.angle, hovered);
+}
+
+void NoGUI::DrawTriangleOutline(std::shared_ptr< Outline > outline, const Vector2& v1, const Vector2& v2, const Vector2& v3, bool hovered)
+{
+	if ( outline )
+	{
+		if ( outline->fill )
+		{
+			if ( hovered )
+			{
+				DrawTriangleLinesEx(v1, v2, v3, outline->thick, outline->fill->hoverCol);
+			}
+			else
+			{
+				DrawTriangleLinesEx(v1, v2, v3, outline->thick, outline->fill->col);
+			}
+		}
+	}
+}
+
+void NoGUI::DrawTriangleOutline(std::shared_ptr< Outline > outline, const Transform& transform, bool hovered)
+{
+	Vector2 v1;
+	Vector2 v2;
+	Vector2 v3;
+	Vector2 origin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	origin.x *= transform.radius.x;
+	origin.y *= transform.radius.y;
+	Vector2 center = transform.pos();
+	if ( transform.angle == 0 )
+	{
+		v1 = {center.x - origin.x, center.y - origin.y - transform.radius.y};
+		v2 = {center.x - origin.x - transform.radius.x, center.y - origin.y + transform.radius.y};
+		v3 = {center.x - origin.x + transform.radius.x, center.y - origin.y + transform.radius.y};
+	}
+	else
+	{
+		float rads = transform.angle * DEG2RAD;
+		// align to origin
+		Vector2 o1 = {-origin.x, -origin.y - transform.radius.y};
+		Vector2 o2 = {-origin.x - transform.radius.x, -origin.y + transform.radius.y};
+		Vector2 o3 = {-origin.x + transform.radius.x, -origin.y + transform.radius.y};
+		// rotate
+		Vector2 v1Rotate = Vector2Rotate(o1, rads);
+		Vector2 v2Rotate = Vector2Rotate(o2, rads);
+		Vector2 v3Rotate = Vector2Rotate(o3, rads);
+		// translate back
+		v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+		v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+		v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
+	}
+	DrawTriangleOutline(outline, v1, v2, v3, hovered);
+}
+
+void NoGUI::DrawRectangleOutline(std::shared_ptr< Outline > outline, const Rectangle& rect, const Vector2& origin, float angle, bool hovered)
+{
+	if ( outline )
+	{
+		if ( outline->fill )
+		{
+			if ( hovered )
+			{
+				DrawRectangleLinesPro(rect, origin, angle, outline->thick, outline->fill->hoverCol);
+			}
+			else
+			{
+				DrawRectangleLinesPro(rect, origin, angle, outline->thick, outline->fill->col);
+			}
+		}
+	}
+}
+
+void NoGUI::DrawRectangleOutline(std::shared_ptr< Outline > outline, const Transform& transform, bool hovered)
+{
+	Vector2 origin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	origin.x *= transform.radius.x;
+	origin.y *= transform.radius.y;
+	Vector2 center = transform.pos();
+	Rectangle rect = {center.x, center.y, transform.radius.x * 2, transform.radius.y * 2};
+	origin.x += transform.radius.x;
+	origin.y += transform.radius.y;
+	DrawRectangleOutline(outline, rect, origin, transform.angle, hovered);
+}
+
+void NoGUI::DrawPolyOutline(std::shared_ptr< Outline > outline, unsigned int n, const Vector2& center, const Vector2& radius, const Vector2& origin, float angle, bool hovered)
+{
+	if ( outline )
+	{
+		if ( outline->fill )
+		{
+			if ( hovered )
+			{
+				DrawPolyLinesPro(center, n, radius, origin, angle, outline->thick, outline->fill->hoverCol);
+			}
+			else
+			{
+				DrawPolyLinesPro(center, n, radius, origin, angle, outline->thick, outline->fill->col);
+			}
+		}
+	}
+}
+	
+void NoGUI::DrawPolyOutline(std::shared_ptr< Outline > outline, unsigned int n, const Transform& transform, bool hovered)
+{
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	DrawPolyOutline(outline, n, transform.pos(), transform.radius, shapeOrigin, transform.angle, hovered);
+}
+
+void NoGUI::DrawShapeOutline(unsigned int n, std::shared_ptr< Outline > outline, Vector2 center, Vector2 radius, Vector2 origin, float angle, bool hovered)
+{
+	switch (n)
+	{
+		case 0:
+		{
+			if ( outline->fill )
+			{
+				if ( hovered )
+				{
+					DrawEllipseLinesPro(center, radius, origin, angle, outline->thick, outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawEllipseLinesPro(center, radius, origin, angle, outline->thick, outline->fill->col);
+				}
+			}
+			
+			break;
+		}
+		
+		case 1:
+		{
+			// TODO: stuff here
+			
+			break;
+		}
+		
+		case 2:
+		{
+			
+			break;
+		}
+		
+		case 3:
+		{
+			if ( outline->fill )
+			{
+				Vector2 v1;
+				Vector2 v2;
+				Vector2 v3;
+				if ( angle == 0 )
+				{
+					v1 = {center.x - origin.x, center.y - origin.y - radius.y};
+					v2 = {center.x - origin.x - radius.x, center.y - origin.y + radius.y};
+					v3 = {center.x - origin.x + radius.x, center.y - origin.y + radius.y};
+				}
+				else
+				{
+					float rads = angle * DEG2RAD;
+					// align to origin
+					Vector2 o1 = {-origin.x, -origin.y - radius.y};
+					Vector2 o2 = {-origin.x - radius.x, -origin.y + radius.y};
+					Vector2 o3 = {-origin.x + radius.x, -origin.y + radius.y};
+					// rotate
+					Vector2 v1Rotate = Vector2Rotate(o1, rads);
+					Vector2 v2Rotate = Vector2Rotate(o2, rads);
+					Vector2 v3Rotate = Vector2Rotate(o3, rads);
+					// translate back
+					v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+					v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+					v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
+				}
+				if ( hovered )
+				{
+					DrawTriangleLinesEx(v1, v2, v3, outline->thick, outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawTriangleLinesEx(v1, v2, v3, outline->thick, outline->fill->col);
+				}
+			}
+			
+			break;
+		}
+		
+		case 4:
+		{	
+			if ( outline->fill )
+			{
+				Rectangle rect = {center.x, center.y, radius.x * 2, radius.y * 2};
+				origin.x += radius.x;
+				origin.y += radius.y;
+				if ( hovered )
+				{
+					DrawRectangleLinesPro(rect, origin, angle, outline->thick, outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawRectangleLinesPro(rect, origin, angle, outline->thick, outline->fill->col);
+				}
+			}
+			
+			break;
+		}
+		
+		default:
+		{
+			if ( outline->fill )
+			{
+				if ( hovered )
+				{
+					DrawPolyLinesPro(center, n, radius, origin, angle, outline->thick, outline->fill->hoverCol);
+				}
+				else
+				{
+					DrawPolyLinesPro(center, n, radius, origin, angle, outline->thick, outline->fill->col);
+				}
+			}
+			
+			break;
+		}
+	}
+}
+
+void NoGUI::DrawShapeOutline(unsigned int n, std::shared_ptr< Outline > outline, const Transform& transform, bool hovered)
+{
+	Vector2 shapeOrigin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	shapeOrigin.x *= transform.radius.x;
+	shapeOrigin.y *= transform.radius.y;
+	DrawShapeOutline(n, outline, transform.pos(), transform.radius, shapeOrigin, transform.angle, hovered);
+}
+
 void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin, float angle, bool hovered)
 {
 	switch (shape.n)
 	{
 		case 0:
 		{
-			if ( shape.fill )
-			{
-				if ( hovered )
-				{
-					DrawEllipsePro(center, radius, origin, angle, shape.fill->hoverCol);
-				}
-				else
-				{
-					DrawEllipsePro(center, radius, origin, angle, shape.fill->col);
-				}
-			}
-			if ( shape.outline )
-			{
-				if ( hovered )
-				{
-					DrawEllipseLinesPro(center, radius, origin, angle, shape.outline->thick, shape.outline->fill->hoverCol);
-				}
-				else
-				{
-					DrawEllipseLinesPro(center, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
-				}
-			}
+			DrawEllipseFill(shape.fill, center, radius, origin, angle, hovered);
+			DrawEllipseOutline(shape.outline, center, radius, origin, angle, hovered);
+			
+			break;
 		}
 		
 		case 1:
 		{
-			if ( hovered )
-			{
-				DrawPixel(center.x, center.y, shape.fill->hoverCol);
-			}
-			else
-			{
-				DrawPixel(center.x, center.y, shape.fill->col);
-			}
+			DrawPixelFill(shape.fill, Vector2Add(center, origin), hovered);
 			
 			break;
 		}
@@ -70,14 +608,7 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 				endPos.x += center.x;
 				endPos.y += center.y;
 			}
-			if ( hovered )
-			{
-				DrawLineEx(startPos, endPos, radius.y, shape.fill->hoverCol);
-			}
-			else
-			{
-				DrawLineEx(startPos, endPos, radius.y, shape.fill->col);
-			}
+			DrawLineFill(shape.fill, startPos, endPos, radius.y, hovered);
 			
 			break;
 		}
@@ -109,29 +640,8 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 				v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
 				v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
 			}
-			
-			if ( shape.fill )
-			{
-				if ( hovered )
-				{
-					DrawTriangle(v1, v2, v3, shape.fill->hoverCol);
-				}
-				else
-				{
-					DrawTriangle(v1, v2, v3, shape.fill->col);
-				}
-			}
-			if ( shape.outline )
-			{
-				if ( hovered )
-				{
-					DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->hoverCol);
-				}
-				else
-				{
-					DrawTriangleLinesEx(v1, v2, v3, shape.outline->thick, shape.outline->fill->col);
-				}
-			}
+			DrawTriangleFill(shape.fill, v1, v2, v3, hovered);
+			DrawTriangleOutline(shape.outline, v1, v2, v3, hovered);
 			
 			break;
 		}
@@ -141,57 +651,16 @@ void NoGUI::DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vecto
 			Rectangle rect = {center.x, center.y, radius.x * 2, radius.y * 2};
 			origin.x += radius.x;
 			origin.y += radius.y;
-			
-			if ( shape.fill )
-			{
-				if ( hovered )
-				{
-					DrawRectanglePro(rect, origin, angle, shape.fill->hoverCol);
-				}
-				else
-				{
-					DrawRectanglePro(rect, origin, angle, shape.fill->col);
-				}
-			}
-			if ( shape.outline )
-			{
-				if ( hovered )
-				{
-					DrawRectangleLinesPro(rect, origin, angle, shape.outline->thick, shape.outline->fill->hoverCol);
-				}
-				else
-				{
-					DrawRectangleLinesPro(rect, origin, angle, shape.outline->thick, shape.outline->fill->col);
-				}
-			}
+			DrawRectangleFill(shape.fill, rect, origin, angle, hovered);
+			DrawRectangleOutline(shape.outline, rect, origin, angle, hovered);
 			
 			break;
 		}
 		
 		default:
 		{
-			if ( shape.fill )
-			{
-				if ( hovered )
-				{
-					DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->hoverCol);
-				}
-				else
-				{
-					DrawPolyPro(center, shape.n, radius, origin, angle, shape.fill->col);
-				}
-			}
-			if ( shape.outline )
-			{
-				if ( hovered )
-				{
-					DrawPolyLinesPro(center, shape.n, radius, origin, angle, shape.outline->thick, shape.outline->fill->hoverCol);
-				}
-				else
-				{
-					DrawPolyLinesPro(center, shape.n, radius, origin, angle, shape.outline->thick, shape.outline->fill->col);
-				}
-			}
+			DrawPolyFill(shape.fill, shape.n, center, radius, origin, angle, hovered);
+			DrawPolyOutline(shape.outline, shape.n, center, radius, origin, angle, hovered);
 			
 			break;
 		}
@@ -2154,14 +2623,118 @@ void NoGUI::DrawComponents(Element* elem)
 	DrawComponents(elem->components->getComponents(), elem->getShape(), *(elem), elem->getInner(), elem->getHover());
 }
 
-// TODO: draw outlines last
 void NoGUI::DrawElement(Element* elem)
 {
 	std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
-	DrawShape(*(shape.get()), *(elem), elem->getHover());
-	if ( elem->components )
+	Vector2 center = elem->pos();
+	Vector2 origin = {(float)static_cast< int >(elem->origin.x), (float)static_cast< int >(elem->origin.y)};
+	origin.x *= elem->radius.x;
+	origin.y *= elem->radius.y;
+	switch (shape->n)
 	{
-		DrawComponents(elem);
+		case 0:
+		{
+			DrawEllipseFill(shape->fill, center, elem->radius, origin, elem->angle, elem->getHover());
+			DrawComponents(elem);
+			DrawEllipseOutline(shape->outline, center, elem->radius, origin, elem->angle, elem->getHover());
+			
+			break;
+		}
+		
+		case 1:
+		{
+			DrawPixelFill(shape->fill, Vector2Add(center, origin), elem->getHover());
+			DrawComponents(elem);
+			
+			break;
+		}
+		
+		case 2:
+		{
+			Vector2 startPos;
+			Vector2 endPos;
+			if ( elem->angle == 0.0f )
+			{
+				startPos = {center.x - elem->radius.x - origin.x, center.y - origin.y / 2};
+				endPos = {center.x + elem->radius.x - origin.x, center.y - origin.y / 2};
+			}
+			else
+			{
+				float rads = elem->angle * DEG2RAD;
+				// align to origin
+				Vector2 leftPos = {-elem->radius.x - origin.x, -origin.y / 2};
+				Vector2 rightPos = {elem->radius.x - origin.x, -origin.y / 2};
+				// rotate
+				startPos = Vector2Rotate(leftPos, rads);
+				endPos = Vector2Rotate(rightPos, rads);
+				// translate back
+				startPos.x += center.x;
+				startPos.y += center.y;
+				endPos.x += center.x;
+				endPos.y += center.y;
+			}
+			DrawLineFill(shape->fill, startPos, endPos, elem->radius.y, elem->getHover());
+			DrawComponents(elem);
+			
+			break;
+		}
+		
+		case 3:
+		{
+			Vector2 v1;
+			Vector2 v2;
+			Vector2 v3;
+			if ( elem->angle == 0 )
+			{
+				v1 = {center.x - origin.x, center.y - origin.y - elem->radius.y};
+				v2 = {center.x - origin.x - elem->radius.x, center.y - origin.y + elem->radius.y};
+				v3 = {center.x - origin.x + elem->radius.x, center.y - origin.y + elem->radius.y};
+			}
+			else
+			{
+				float rads = elem->angle * DEG2RAD;
+				// align to origin
+				Vector2 o1 = {-origin.x, -origin.y - elem->radius.y};
+				Vector2 o2 = {-origin.x - elem->radius.x, -origin.y + elem->radius.y};
+				Vector2 o3 = {-origin.x + elem->radius.x, -origin.y + elem->radius.y};
+				// rotate
+				Vector2 v1Rotate = Vector2Rotate(o1, rads);
+				Vector2 v2Rotate = Vector2Rotate(o2, rads);
+				Vector2 v3Rotate = Vector2Rotate(o3, rads);
+				// translate back
+				v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+				v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+				v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
+			}
+			
+			DrawTriangleFill(shape->fill, v1, v2, v3, elem->getHover());
+			DrawComponents(elem);
+			DrawTriangleOutline(shape->outline, v1, v2, v3, elem->getHover());
+			
+			break;
+		}
+		
+		case 4:
+		{
+			Rectangle rect = {center.x, center.y, elem->radius.x * 2, elem->radius.y * 2};
+			origin.x += elem->radius.x;
+			origin.y += elem->radius.y;
+			
+			DrawRectangleFill(shape->fill, rect, origin, elem->angle, elem->getHover());
+			DrawComponents(elem);
+			DrawRectangleOutline(shape->outline, rect, origin, elem->angle, elem->getHover());
+			
+			break;
+		}
+		
+		default:
+		{
+			DrawPolyFill(shape->fill, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
+			DrawComponents(elem);
+			DrawPolyOutline(shape->outline, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
+			
+			break;
+		}
 	}
 }
 
