@@ -2623,28 +2623,33 @@ void NoGUI::DrawComponents(Element* elem)
 	DrawComponents(elem->components->getComponents(), elem->getShape(), *(elem), elem->getInner(), elem->getHover());
 }
 
-void NoGUI::DrawElement(Element* elem)
+void NoGUI::DrawElement(const NoGUI::Transform& transform, std::shared_ptr< nShape > shape, const char* inner, std::shared_ptr< NoGUI::CContainer > components, bool hovered)
 {
-	std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
-	Vector2 center = elem->pos();
-	Vector2 origin = {(float)static_cast< int >(elem->origin.x), (float)static_cast< int >(elem->origin.y)};
-	origin.x *= elem->radius.x;
-	origin.y *= elem->radius.y;
+	Vector2 center = transform.pos();
+	Vector2 origin = {(float)static_cast< int >(transform.origin.x), (float)static_cast< int >(transform.origin.y)};
+	origin.x *= transform.radius.x;
+	origin.y *= transform.radius.y;
 	switch (shape->n)
 	{
 		case 0:
 		{
-			DrawEllipseFill(shape->fill, center, elem->radius, origin, elem->angle, elem->getHover());
-			DrawComponents(elem);
-			DrawEllipseOutline(shape->outline, center, elem->radius, origin, elem->angle, elem->getHover());
+			DrawEllipseFill(shape->fill, center, transform.radius, origin, transform.angle, hovered);
+			if ( components )
+			{
+				DrawComponents(components->getComponents(), shape, transform, inner, hovered);
+			}	
+			DrawEllipseOutline(shape->outline, center, transform.radius, origin, transform.angle, hovered);
 			
 			break;
 		}
 		
 		case 1:
 		{
-			DrawPixelFill(shape->fill, Vector2Add(center, origin), elem->getHover());
-			DrawComponents(elem);
+			DrawPixelFill(shape->fill, Vector2Add(center, origin), hovered);
+			if ( components )
+			{
+				DrawComponents(components->getComponents(), shape, transform, inner, hovered);
+			}
 			
 			break;
 		}
@@ -2653,17 +2658,17 @@ void NoGUI::DrawElement(Element* elem)
 		{
 			Vector2 startPos;
 			Vector2 endPos;
-			if ( elem->angle == 0.0f )
+			if ( transform.angle == 0.0f )
 			{
-				startPos = {center.x - elem->radius.x - origin.x, center.y - origin.y / 2};
-				endPos = {center.x + elem->radius.x - origin.x, center.y - origin.y / 2};
+				startPos = {center.x - transform.radius.x - origin.x, center.y - origin.y / 2};
+				endPos = {center.x + transform.radius.x - origin.x, center.y - origin.y / 2};
 			}
 			else
 			{
-				float rads = elem->angle * DEG2RAD;
+				float rads = transform.angle * DEG2RAD;
 				// align to origin
-				Vector2 leftPos = {-elem->radius.x - origin.x, -origin.y / 2};
-				Vector2 rightPos = {elem->radius.x - origin.x, -origin.y / 2};
+				Vector2 leftPos = {-transform.radius.x - origin.x, -origin.y / 2};
+				Vector2 rightPos = {transform.radius.x - origin.x, -origin.y / 2};
 				// rotate
 				startPos = Vector2Rotate(leftPos, rads);
 				endPos = Vector2Rotate(rightPos, rads);
@@ -2673,8 +2678,11 @@ void NoGUI::DrawElement(Element* elem)
 				endPos.x += center.x;
 				endPos.y += center.y;
 			}
-			DrawLineFill(shape->fill, startPos, endPos, elem->radius.y, elem->getHover());
-			DrawComponents(elem);
+			DrawLineFill(shape->fill, startPos, endPos, transform.radius.y, hovered);
+			if ( components )
+			{
+				DrawComponents(components->getComponents(), shape, transform, inner, hovered);
+			}
 			
 			break;
 		}
@@ -2684,19 +2692,19 @@ void NoGUI::DrawElement(Element* elem)
 			Vector2 v1;
 			Vector2 v2;
 			Vector2 v3;
-			if ( elem->angle == 0 )
+			if ( transform.angle == 0 )
 			{
-				v1 = {center.x - origin.x, center.y - origin.y - elem->radius.y};
-				v2 = {center.x - origin.x - elem->radius.x, center.y - origin.y + elem->radius.y};
-				v3 = {center.x - origin.x + elem->radius.x, center.y - origin.y + elem->radius.y};
+				v1 = {center.x - origin.x, center.y - origin.y - transform.radius.y};
+				v2 = {center.x - origin.x - transform.radius.x, center.y - origin.y + transform.radius.y};
+				v3 = {center.x - origin.x + transform.radius.x, center.y - origin.y + transform.radius.y};
 			}
 			else
 			{
-				float rads = elem->angle * DEG2RAD;
+				float rads = transform.angle * DEG2RAD;
 				// align to origin
-				Vector2 o1 = {-origin.x, -origin.y - elem->radius.y};
-				Vector2 o2 = {-origin.x - elem->radius.x, -origin.y + elem->radius.y};
-				Vector2 o3 = {-origin.x + elem->radius.x, -origin.y + elem->radius.y};
+				Vector2 o1 = {-origin.x, -origin.y - transform.radius.y};
+				Vector2 o2 = {-origin.x - transform.radius.x, -origin.y + transform.radius.y};
+				Vector2 o3 = {-origin.x + transform.radius.x, -origin.y + transform.radius.y};
 				// rotate
 				Vector2 v1Rotate = Vector2Rotate(o1, rads);
 				Vector2 v2Rotate = Vector2Rotate(o2, rads);
@@ -2707,35 +2715,49 @@ void NoGUI::DrawElement(Element* elem)
 				v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
 			}
 			
-			DrawTriangleFill(shape->fill, v1, v2, v3, elem->getHover());
-			DrawComponents(elem);
-			DrawTriangleOutline(shape->outline, v1, v2, v3, elem->getHover());
+			DrawTriangleFill(shape->fill, v1, v2, v3, hovered);
+			if ( components )
+			{
+				DrawComponents(components->getComponents(), shape, transform, inner, hovered);
+			}
+			DrawTriangleOutline(shape->outline, v1, v2, v3, hovered);
 			
 			break;
 		}
 		
 		case 4:
 		{
-			Rectangle rect = {center.x, center.y, elem->radius.x * 2, elem->radius.y * 2};
-			origin.x += elem->radius.x;
-			origin.y += elem->radius.y;
+			Rectangle rect = {center.x, center.y, transform.radius.x * 2, transform.radius.y * 2};
+			origin.x += transform.radius.x;
+			origin.y += transform.radius.y;
 			
-			DrawRectangleFill(shape->fill, rect, origin, elem->angle, elem->getHover());
-			DrawComponents(elem);
-			DrawRectangleOutline(shape->outline, rect, origin, elem->angle, elem->getHover());
+			DrawRectangleFill(shape->fill, rect, origin, transform.angle, hovered);
+			if ( components )
+			{
+				DrawComponents(components->getComponents(), shape, transform, inner, hovered);
+			}
+			DrawRectangleOutline(shape->outline, rect, origin, transform.angle, hovered);
 			
 			break;
 		}
 		
 		default:
 		{
-			DrawPolyFill(shape->fill, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
-			DrawComponents(elem);
-			DrawPolyOutline(shape->outline, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
+			DrawPolyFill(shape->fill, shape->n, center, transform.radius, origin, transform.angle, hovered);
+			if ( components )
+			{
+				DrawComponents(components->getComponents(), shape, transform, inner, hovered);
+			}
+			DrawPolyOutline(shape->outline, shape->n, center, transform.radius, origin, transform.angle, hovered);
 			
 			break;
 		}
 	}
+}
+
+void NoGUI::DrawElement(Element* elem)
+{
+	DrawElement(*(elem), elem->getShape(), elem->getInner(), elem->components, elem->getHover());
 }
 
 Vector2 NoGUI::Transform::pos() const
@@ -3410,116 +3432,117 @@ void ManagerGrid::render()
 				//elem->draw();
 				Transform transform = Transform(Vector2Scale(elem->pos(), cellSize), Vector2Scale(elem->radius, cellSize), elem->origin, elem->angle);
 				std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
-				Vector2 center = transform.pos();
-				Vector2 origin = {(float)static_cast< int >(elem->origin.x), (float)static_cast< int >(elem->origin.y)};
-				origin.x *= transform.radius.x;
-				origin.y *= transform.radius.y;
-				switch (shape->n)
-				{
-					case 0:
-					{
-						DrawEllipseFill(shape->fill, center, elem->radius, origin, elem->angle, elem->getHover());
-						DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						DrawEllipseOutline(shape->outline, center, elem->radius, origin, elem->angle, elem->getHover());
+				DrawElement(transform, shape, elem->getInner(), elem->components, elem->getHover());
+				// Vector2 center = transform.pos();
+				// Vector2 origin = {(float)static_cast< int >(elem->origin.x), (float)static_cast< int >(elem->origin.y)};
+				// origin.x *= transform.radius.x;
+				// origin.y *= transform.radius.y;
+				// switch (shape->n)
+				// {
+					// case 0:
+					// {
+						// DrawEllipseFill(shape->fill, center, elem->radius, origin, elem->angle, elem->getHover());
+						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
+						// DrawEllipseOutline(shape->outline, center, elem->radius, origin, elem->angle, elem->getHover());
 			
-						break;
-					}
+						// break;
+					// }
 		
-					case 1:
-					{
-						DrawPixelFill(shape->fill, Vector2Add(center, origin), elem->getHover());
-						DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
+					// case 1:
+					// {
+						// DrawPixelFill(shape->fill, Vector2Add(center, origin), elem->getHover());
+						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
 			
-						break;
-					}
+						// break;
+					// }
 		
-					case 2:
-					{
-						Vector2 startPos;
-						Vector2 endPos;
-						if ( elem->angle == 0.0f )
-						{
-							startPos = {center.x - elem->radius.x - origin.x, center.y - origin.y / 2};
-							endPos = {center.x + elem->radius.x - origin.x, center.y - origin.y / 2};
-						}
-						else
-						{
-							float rads = elem->angle * DEG2RAD;
-							// align to origin
-							Vector2 leftPos = {-elem->radius.x - origin.x, -origin.y / 2};
-							Vector2 rightPos = {elem->radius.x - origin.x, -origin.y / 2};
-							// rotate
-							startPos = Vector2Rotate(leftPos, rads);
-							endPos = Vector2Rotate(rightPos, rads);
-							// translate back
-							startPos.x += center.x;
-							startPos.y += center.y;
-							endPos.x += center.x;
-							endPos.y += center.y;
-						}
-						DrawLineFill(shape->fill, startPos, endPos, elem->radius.y, elem->getHover());
-						DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
+					// case 2:
+					// {
+						// Vector2 startPos;
+						// Vector2 endPos;
+						// if ( elem->angle == 0.0f )
+						// {
+							// startPos = {center.x - elem->radius.x - origin.x, center.y - origin.y / 2};
+							// endPos = {center.x + elem->radius.x - origin.x, center.y - origin.y / 2};
+						// }
+						// else
+						// {
+							// float rads = elem->angle * DEG2RAD;
+							// // align to origin
+							// Vector2 leftPos = {-elem->radius.x - origin.x, -origin.y / 2};
+							// Vector2 rightPos = {elem->radius.x - origin.x, -origin.y / 2};
+							// // rotate
+							// startPos = Vector2Rotate(leftPos, rads);
+							// endPos = Vector2Rotate(rightPos, rads);
+							// // translate back
+							// startPos.x += center.x;
+							// startPos.y += center.y;
+							// endPos.x += center.x;
+							// endPos.y += center.y;
+						// }
+						// DrawLineFill(shape->fill, startPos, endPos, elem->radius.y, elem->getHover());
+						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
 			
-						break;
-					}
+						// break;
+					// }
 		
-					case 3:
-					{
-						Vector2 v1;
-						Vector2 v2;
-						Vector2 v3;
-						if ( elem->angle == 0 )
-						{
-							v1 = {center.x - origin.x, center.y - origin.y - elem->radius.y};
-							v2 = {center.x - origin.x - elem->radius.x, center.y - origin.y + elem->radius.y};
-							v3 = {center.x - origin.x + elem->radius.x, center.y - origin.y + elem->radius.y};
-						}
-						else
-						{
-							float rads = elem->angle * DEG2RAD;
-							// align to origin
-							Vector2 o1 = {-origin.x, -origin.y - elem->radius.y};
-							Vector2 o2 = {-origin.x - elem->radius.x, -origin.y + elem->radius.y};
-							Vector2 o3 = {-origin.x + elem->radius.x, -origin.y + elem->radius.y};
-							// rotate
-							Vector2 v1Rotate = Vector2Rotate(o1, rads);
-							Vector2 v2Rotate = Vector2Rotate(o2, rads);
-							Vector2 v3Rotate = Vector2Rotate(o3, rads);
-							// translate back
-							v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
-							v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
-							v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
-						}
+					// case 3:
+					// {
+						// Vector2 v1;
+						// Vector2 v2;
+						// Vector2 v3;
+						// if ( elem->angle == 0 )
+						// {
+							// v1 = {center.x - origin.x, center.y - origin.y - elem->radius.y};
+							// v2 = {center.x - origin.x - elem->radius.x, center.y - origin.y + elem->radius.y};
+							// v3 = {center.x - origin.x + elem->radius.x, center.y - origin.y + elem->radius.y};
+						// }
+						// else
+						// {
+							// float rads = elem->angle * DEG2RAD;
+							// // align to origin
+							// Vector2 o1 = {-origin.x, -origin.y - elem->radius.y};
+							// Vector2 o2 = {-origin.x - elem->radius.x, -origin.y + elem->radius.y};
+							// Vector2 o3 = {-origin.x + elem->radius.x, -origin.y + elem->radius.y};
+							// // rotate
+							// Vector2 v1Rotate = Vector2Rotate(o1, rads);
+							// Vector2 v2Rotate = Vector2Rotate(o2, rads);
+							// Vector2 v3Rotate = Vector2Rotate(o3, rads);
+							// // translate back
+							// v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
+							// v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
+							// v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
+						// }
 			
-						DrawTriangleFill(shape->fill, v1, v2, v3, elem->getHover());
-						DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						DrawTriangleOutline(shape->outline, v1, v2, v3, elem->getHover());
+						// DrawTriangleFill(shape->fill, v1, v2, v3, elem->getHover());
+						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
+						// DrawTriangleOutline(shape->outline, v1, v2, v3, elem->getHover());
 			
-						break;
-					}
+						// break;
+					// }
 		
-					case 4:
-					{
-						Rectangle rect = {center.x, center.y, elem->radius.x * 2, elem->radius.y * 2};
-						origin.x += elem->radius.x;
-						origin.y += elem->radius.y;
+					// case 4:
+					// {
+						// Rectangle rect = {center.x, center.y, elem->radius.x * 2, elem->radius.y * 2};
+						// origin.x += elem->radius.x;
+						// origin.y += elem->radius.y;
 			
-						DrawRectangleFill(shape->fill, rect, origin, elem->angle, elem->getHover());
-						DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						DrawRectangleOutline(shape->outline, rect, origin, elem->angle, elem->getHover());
+						// DrawRectangleFill(shape->fill, rect, origin, elem->angle, elem->getHover());
+						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
+						// DrawRectangleOutline(shape->outline, rect, origin, elem->angle, elem->getHover());
 			
-						break;
-					}
+						// break;
+					// }
 		
-					default:
-					{
-						DrawPolyFill(shape->fill, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
-						DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						DrawPolyOutline(shape->outline, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
+					// default:
+					// {
+						// DrawPolyFill(shape->fill, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
+						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
+						// DrawPolyOutline(shape->outline, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
 			
-						break;
-					}
-				}
+						// break;
+					// }
+				// }
 			}
 		}
 	}

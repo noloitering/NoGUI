@@ -253,5 +253,6 @@ namespace NoGUI
 	void DrawComponents(Components& components, std::shared_ptr< nShape > shape, const NoGUI::Transform& transform, const char* inner, bool hovered=false);
 	void DrawComponents(Element* elem);
 	// Elements
+	void DrawElement(const NoGUI::Transform& transform, std::shared_ptr< nShape > shape, const char* inner, std::shared_ptr< NoGUI::CContainer > components=nullptr, bool hovered=false);
 	void DrawElement(Element* elem);
 }
