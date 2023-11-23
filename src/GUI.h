@@ -152,7 +152,7 @@ namespace NoGUI
 	
 	class Manager : public Notifier // Container for Pages
 	{
-//	friend class ManagerGrid;
+	friend class ManagerGrid;
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
 		bool onFocus = false;
@@ -183,6 +183,20 @@ namespace NoGUI
 		void clear();
 		void update();
 		void setActive(size_t index);
+	};
+	
+	class ManagerGrid : public Manager
+	{
+	private:
+		unsigned int cellSize = 16;
+	public:
+		ManagerGrid(bool withPg=true, unsigned int cell=16)
+			: Manager(withPg), cellSize(cell) {}
+		ManagerGrid(std::shared_ptr< Page > pg, unsigned int cell=16)
+			: Manager(pg), cellSize(cell) {}
+		ManagerGrid(std::vector< std::shared_ptr< Page > > pgs, unsigned int cell=16)
+			: Manager(pgs), cellSize(cell) {}
+		void render();
 	};
 	
 	// helper functions
