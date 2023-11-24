@@ -3430,120 +3430,38 @@ void ManagerGrid::render()
 			for (auto elem : page->getElements())
 			{
 				//elem->draw();
-				Transform transform = Transform(Vector2Scale(elem->pos(), cellSize), Vector2Scale(elem->radius, cellSize), elem->origin, elem->angle);
+				Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
 				std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
 				DrawElement(transform, shape, elem->getInner(), elem->components, elem->getHover());
-				// Vector2 center = transform.pos();
-				// Vector2 origin = {(float)static_cast< int >(elem->origin.x), (float)static_cast< int >(elem->origin.y)};
-				// origin.x *= transform.radius.x;
-				// origin.y *= transform.radius.y;
-				// switch (shape->n)
-				// {
-					// case 0:
-					// {
-						// DrawEllipseFill(shape->fill, center, elem->radius, origin, elem->angle, elem->getHover());
-						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						// DrawEllipseOutline(shape->outline, center, elem->radius, origin, elem->angle, elem->getHover());
-			
-						// break;
-					// }
-		
-					// case 1:
-					// {
-						// DrawPixelFill(shape->fill, Vector2Add(center, origin), elem->getHover());
-						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-			
-						// break;
-					// }
-		
-					// case 2:
-					// {
-						// Vector2 startPos;
-						// Vector2 endPos;
-						// if ( elem->angle == 0.0f )
-						// {
-							// startPos = {center.x - elem->radius.x - origin.x, center.y - origin.y / 2};
-							// endPos = {center.x + elem->radius.x - origin.x, center.y - origin.y / 2};
-						// }
-						// else
-						// {
-							// float rads = elem->angle * DEG2RAD;
-							// // align to origin
-							// Vector2 leftPos = {-elem->radius.x - origin.x, -origin.y / 2};
-							// Vector2 rightPos = {elem->radius.x - origin.x, -origin.y / 2};
-							// // rotate
-							// startPos = Vector2Rotate(leftPos, rads);
-							// endPos = Vector2Rotate(rightPos, rads);
-							// // translate back
-							// startPos.x += center.x;
-							// startPos.y += center.y;
-							// endPos.x += center.x;
-							// endPos.y += center.y;
-						// }
-						// DrawLineFill(shape->fill, startPos, endPos, elem->radius.y, elem->getHover());
-						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-			
-						// break;
-					// }
-		
-					// case 3:
-					// {
-						// Vector2 v1;
-						// Vector2 v2;
-						// Vector2 v3;
-						// if ( elem->angle == 0 )
-						// {
-							// v1 = {center.x - origin.x, center.y - origin.y - elem->radius.y};
-							// v2 = {center.x - origin.x - elem->radius.x, center.y - origin.y + elem->radius.y};
-							// v3 = {center.x - origin.x + elem->radius.x, center.y - origin.y + elem->radius.y};
-						// }
-						// else
-						// {
-							// float rads = elem->angle * DEG2RAD;
-							// // align to origin
-							// Vector2 o1 = {-origin.x, -origin.y - elem->radius.y};
-							// Vector2 o2 = {-origin.x - elem->radius.x, -origin.y + elem->radius.y};
-							// Vector2 o3 = {-origin.x + elem->radius.x, -origin.y + elem->radius.y};
-							// // rotate
-							// Vector2 v1Rotate = Vector2Rotate(o1, rads);
-							// Vector2 v2Rotate = Vector2Rotate(o2, rads);
-							// Vector2 v3Rotate = Vector2Rotate(o3, rads);
-							// // translate back
-							// v1 = {v1Rotate.x + center.x, v1Rotate.y + center.y};
-							// v2 = {v2Rotate.x + center.x, v2Rotate.y + center.y};
-							// v3 = {v3Rotate.x + center.x, v3Rotate.y + center.y};
-						// }
-			
-						// DrawTriangleFill(shape->fill, v1, v2, v3, elem->getHover());
-						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						// DrawTriangleOutline(shape->outline, v1, v2, v3, elem->getHover());
-			
-						// break;
-					// }
-		
-					// case 4:
-					// {
-						// Rectangle rect = {center.x, center.y, elem->radius.x * 2, elem->radius.y * 2};
-						// origin.x += elem->radius.x;
-						// origin.y += elem->radius.y;
-			
-						// DrawRectangleFill(shape->fill, rect, origin, elem->angle, elem->getHover());
-						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						// DrawRectangleOutline(shape->outline, rect, origin, elem->angle, elem->getHover());
-			
-						// break;
-					// }
-		
-					// default:
-					// {
-						// DrawPolyFill(shape->fill, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
-						// DrawComponents(elem->components->getComponents(), shape, transform, elem->getInner(), elem->getHover());
-						// DrawPolyOutline(shape->outline, shape->n, center, elem->radius, origin, elem->angle, elem->getHover());
-			
-						// break;
-					// }
-				// }
 			}
 		}
 	}
+}
+
+void ManagerGrid::drawCells(const Color& col)
+{
+	for (float x=cellSize.x; x < GetScreenWidth(); x+=cellSize.x)
+	{
+		DrawLine(x, 0, x, GetScreenHeight(), col);
+	}
+	for (float y=cellSize.y; y < GetScreenHeight(); y+=cellSize.y)
+	{
+		DrawLine(0, y, GetScreenWidth(), y, col);
+	}
+}
+
+Vector2 ManagerGrid::getCellSize()
+{
+	
+	return cellSize;
+}
+
+void ManagerGrid::setCellSize(float newSize)
+{
+	cellSize = (Vector2){newSize, newSize};
+}
+
+void ManagerGrid::setCellSize(float x, float y)
+{
+	cellSize = (Vector2){x, y};
 }

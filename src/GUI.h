@@ -188,15 +188,19 @@ namespace NoGUI
 	class ManagerGrid : public Manager
 	{
 	private:
-		unsigned int cellSize = 16;
+		Vector2 cellSize = {16, 16};
 	public:
-		ManagerGrid(bool withPg=true, unsigned int cell=16)
-			: Manager(withPg), cellSize(cell) {}
-		ManagerGrid(std::shared_ptr< Page > pg, unsigned int cell=16)
-			: Manager(pg), cellSize(cell) {}
-		ManagerGrid(std::vector< std::shared_ptr< Page > > pgs, unsigned int cell=16)
-			: Manager(pgs), cellSize(cell) {}
+		ManagerGrid(bool withPg=true, float cellX=16, float cellY=16)
+			: Manager(withPg) {cellSize.x = cellX; cellSize.y = cellY;}
+		ManagerGrid(std::shared_ptr< Page > pg, float cellX=16, float cellY=16)
+			: Manager(pg) {cellSize.x = cellX; cellSize.y = cellY;}
+		ManagerGrid(std::vector< std::shared_ptr< Page > > pgs, float cell=16)
+			: Manager(pgs) {cellSize.x = cell; cellSize.y = cell;}
 		void render();
+		void drawCells(const Color& col=GRAY);
+		void setCellSize(float newSize);
+		void setCellSize(float x, float y);
+		Vector2 getCellSize();
 	};
 	
 	// helper functions
