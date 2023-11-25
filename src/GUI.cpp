@@ -3429,10 +3429,45 @@ void ManagerGrid::render()
 		{
 			for (auto elem : page->getElements())
 			{
-				//elem->draw();
 				Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
 				std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
-				DrawElement(transform, shape, elem->getInner(), elem->components, elem->getHover());
+				//DrawElement(transform, shape, elem->getInner(), elem->components, elem->getHover());
+				// TODO: the following is a slower but cleaner way of drawing the Element. It can be optimized.
+				DrawShapeFill(shape->n, shape->fill, transform, elem->getHover());
+				if ( elem->components )
+				{
+					// transforms in the multishape component need to follow the grid sizing
+					if ( elem->components->getComponent< CMultiShape >().active )
+					{
+						CMultiShape& multiShape = elem->components->getComponent< CMultiShape >();
+						multiShape.active = false; // manually draw the MultiShape Component
+						DrawComponents(elem.get());
+						for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShape.shapes )
+						{
+							Transform shapeTransform = shape.second;
+							shapeTransform.position = Vector2Multiply(shapeTransform.position, cellSize); // grid scaling
+							shapeTransform.radius = Vector2Multiply(shapeTransform.radius, cellSize); // grid scaling
+							Vector2 center = transform.pos(shapeTransform.origin);
+							Vector2 offset = shapeTransform.pos();
+							float angle = shapeTransform.angle;
+							if ( transform.angle != 0 )
+							{
+								offset = Vector2Rotate(offset, transform.angle * DEG2RAD);
+								angle += transform.angle;
+							}
+							center.x += offset.x;
+							center.y += offset.y;
+							
+							DrawShape(*(shape.first), center, shapeTransform.radius, (Vector2){0, 0}, angle, elem->getHover());
+						}
+						multiShape.active = true;
+					}
+					else
+					{
+						DrawComponents(elem.get());
+					}
+				}
+				DrawShapeOutline(shape->n, shape->outline, transform, elem->getHover());
 			}
 		}
 	}
