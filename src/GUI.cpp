@@ -3421,6 +3421,94 @@ void Manager::setActive(size_t index)
 	pages.at(index)->setActive(true);
 }
 
+void ManagerGrid::update()
+{
+	for (auto pageIt=pages.rbegin(); pageIt != pages.rend(); pageIt++)
+	{
+		std::shared_ptr< Page > page = *(pageIt);
+		page->update();
+		if ( page->getActive() )
+		{
+			std::vector< std::shared_ptr< NoGUI::Element > > elements = page->getElements();
+			for (auto elemIt=elements.rbegin(); elemIt != elements.rend(); elemIt++)
+			{
+				//elem->isHover();
+				std::shared_ptr< Element > elem = *(elemIt);
+				Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
+//				bool prevHover = elem->getHover();
+				bool prevFocus = elem->getFocus();
+//				elem->isHover();
+				Vector2 mousePos = GetMousePosition();
+				elem->hover = CheckCollisionPointShape(mousePos, elem->getShape()->n, transform);
+				if ( elem->components )
+				{
+					CMultiShape& multiShapeComp = elem->components->getComponent< CMultiShape >();
+					NoGUI::CInput& inputComp = elem->components->getComponent< NoGUI::CInput >();
+					if ( !elem->getHover() )
+					{
+						if ( multiShapeComp.active && multiShapeComp.collision )
+						{
+							for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
+							{
+								Vector2 center = elem->pos(shape.second.origin);
+								Vector2 offset = shape.second.pos();
+								float angle = shape.second.angle;
+								if ( elem->rotation() != 0 )
+								{
+									offset = Vector2Rotate(offset, elem->rotation() * DEG2RAD);
+									angle += elem->rotation();
+								}
+								center.x += offset.x;
+								center.y += offset.y;
+								NoGUI::Transform bbox = NoGUI::Transform(Vector2Multiply(center, cellSize), Vector2Multiply(shape.second.radius, cellSize), NoGUI::Align(0, 0), angle);
+								if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
+								{
+									elem->hover = true;
+				
+									break;
+								}
+							}
+						}
+					}
+					if ( elem->getHover() && inputComp.active )
+					{
+						collectInput(elem.get());
+					}
+				}
+				elem->isFocus();
+				int event = 0;
+				if ( !prevFocus )
+				{
+					if ( elem->getFocus() )
+					{
+						if ( !onFocus )
+						{
+							event = ONFOCUS;
+							onFocus = true;
+						}
+					}
+				}
+				else
+				{
+					if ( elem->getFocus() )
+					{
+						event = FOCUSING;
+					}
+					else
+					{
+						event = OFFFOCUS;
+					}
+				}
+				if ( event )
+				{
+					notify(elem, static_cast<Event>(event));
+				}
+			}
+		}
+	}
+	onFocus = false;
+}
+
 void ManagerGrid::render()
 {
 	for (auto page : pages)
@@ -3441,7 +3529,7 @@ void ManagerGrid::render()
 					{
 						CMultiShape& multiShape = elem->components->getComponent< CMultiShape >();
 						multiShape.active = false; // manually draw the MultiShape Component
-						DrawComponents(elem.get());
+						DrawComponents(elem->components->getComponents(), elem->getShape(), transform, elem->getInner(), elem->getHover());
 						for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShape.shapes )
 						{
 							Transform shapeTransform = shape.second;
@@ -3464,7 +3552,7 @@ void ManagerGrid::render()
 					}
 					else
 					{
-						DrawComponents(elem.get());
+						DrawComponents(elem->components->getComponents(), elem->getShape(), transform, elem->getInner(), elem->getHover());
 					}
 				}
 				DrawShapeOutline(shape->n, shape->outline, transform, elem->getHover());

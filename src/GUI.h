@@ -35,6 +35,8 @@ namespace NoGUI
 	
 	class Element : public NoMAD::GameObj, public NoGUI::Transform
 	{
+	friend class Manager;
+	friend class ManagerGrid;
 	protected:
 		bool active = true; // logic switch
 		bool alive = true; // to be or not to be
@@ -171,6 +173,7 @@ namespace NoGUI
 		Manager(std::vector< std::shared_ptr< Page > > pgs)
 			: pages(pgs) {}
 		virtual void render();
+		virtual void update();
 //		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0);
 		std::shared_ptr< Page > addPage(bool active=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > pg);
@@ -181,7 +184,6 @@ namespace NoGUI
 //		void removeElement(size_t id, size_t pageIndex=0);
 		void removePage(size_t pageIndex);
 		void clear();
-		void update();
 		void setActive(size_t index);
 	};
 	
@@ -196,6 +198,7 @@ namespace NoGUI
 			: Manager(pg) {cellSize.x = cellX; cellSize.y = cellY;}
 		ManagerGrid(std::vector< std::shared_ptr< Page > > pgs, float cell=16)
 			: Manager(pgs) {cellSize.x = cell; cellSize.y = cell;}
+		void update();
 		void render();
 		void drawCells(const Color& col=GRAY);
 		void setCellSize(float newSize);
