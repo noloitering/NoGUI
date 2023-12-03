@@ -152,6 +152,88 @@ namespace NoGUI
 		}
 	};
 	
+	class ContextPage : public Page
+	{
+	protected:
+		std::shared_ptr< Element > context;
+		Wrap flow = Wrap::DOWN;
+	public:
+		ContextPage(std::shared_ptr< Element > element, const Vector2& pos, bool init=true)
+			: Page(init), context(element), position(pos) {}
+		ContextPage(std::shared_ptr< Element > element, const Vector2& pos, std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool init=true)
+			: Page(comps, init), context(element), position(pos) {}
+		Vector2 position;
+		std::shared_ptr< Element > getContext();
+		Wrap getFlow();
+		void setContext(std::shared_ptr< NoGUI::Element > element);
+		void setFlow(const Wrap& wrap);
+		
+		template <class C=Element>
+		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Vector2& radius, const char* tag="Default", const char* inner="")
+		{
+			float increment = 0.0f;
+			Vector2 pos = position;
+			Align alignment = context->origin;
+			std::shared_ptr< CContainer > components = getComponents(tag);
+			std::shared_ptr< Element > lastElement = getElement(size() - 1);
+			if ( components == nullptr )
+			{
+				components = addComponents(tag);
+			}
+			if ( style->outline )
+			{
+				increment += style->outline->thick / 2;
+			}
+			if ( lastElement )
+			{
+				pos = lastElement->pos(NoGUI::Align());
+				std::shared_ptr< nShape > lastShape = lastElement->getShape();
+				increment += lastElement->radius.y;
+				if ( lastShape->outline )
+				{
+					increment += lastShape->outline->thick / 2;
+				}
+			}
+			switch (flow)
+			{
+				case Wrap::NONE:
+				{
+					
+					break;
+				}
+				
+				case Wrap::DOWN:
+				{
+					alignment = NoGUI::Align(0, -1);
+					pos.y += increment;
+					
+					break;
+				}
+				
+				case Wrap::UP:
+				{
+					alignment = NoGUI::Align(0, 1);
+					pos.y -= increment;
+					
+					break;
+				}
+				
+				case Wrap::AROUND:
+				{
+					alignment = NoGUI::Align(0, 0);
+					// TODO: circle around context
+					
+					break;
+				}
+			}
+			Transform transform = Transform(pos, radius, alignment);
+			auto elem = std::shared_ptr< Element >(new C(total++, style, transform, components, tag, inner));
+			toAdd[tag].push_back(elem);
+	
+			return elem;
+		}
+	};
+	
 	class Manager : public Notifier // Container for Pages
 	{
 	friend class ManagerGrid;

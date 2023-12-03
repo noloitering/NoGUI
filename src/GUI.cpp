@@ -3288,6 +3288,72 @@ void Page::clearElements()
 	total = 0;
 }
 
+std::shared_ptr< Element > ContextPage::getContext()
+{
+	
+	return context;
+}
+
+NoGUI::Wrap ContextPage::getFlow()
+{
+	
+	return flow;
+}
+
+void ContextPage::setContext(std::shared_ptr< NoGUI::Element > element)
+{
+	context = element;
+}
+
+void ContextPage::setFlow(const Wrap& wrap)
+{
+	flow = wrap;
+	Vector2 pos = position;
+	for (std::shared_ptr< Element > elem : getElements())
+	{
+		float increment = elem->height();
+		if ( elem->getShape()->outline )
+		{
+			increment += elem->getShape()->outline->thick / 2;
+		}
+		switch (flow)
+		{
+			case Wrap::NONE:
+			{
+
+				break;
+			}
+				
+			case Wrap::DOWN:
+			{
+				elem->origin = NoGUI::Align(0, -1);
+				elem->position = pos;
+				pos.y += increment;
+				
+				break;
+			}
+				
+			case Wrap::UP:
+			{
+				elem->origin = NoGUI::Align(0, 1);
+				elem->position = pos;
+				pos.y -= increment;
+				
+				break;
+			}
+				
+			case Wrap::AROUND:
+			{
+				elem->origin = NoGUI::Align(0, 0);
+				// TODO: circle around context
+				
+				break;
+			}
+		}
+		
+	}
+}
+
 // std::shared_ptr< Element > GUIManager::addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0)
 // {
 	
