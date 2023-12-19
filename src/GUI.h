@@ -113,6 +113,45 @@ namespace NoGUI
 		void draw();
 	};
 	
+	class Slider : public Trigger
+	{
+	protected:
+		std::shared_ptr< nShape > slide;
+		Transform slideTransform;
+	public:
+		Slider(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="", std::shared_ptr< nShape > slideStyle=nullptr)
+			: Trigger(num, style, pos, size, rotation, origin, c, type, in) 
+			{
+				if ( slideStyle ) 
+				{ 
+					slide = slideStyle;
+				}
+				else 
+				{
+					slide = std::make_shared< nShape >(style->n, std::make_shared< Fill >(style->fill->col, style->fill->hoverCol), style->outline);
+				}
+				slideTransform = Transform((Vector2){0, 0}, (Vector2){0.0f, size.y}, Align(-1, 0));
+			}
+		Slider(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="", std::shared_ptr< nShape > slideStyle=nullptr)
+			: Trigger(num, style, dimensions,  c, type, in) 
+			{
+				if ( slideStyle != nullptr )
+				{
+					slide = slideStyle; 
+				}
+				else
+				{
+					slide = std::make_shared< nShape >(style->n, std::make_shared< Fill >(style->fill->col, style->fill->hoverCol), style->outline); 
+				}
+				slideTransform = Transform((Vector2){0, 0}, (Vector2){0.0f, dimensions.radius.y}, Align(-1, 0));
+			}
+		void draw();
+		bool isFocus();
+		std::shared_ptr< nShape > getSlide();
+		void setSlide(std::shared_ptr< nShape > slideStyle);
+		void setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform);
+	};
+	
 	class Page : public CMap // Container for Elements
 	{
 	protected:

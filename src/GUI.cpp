@@ -3140,6 +3140,76 @@ void CheckBox::draw()
 	}
 }
 
+std::shared_ptr< nShape > Slider::getSlide()
+{
+	
+	return slide;
+}
+
+void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
+{
+	slide = slideStyle;
+}
+
+void Slider::setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform)
+{
+	slide = slideStyle;
+	slideTransform = transform;
+}
+
+bool Slider::isFocus()
+{
+	Vector2 mousePos = GetMousePosition();
+	focus = Trigger::isFocus();
+	if ( focus )
+	{
+		Vector2 startPoint = pos(NoGUI::Align(-1, -1));
+		Vector2 slideRadius = {0, slideTransform.radius.y};
+		if ( angle == 0 )
+		{
+			slideRadius.x = (mousePos.x  - startPoint.x) / 2;
+		}
+		else
+		{
+			Vector2 endPoint = pos(NoGUI::Align(1, -1));
+			Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+			Vector2 collisionPoint;
+			if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+			{
+				slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) / 2;
+			}
+		}
+		slideTransform.radius = slideRadius;
+		// reposition slider since multishapes have a center origin
+		slideTransform.repos((Vector2){slideRadius.x, slideTransform.position.y});
+	}
+	
+	return focus;
+}
+
+void Slider::draw()
+{
+	// TODO: ineffiecent but cleaner way of doing things
+	DrawShapeFill(shape->n, shape->fill, *(this), getHover());
+	// TODO: copy pasted from DrawCMultiShape
+	Vector2 center = pos(slideTransform.origin);
+	Vector2 offset = slideTransform.pos();
+	float slideAngle = slideTransform.angle;
+	if ( angle != 0 )
+	{
+		offset = Vector2Rotate(offset, angle * DEG2RAD);
+		slideAngle += angle;
+	}
+	center.x += offset.x;
+	center.y += offset.y;
+	DrawShape(*(slide), center, slideTransform.radius, (Vector2){0, 0}, slideAngle, getHover());
+	if ( components )
+	{
+		DrawComponents(this);
+	}
+	DrawShapeOutline(shape->n, shape->outline, *(this), getHover());
+}
+
 void Page::update()
 {
 	std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > new_map;
