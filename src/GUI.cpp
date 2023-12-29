@@ -676,6 +676,22 @@ void NoGUI::DrawShape(const nShape& shape, const NoGUI::Transform& transform, bo
 	DrawShape(shape, transform.pos(), transform.radius, shapeOrigin, transform.rotation(), hovered);
 }
 
+void NoGUI::DrawShapeAnchored(const nShape& shape, const NoGUI::Transform& transform,  const NoGUI::Transform& anchor, bool hovered)
+{
+	Vector2 center = anchor.pos(transform.origin);
+	Vector2 offset = transform.pos();
+	float angle = transform.angle;
+	if ( anchor.angle != 0 )
+	{
+		offset = Vector2Rotate(offset, anchor.angle * DEG2RAD);
+		angle += anchor.angle;
+	}
+	center.x += offset.x;
+	center.y += offset.y;
+	
+	DrawShape(shape, center, transform.radius, (Vector2){0, 0}, angle, hovered);
+}
+
 void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size)
 {
 	std::shared_ptr< NoGUI::Fill > defaultBarFill = std::make_shared< NoGUI::Fill >(LIGHTGRAY);
@@ -2550,19 +2566,7 @@ void NoGUI::DrawCMultiShape(const Transform& anchor, const CMultiShape& shapes, 
 {
 	for ( std::pair< std::shared_ptr< nShape >, Transform > shape : shapes.shapes )
 	{
-		Transform transform = shape.second;
-		Vector2 center = anchor.pos(transform.origin);
-		Vector2 offset = transform.pos();
-		float angle = transform.angle;
-		if ( anchor.angle != 0 )
-		{
-			offset = Vector2Rotate(offset, anchor.angle * DEG2RAD);
-			angle += anchor.angle;
-		}
-		center.x += offset.x;
-		center.y += offset.y;
-		
-		DrawShape(*(shape.first), center, transform.radius, (Vector2){0, 0}, angle, hovered);
+		DrawShapeAnchored(*(shape.first), shape.second, anchor, hovered);
 	}
 }
 
@@ -3191,18 +3195,7 @@ void Slider::draw()
 {
 	// TODO: ineffiecent but cleaner way of doing things
 	DrawShapeFill(shape->n, shape->fill, *(this), getHover());
-	// TODO: copy pasted from DrawCMultiShape
-	Vector2 center = pos(slideTransform.origin);
-	Vector2 offset = slideTransform.pos();
-	float slideAngle = slideTransform.angle;
-	if ( angle != 0 )
-	{
-		offset = Vector2Rotate(offset, angle * DEG2RAD);
-		slideAngle += angle;
-	}
-	center.x += offset.x;
-	center.y += offset.y;
-	DrawShape(*(slide), center, slideTransform.radius, (Vector2){0, 0}, slideAngle, getHover());
+	DrawShapeAnchored(*(slide), slideTransform, *(this), getHover());
 	if ( components )
 	{
 		DrawComponents(this);

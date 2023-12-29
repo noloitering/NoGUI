@@ -365,6 +365,7 @@ namespace NoGUI
 	void DrawShapeOutline(unsigned int n, std::shared_ptr< Outline > outline, const Transform& transform, bool hovered=false);
 	void DrawShape(const nShape& shape, Vector2 center, Vector2 radius, Vector2 origin={0, 0}, float angle=0, bool hovered=false);
 	void DrawShape(const nShape& shape, const NoGUI::Transform& transform, bool hovered=false);
+	void DrawShapeAnchored(const nShape& shape, const NoGUI::Transform& transform, const NoGUI::Transform& anchor, bool hovered=false);
 	void DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const NoGUI::Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size);
 	// Components
 	void DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform& transform);
