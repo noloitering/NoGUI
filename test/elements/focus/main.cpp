@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Trigger > centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, triangle, centerT, shapeComps, "Shape", "Trigger");
 	std::shared_ptr< NoGUI::CheckBox > bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, octagon, bottomT, shapeComps, "Shape", "CheckBox");
 	std::shared_ptr< NoGUI::Slider > bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, rect, bottomLT, shapeComps, "Shape", "Slider");
-	std::shared_ptr< NoGUI::Toggle > bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomRT, shapeComps, "Shape", "Toggle");
+	std::shared_ptr< NoGUI::Cursorer > bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, ellipse, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 	shapeElem->setInner(TextFormat("click the\n%s elements!", argv[1]));
 	if ( argc > 1 )
 	{
@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, ellipse, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, ellipse, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, ellipse, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, ellipse, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "ellipse") == 0 )
 		{
@@ -79,7 +79,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, ellipse, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, ellipse, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, ellipse, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, ellipse, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, ellipse, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "line") == 0 )
 		{
@@ -89,7 +89,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, line, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, line, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, line, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, line, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, line, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "tri") == 0 )
 		{
@@ -106,7 +106,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, triangle, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, triangle, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, triangle, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, triangle, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "triangle") == 0 )
 		{
@@ -119,7 +119,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, triangle, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, triangle, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, triangle, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, triangle, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, triangle, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "square") == 0 )
 		{
@@ -136,7 +136,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, rect, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, rect, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, rect, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, rect, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "rectangle") == 0 )
 		{
@@ -149,7 +149,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, rect, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, rect, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, rect, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, rect, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, rect, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "poly") == 0 )
 		{
@@ -172,7 +172,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, octagon, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, ninegon, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, tengon, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, elevengon, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, elevengon, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 		else if ( strcasecmp(argv[1], "polygon") == 0 )
 		{
@@ -191,7 +191,7 @@ int main(int argc, char ** argv)
 			centerElem = std::make_shared< NoGUI::Trigger >(NoMAD::OBJCOUNT, octagon, centerT, shapeComps, "Shape", "Trigger");
 			bottomElem = std::make_shared< NoGUI::CheckBox >(NoMAD::OBJCOUNT, ninegon, bottomT, shapeComps, "Shape", "CheckBox");
 			bottomLElem = std::make_shared< NoGUI::Slider >(NoMAD::OBJCOUNT, tengon, bottomLT, shapeComps, "Shape", "Slider");
-			bottomRElem = std::make_shared< NoGUI::Toggle >(NoMAD::OBJCOUNT, elevengon, bottomRT, shapeComps, "Shape", "Toggle");
+			bottomRElem = std::make_shared< NoGUI::Cursorer >(NoMAD::OBJCOUNT, elevengon, ellipse, bottomRT, shapeComps, "Shape", "Cursorer");
 		}
 	}
 	

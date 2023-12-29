@@ -118,6 +118,10 @@ namespace NoGUI
 	protected:
 		std::shared_ptr< nShape > slide;
 		Transform slideTransform;
+		Slider(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Trigger(num, style, pos, size, rotation, origin, c, type, in) {slide = slideStyle;}
+		Slider(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Trigger(num, style, dimensions, c, type, in) {slide = slideStyle;}
 	public:
 		Slider(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="", std::shared_ptr< nShape > slideStyle=nullptr)
 			: Trigger(num, style, pos, size, rotation, origin, c, type, in) 
@@ -150,6 +154,16 @@ namespace NoGUI
 		std::shared_ptr< nShape > getSlide();
 		void setSlide(std::shared_ptr< nShape > slideStyle);
 		void setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform);
+	};
+	
+	class Cursorer : public Slider
+	{
+	public:
+		Cursorer(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Slider(num, style, slideStyle, pos, size, rotation, origin, c, type, in) {slideTransform = Transform((Vector2){0, 0}, (Vector2){10.0f, 10.0f}, Align(-1, 0));}
+		Cursorer(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+			: Slider(num, style, slideStyle, dimensions, c, type, in) {slideTransform = Transform((Vector2){0, 0}, (Vector2){10.0f, 10.0f}, Align(-1, 0));}
+		bool isFocus();
 	};
 	
 	class Page : public CMap // Container for Elements

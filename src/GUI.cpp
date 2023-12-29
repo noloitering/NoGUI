@@ -3203,6 +3203,34 @@ void Slider::draw()
 	DrawShapeOutline(shape->n, shape->outline, *(this), getHover());
 }
 
+bool Cursorer::isFocus()
+{
+	Vector2 mousePos = GetMousePosition();
+	focus = Trigger::isFocus();
+	if ( focus )
+	{
+		Vector2 startPoint = pos(NoGUI::Align(-1, -1));
+		Vector2 slidePos = {0, slideTransform.radius.y};
+		if ( angle == 0 )
+		{
+			slidePos.x = (mousePos.x  - startPoint.x);
+		}
+		else
+		{
+			Vector2 endPoint = pos(NoGUI::Align(1, -1));
+			Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+			Vector2 collisionPoint;
+			if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+			{
+				slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+			}
+		}
+		slideTransform.repos((Vector2){slidePos.x, slideTransform.position.y});
+	}
+	
+	return focus;
+}
+
 void Page::update()
 {
 	std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > new_map;

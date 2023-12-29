@@ -1,10 +1,16 @@
 test_hover.exe
 Launching with different arguments should display different shapes in the top left, center, and right. As well as dead center, and bottom left, center, and right
-clicking on an element should turn it red
 
 CONTROLS:
 Scroll Up: rotate 1 degree clockwise around origin point
 Scroll Down: rotate 1 degree counter-clockwise around origin point
+Button: flickers red for a single frame when clicked
+Hoverable: turns red when hovered
+Toggle: turns red when clicked, and returns to white when clicked again
+Trigger: holds red as long as mouse button is down on it
+Slider: Like Trigger, but with another rectangle that scales to the length of the mouse
+CheckBox: turns red and displays text when clicked
+Cursorer: Like trigger, but a smaller shape follows the mouse cursor
 
 TESTS:
 1) NO ARGUMENTS CASE
