@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
 	SetTargetFPS(60);
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(GRAY);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
@@ -55,17 +55,17 @@ int main(int argc, char ** argv)
 	NoGUI::Transform bottomPos = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, bottom);
 	NoGUI::Transform bottomRightPos = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, bottomRight);
 
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, dataT, std::make_shared< NoGUI::CContainer >(), "Tip");
-	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, toggleT, std::make_shared< NoGUI::CContainer >(), "Tip", "Wrap DOWN");
-	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > centerLeftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerLeftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > centerRightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerRightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > bottomLeftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLeftPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > bottomRightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomRightPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, dataT, "Tip", "", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, toggleT, "Tip", "Wrap DOWN", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > centerLeftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerLeftPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > centerRightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerRightPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > bottomLeftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomLeftPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > bottomRightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, bottomRightPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
 	dataElem->components->addComponent< NoGUI::CText >();
 	toggleElem->components->addComponent< NoGUI::CText >();
 	leftElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, left, wrap);

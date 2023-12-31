@@ -14,7 +14,7 @@ int main(int argc, char ** argv)
 	Vector2 elemSize = {100, 100};
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(RAYWHITE);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(GRAY);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 5, NoGUI::Wrap::AROUND);
 	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill, outline);
@@ -26,7 +26,7 @@ int main(int argc, char ** argv)
 	
 //	std::shared_ptr< NoGUI::Element > scrollElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip", "\nscrolling ENABLED");
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, polygon, centerT);
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip");
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, "Tip", "", std::make_shared< NoGUI::CContainer >());
 	dataElem->components->addComponent< NoGUI::CText >();
 	
 	// main

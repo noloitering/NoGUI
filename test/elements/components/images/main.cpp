@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
 	}
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >();
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > toggleFill = std::make_shared< NoGUI::Fill >(GREEN);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
@@ -54,21 +54,21 @@ int main(int argc, char ** argv)
 	NoGUI::Transform bottomT = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
 	NoGUI::Transform bottomRT = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, NoGUI::Align(1, 1));
 	
-	std::shared_ptr< NoGUI::Element > styleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip", "NONE");
-	std::shared_ptr< NoGUI::Element > scrollElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, std::make_shared< NoGUI::CContainer >(), "Tip", "\nscrolling ENABLED");
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, std::make_shared< NoGUI::CContainer >(), "Tip");
+	std::shared_ptr< NoGUI::Element > styleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, "Tip", "NONE", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > scrollElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, "Tip", "\nscrolling ENABLED", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, "Tip", "", std::make_shared< NoGUI::CContainer >());
 	styleElem->components->addComponent< NoGUI::CText >();
 	dataElem->components->addComponent< NoGUI::CText >();
 	scrollElem->components->addComponent< NoGUI::CText >(toggleFill, nullptr, 20.0f, NoGUI::Align(), NoGUI::Wrap::DOWN, 0.0f, (Vector2){2, 24});
 	std::shared_ptr< NoGUI::CContainer > comps = std::make_shared< NoGUI::CContainer >();
 	comps->addComponent< NoGUI::CImage >(image);
-	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT, comps);
-	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, topT, comps);
-	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightT, comps);
-	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, fivegon, centerT, comps);
-	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sixgon, bottomT, comps);
-	std::shared_ptr< NoGUI::Element > bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, bottomLT, comps);
-	std::shared_ptr< NoGUI::Element > bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, bottomRT, comps);
+	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT, "", "", comps);
+	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, triangle, topT, "", "", comps);
+	std::shared_ptr< NoGUI::Element > rightElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightT, "", "", comps);
+	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, fivegon, centerT, "", "", comps);
+	std::shared_ptr< NoGUI::Element > bottomElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sixgon, bottomT, "", "", comps);
+	std::shared_ptr< NoGUI::Element > bottomLElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, sevengon, bottomLT, "", "", comps);
+	std::shared_ptr< NoGUI::Element > bottomRElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, octagon, bottomRT, "", "", comps);
 	
 	elemVec.push_back(dataElem);
 	elemVec.push_back(styleElem);

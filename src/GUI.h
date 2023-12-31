@@ -44,9 +44,9 @@ namespace NoGUI
 		bool hover = false; // mouse hover
 		std::shared_ptr< nShape > shape;
 	public:
-		Element(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+		Element(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
 			: GameObj(num, type, in), Transform(pos, size, origin, rotation), shape(style), components(c) {}
-		Element(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
+		Element(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
 			: GameObj(num, type, in), Transform(dimensions), shape(style), components(c) {}
 		virtual void draw();
 		virtual bool isFocus();
@@ -66,50 +66,50 @@ namespace NoGUI
 	class Button : public Element
 	{
 	public:
-		Button(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
-		Button(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, dimensions,  c, type, in) {}
+		Button(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, pos, size, rotation, origin, type, in, c) {}
+		Button(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, dimensions, type, in, c) {}
 		bool isFocus();
 	};
 	
 	class Hoverable : public Element
 	{
 	public:
-		Hoverable(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
-		Hoverable(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, dimensions,  c, type, in) {}
+		Hoverable(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, pos, size, rotation, origin, type, in, c) {}
+		Hoverable(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, dimensions, type, in, c) {}
 		bool isFocus();
 	};
 	
 	class Toggle : public Element
 	{
 	public:
-		Toggle(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
-		Toggle(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, dimensions,  c, type, in) {}
+		Toggle(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, pos, size, rotation, origin, type, in, c) {}
+		Toggle(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, dimensions, type, in, c) {}
 		bool isFocus();
 	};
 	
 	class Trigger : public Element
 	{
 	public:
-		Trigger(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, pos, size, rotation, origin, c, type, in) {}
-		Trigger(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Element(num, style, dimensions,  c, type, in) {}
+		Trigger(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, pos, size, rotation, origin, type, in, c) {}
+		Trigger(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Element(num, style, dimensions, type, in, c) {}
 		bool isFocus();
 	};
 	
 	class CheckBox : public Toggle
 	{
 	public:
-		CheckBox(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Toggle(num, style, pos, size, rotation, origin, c, type, in) {}
-		CheckBox(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Toggle(num, style, dimensions,  c, type, in) {}
+		CheckBox(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Toggle(num, style, pos, size, rotation, origin, type, in, c) {}
+		CheckBox(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
+			: Toggle(num, style, dimensions, type, in, c) {}
 		void draw();
 	};
 	
@@ -118,13 +118,9 @@ namespace NoGUI
 	protected:
 		std::shared_ptr< nShape > slide;
 		Transform slideTransform;
-		Slider(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Trigger(num, style, pos, size, rotation, origin, c, type, in) {slide = slideStyle;}
-		Slider(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Trigger(num, style, dimensions, c, type, in) {slide = slideStyle;}
 	public:
-		Slider(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="", std::shared_ptr< nShape > slideStyle=nullptr)
-			: Trigger(num, style, pos, size, rotation, origin, c, type, in) 
+		Slider(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr)
+			: Trigger(num, style, pos, size, rotation, origin, type, in, c)
 			{
 				if ( slideStyle ) 
 				{ 
@@ -136,8 +132,8 @@ namespace NoGUI
 				}
 				slideTransform = Transform((Vector2){0, 0}, (Vector2){0.0f, size.y}, Align(-1, 0));
 			}
-		Slider(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="", std::shared_ptr< nShape > slideStyle=nullptr)
-			: Trigger(num, style, dimensions,  c, type, in) 
+		Slider(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr)
+			: Trigger(num, style, dimensions, type, in, c)
 			{
 				if ( slideStyle != nullptr )
 				{
@@ -152,6 +148,7 @@ namespace NoGUI
 		void draw();
 		bool isFocus();
 		std::shared_ptr< nShape > getSlide();
+		const Transform& getSlideTransform();
 		void setSlide(std::shared_ptr< nShape > slideStyle);
 		void setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform);
 	};
@@ -159,10 +156,24 @@ namespace NoGUI
 	class Cursorer : public Slider
 	{
 	public:
-		Cursorer(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Slider(num, style, slideStyle, pos, size, rotation, origin, c, type, in) {slideTransform = Transform((Vector2){0, 0}, (Vector2){10.0f, 10.0f}, Align(-1, 0));}
-		Cursorer(const size_t& num, std::shared_ptr< nShape > style, std::shared_ptr< nShape > slideStyle, const Transform& dimensions, std::shared_ptr< CContainer > c=nullptr, const char* type="Default", const char* in="")
-			: Slider(num, style, slideStyle, dimensions, c, type, in) {slideTransform = Transform((Vector2){0, 0}, (Vector2){10.0f, 10.0f}, Align(-1, 0));}
+		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr)
+			: Slider(num, style, pos, size, rotation, origin, type, in, c, slideStyle) 
+			{
+				if ( slideStyle == nullptr )
+				{
+					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
+				}
+				slideTransform = Transform((Vector2){0, 0}, (Vector2){10.0f, 10.0f}, Align(-1, 0));
+			}
+		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr)
+			: Slider(num, style, dimensions, type, in, c, slideStyle) 
+			{
+				if ( slideStyle == nullptr )
+				{
+					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
+				}
+				slideTransform = Transform((Vector2){0, 0}, (Vector2){10.0f, 10.0f}, Align(-1, 0));
+			}
 		bool isFocus();
 	};
 	
@@ -190,16 +201,20 @@ namespace NoGUI
 		bool getActive();
 		bool setActive(bool set);
 		
-		template <class C=Element>
-		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="")
+		template <class C=Element, typename... Args>
+		std::shared_ptr< Element > addElement(Args&&... EArgs)
 		{
-			std::shared_ptr< CContainer > components = getComponents(tag);
-			if ( components == nullptr )
+			auto elem = std::shared_ptr< Element >(new C(total++, std::forward<Args>(EArgs)...));
+			if ( elem->components == nullptr )
 			{
-				components = addComponents(tag);
+				std::shared_ptr< CContainer > components = getComponents(elem->getTag());
+				if ( components == nullptr )
+				{
+					components = addComponents(elem->getTag());
+				}
+				elem->components = components;
 			}
-			auto elem = std::shared_ptr< Element >(new C(total++, style, dimensions, components, tag, inner));
-			toAdd[tag].push_back(elem);
+			toAdd[elem->getTag()].push_back(elem);
 	
 			return elem;
 		}
@@ -221,18 +236,14 @@ namespace NoGUI
 		void setContext(std::shared_ptr< NoGUI::Element > element);
 		void setFlow(const Wrap& wrap);
 		
-		template <class C=Element>
-		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Vector2& radius, const char* tag="Default", const char* inner="")
+		template <class C=Element, typename... Args>
+		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Vector2& radius, Args&&... EArgs)
 		{
 			float increment = 0.0f;
 			Vector2 pos = position;
 			Align alignment = context->origin;
-			std::shared_ptr< CContainer > components = getComponents(tag);
+//			std::shared_ptr< CContainer > components = getComponents(tag);
 			std::shared_ptr< Element > lastElement = getElement(size() - 1);
-			if ( components == nullptr )
-			{
-				components = addComponents(tag);
-			}
 			if ( style->outline )
 			{
 				increment += style->outline->thick / 2;
@@ -280,8 +291,17 @@ namespace NoGUI
 				}
 			}
 			Transform transform = Transform(pos, radius, alignment);
-			auto elem = std::shared_ptr< Element >(new C(total++, style, transform, components, tag, inner));
-			toAdd[tag].push_back(elem);
+			auto elem = std::shared_ptr< Element >(new C(total++, style, transform, std::forward<Args>(EArgs)...));
+			if ( elem->components == nullptr )
+			{
+				std::shared_ptr< CContainer > components = getComponents(elem->getTag());
+				if ( components == nullptr )
+				{
+					components = addComponents(elem->getTag());
+				}
+				elem->components = components;
+			}
+			toAdd[elem->getTag()].push_back(elem);
 	
 			return elem;
 		}

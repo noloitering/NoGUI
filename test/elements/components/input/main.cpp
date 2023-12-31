@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
 	SetTargetFPS(60);
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(GRAY);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE, RED);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 1);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, outline);
@@ -32,12 +32,12 @@ int main(int argc, char ** argv)
 	NoGUI::Transform button1Pos = NoGUI::Transform((Vector2){416, 8}, (Vector2){50, 50}, NoGUI::Align(-1, -1));
 	NoGUI::Transform button2Pos = NoGUI::Transform((Vector2){116, 116}, (Vector2){50, 50}, NoGUI::Align(-1, -1));
 	NoGUI::Transform dataPos = NoGUI::Transform((Vector2){window.x - 8, 8}, elemSize, NoGUI::Align(1, -1));
-	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, std::make_shared< NoGUI::CContainer >(), "Test");
-	std::shared_ptr< NoGUI::Element > textSetting = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, val1Pos, std::make_shared< NoGUI::CContainer >(), "TextData");
-	std::shared_ptr< NoGUI::Element > capSetting = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, val2Pos, std::make_shared< NoGUI::CContainer >(), "CapData");
-	std::shared_ptr< NoGUI::Element > textButton = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, button1Pos, std::make_shared< NoGUI::CContainer >(), "TextButton", "set");
-	std::shared_ptr< NoGUI::Element > capButton = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, button2Pos, std::make_shared< NoGUI::CContainer >(), "CapButton", "set");
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, noRect, dataPos, std::make_shared< NoGUI::CContainer >(), "Data");
+	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, "Test", "", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > textSetting = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, val1Pos, "TextData", "", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > capSetting = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, val2Pos, "CapData", "", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > textButton = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, button1Pos, "TextButton", "set", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > capButton = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, button2Pos, "CapButton", "set", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, noRect, dataPos, "Data", "", std::make_shared< NoGUI::CContainer >());
 	
 	centerElem->components->addComponent< NoGUI::CText >(nullptr, font, 20, NoGUI::Align(-1, 0));
 	centerElem->components->addComponent< NoGUI::CInput >(5);

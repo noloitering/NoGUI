@@ -3150,6 +3150,12 @@ std::shared_ptr< nShape > Slider::getSlide()
 	return slide;
 }
 
+const NoGUI::Transform& Slider::getSlideTransform()
+{
+	
+	return slideTransform;
+}
+
 void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
 {
 	slide = slideStyle;
@@ -3157,7 +3163,10 @@ void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
 
 void Slider::setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform)
 {
-	slide = slideStyle;
+	if ( slide )
+	{
+		slide = slideStyle;
+	}
 	slideTransform = transform;
 }
 

@@ -326,7 +326,7 @@ int main(int argc, char ** argv)
 	gui.addListener(eventHandler);
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >((Color){100, 100, 100, 100});
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > slideFill = std::make_shared< NoGUI::Fill >(LIME);
 	std::shared_ptr< NoGUI::Fill > outlineFill = std::make_shared< NoGUI::Fill >(GRAY);
 	std::shared_ptr< NoGUI::Fill > cursorFill = std::make_shared< NoGUI::Fill >(BLUE);

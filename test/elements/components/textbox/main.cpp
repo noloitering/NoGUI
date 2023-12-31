@@ -14,7 +14,7 @@ int main(int argc, char ** argv)
 	SetTargetFPS(60);
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >(GRAY);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(BLUE);
 	std::shared_ptr< NoGUI::Fill > toggleFill = std::make_shared< NoGUI::Fill >(RED);
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(lineFill, 3);
@@ -37,9 +37,9 @@ int main(int argc, char ** argv)
 	NoGUI::Transform topLeftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, topLeft);
 	NoGUI::Transform togglePos = NoGUI::Transform((Vector2){0, elemSize.y - 20.0f}, elemSize, topLeft);
 
-	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, std::make_shared< NoGUI::CContainer >(), "Test", msg);
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, topLeftPos, std::make_shared< NoGUI::CContainer >(), "Tip");
-	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, togglePos, std::make_shared< NoGUI::CContainer >(), "Tip", "WRAP: TRUE");
+	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, topLeftPos, "Tip", "", std::make_shared< NoGUI::CContainer >());
+	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, togglePos, "Tip", "WRAP: TRUE", std::make_shared< NoGUI::CContainer >());
 	
 	centerElem->components->addComponent< NoGUI::CTextBox >(nullptr, font, 20, topLeft);
 	centerElem->components->addComponent< NoGUI::CInput >(centerElem->getInner());

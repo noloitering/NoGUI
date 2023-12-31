@@ -86,7 +86,7 @@ int main(int argc, char ** argv)
 	Vector2 window = {1280, 720};
 	Vector2 elemSize = {100, 50};
 	std::shared_ptr< NoGUI::Fill > elemFill = std::make_shared< NoGUI::Fill >(GRAY, DARKGRAY);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > lineFill = std::make_shared< NoGUI::Fill >(DARKGRAY, RED);
 	std::shared_ptr< NoGUI::Fill > textFill = std::make_shared< NoGUI::Fill >(WHITE);
 	std::shared_ptr< NoGUI::Outline > lines = std::make_shared< NoGUI::Outline >(lineFill, 2);

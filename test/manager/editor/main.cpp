@@ -354,7 +354,7 @@ int main(int argc, char ** argv)
 	std::vector< std::shared_ptr< NoGUI::nShape > > userShapes;
 	
 	// UI Colours
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){1, 1, 1, 1});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > textFill = std::make_shared< NoGUI::Fill >(WHITE);
 	std::shared_ptr< NoGUI::Fill > containerGray = std::make_shared< NoGUI::Fill >((Color){100, 100, 100, 200});
 	std::shared_ptr< NoGUI::Fill > innerGray = std::make_shared< NoGUI::Fill >(GRAY, DARKGRAY);

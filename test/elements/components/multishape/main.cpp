@@ -47,9 +47,9 @@ int main(int argc, char ** argv)
 	centerShapes.shapes.push_back(std::pair< std::shared_ptr< NoGUI::nShape >, NoGUI::Transform >(septagon, bottomT));
 	centerShapes.shapes.push_back(std::pair< std::shared_ptr< NoGUI::nShape >, NoGUI::Transform >(octagon, leftT));
 	
-	std::shared_ptr< NoGUI::Element > rightArrow = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightBaseT, rightArrowComps, "pointRight");
-	std::shared_ptr< NoGUI::Element > leftArrow = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftBaseT, leftArrowComps, "pointLeft");
-	std::shared_ptr< NoGUI::Element > centerShape = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, circle, centerT, centerComps, "spinner");
+	std::shared_ptr< NoGUI::Element > rightArrow = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, rightBaseT, "pointRight", "", rightArrowComps);
+	std::shared_ptr< NoGUI::Element > leftArrow = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, leftBaseT, "pointLeft", "", leftArrowComps);
+	std::shared_ptr< NoGUI::Element > centerShape = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, circle, centerT, "spinner", "", centerComps);
 	elemVec.push_back(rightArrow);
 	elemVec.push_back(leftArrow);
 	elemVec.push_back(centerShape);

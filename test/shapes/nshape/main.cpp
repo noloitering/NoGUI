@@ -24,7 +24,7 @@ int main(int argc, char ** argv)
 	int rotation = 0;
 	std::shared_ptr< NoGUI::Fill > testFill = std::make_shared< NoGUI::Fill >(RAYWHITE);
 	std::shared_ptr< NoGUI::Fill > outlineFill = std::make_shared< NoGUI::Fill >(GRAY);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Outline > testOutline = std::make_shared< NoGUI::Outline >(outlineFill, 10);
 	NoGUI::nShape shapeArray[shapeAmount];
 	NoGUI::nShape tipShape = NoGUI::nShape(4, noFill, testOutline);

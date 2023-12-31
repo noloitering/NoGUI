@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
 	char msg[51];
 	
 	std::shared_ptr< NoGUI::Fill > fill = std::make_shared< NoGUI::Fill >();
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){0, 0, 0, 0});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill);
 	std::shared_ptr< NoGUI::nShape > circle = std::make_shared< NoGUI::nShape >(0, fill);
@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 	
 	std::shared_ptr< NoGUI::Element > topElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, topT);
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, circle, centerT);
-	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, leftT, std::make_shared< NoGUI::CContainer >(), "Tip");
+	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, leftT, "Tip", "", std::make_shared< NoGUI::CContainer >());
 	dataElem->components->addComponent< NoGUI::CText >(nullptr, nullptr, 20, NoGUI::Align(0, -1));
 	
 	// main

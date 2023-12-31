@@ -1,4 +1,4 @@
-test_hover.exe
+test_focus.exe
 Launching with different arguments should display different shapes in the top left, center, and right. As well as dead center, and bottom left, center, and right
 
 CONTROLS:
