@@ -108,11 +108,7 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > cursor = std::make_shared< NoGUI::nShape >(0, cursorFill, outline);
 	
 	NoGUI::Transform centerPos1 = NoGUI::Transform((Vector2){window.x / 2.0f - textSize.x - margin, window.y / 2.0f - (elemSize.y * 2.0f + margin) * 1.5f}, elemSize, NoGUI::Align(0, 0));
-//	NoGUI::Transform centerPos1 = NoGUI::Transform((Vector2){window.x / 2.0f - textSize.x - margin, (elemSize.y * 2.0f + margin) * 1.5f}, elemSize, NoGUI::Align(0, 0));
 	NoGUI::Transform textPos1 = NoGUI::Transform((Vector2){centerPos1.position.x + elemSize.x + margin, centerPos1.position.y}, textSize, NoGUI::Align(-1, 0));
-//	NoGUI::Transform centerPos2 = NoGUI::Transform((Vector2){centerPos1.position.x, centerPos1.position.y + elemSize.y * 2 + margin}, elemSize, NoGUI::Align(0, 0));
-//	NoGUI::Transform textPos2 = NoGUI::Transform((Vector2){textPos1.position.x, centerPos2.position.y}, textSize, NoGUI::Align(-1, 0));
-//	NoGUI::Transform centerPos3 = NoGUI::Transform((Vector2){centerPos2.position.x, centerPos2.position.y + elemSize.y * 2 + margin}, elemSize, NoGUI::Align(0, 0));
 	NoGUI::Transform centerPos3 = NoGUI::Transform((Vector2){centerPos1.position.x, window.y - centerPos1.position.y}, elemSize, NoGUI::Align(0, 0));
 	NoGUI::Transform textPos3 = NoGUI::Transform((Vector2){textPos1.position.x, centerPos3.position.y}, textSize, NoGUI::Align(-1, 0));
 	NoGUI::Transform centerPos2 = NoGUI::Transform((Vector2){centerPos1.position.x, (centerPos1.position.y + centerPos3.position.y) / 2.0f}, elemSize, NoGUI::Align(0, 0));
