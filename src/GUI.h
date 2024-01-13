@@ -202,9 +202,9 @@ namespace NoGUI
 		bool setActive(bool set);
 		
 		template <class C=Element, typename... Args>
-		std::shared_ptr< Element > addElement(Args&&... EArgs)
+		std::shared_ptr< C > addElement(Args&&... EArgs)
 		{
-			auto elem = std::shared_ptr< Element >(new C(total++, std::forward<Args>(EArgs)...));
+			auto elem = std::shared_ptr< C >(new C(total++, std::forward<Args>(EArgs)...));
 			if ( elem->components == nullptr )
 			{
 				std::shared_ptr< CContainer > components = getComponents(elem->getTag());
@@ -237,12 +237,12 @@ namespace NoGUI
 		void setFlow(const Wrap& wrap);
 		
 		template <class C=Element, typename... Args>
-		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Vector2& radius, Args&&... EArgs)
+		std::shared_ptr< C > addElement(std::shared_ptr< nShape > style, const Vector2& radius, Args&&... EArgs)
 		{
 			float increment = 0.0f;
 			Vector2 pos = position;
 			Align alignment = context->origin;
-//			std::shared_ptr< CContainer > components = getComponents(tag);
+			// TODO: check toAdd??
 			std::shared_ptr< Element > lastElement = getElement(size() - 1);
 			if ( style->outline )
 			{
@@ -291,7 +291,7 @@ namespace NoGUI
 				}
 			}
 			Transform transform = Transform(pos, radius, alignment);
-			auto elem = std::shared_ptr< Element >(new C(total++, style, transform, std::forward<Args>(EArgs)...));
+			auto elem = std::shared_ptr< C >(new C(total++, style, transform, std::forward<Args>(EArgs)...));
 			if ( elem->components == nullptr )
 			{
 				std::shared_ptr< CContainer > components = getComponents(elem->getTag());

@@ -3158,12 +3158,15 @@ const NoGUI::Transform& Slider::getSlideTransform()
 
 void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
 {
-	slide = slideStyle;
+	if ( slideStyle )
+	{
+		slide = slideStyle;
+	}
 }
 
 void Slider::setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform)
 {
-	if ( slide )
+	if ( slideStyle )
 	{
 		slide = slideStyle;
 	}
@@ -3176,25 +3179,84 @@ bool Slider::isFocus()
 	focus = Trigger::isFocus();
 	if ( focus )
 	{
-		Vector2 startPoint = pos(NoGUI::Align(-1, -1));
 		Vector2 slideRadius = {0, slideTransform.radius.y};
-		if ( angle == 0 )
+		switch (slideTransform.origin.x)
 		{
-			slideRadius.x = (mousePos.x  - startPoint.x) / 2;
-		}
-		else
-		{
-			Vector2 endPoint = pos(NoGUI::Align(1, -1));
-			Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
-			Vector2 collisionPoint;
-			if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+			case NoGUI::XAlign::LEFT:
 			{
-				slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) / 2;
+				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
+				if ( angle == 0 )
+				{
+					slideRadius.x = (mousePos.x  - startPoint.x) / 2;
+				}
+				else
+				{
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) / 2;
+					}
+				}
+				slideTransform.radius = slideRadius;
+				// reposition slider since multishapes have a center origin
+				slideTransform.repos((Vector2){slideRadius.x, slideTransform.position.y});
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::CENTER:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(0, -1));
+				if ( angle == 0 )
+				{
+					slideRadius.x = (mousePos.x  - startPoint.x);
+					if ( slideRadius.x < 0 )
+					{
+						slideRadius.x *= -1;
+					}
+				}
+				else
+				{
+					startPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, pos(NoGUI::Align(0, -1))));
+					}
+				}
+				slideTransform.radius = slideRadius;
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::RIGHT:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(1, -1));
+				if ( angle == 0 )
+				{
+					slideRadius.x = (startPoint.x - mousePos.x) / 2;
+				}
+				else
+				{
+					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) / 2;
+					}
+				}
+				slideTransform.radius = slideRadius;
+				// reposition slider since multishapes have a center origin
+				slideTransform.repos((Vector2){-slideRadius.x, slideTransform.position.y});
+				
+				break;
 			}
 		}
-		slideTransform.radius = slideRadius;
-		// reposition slider since multishapes have a center origin
-		slideTransform.repos((Vector2){slideRadius.x, slideTransform.position.y});
 	}
 	
 	return focus;
@@ -3218,20 +3280,71 @@ bool Cursorer::isFocus()
 	focus = Trigger::isFocus();
 	if ( focus )
 	{
-		Vector2 startPoint = pos(NoGUI::Align(-1, -1));
-		Vector2 slidePos = {0, slideTransform.radius.y};
-		if ( angle == 0 )
+		Vector2 slidePos = {0, slideTransform.position.y};
+		switch (slideTransform.origin.x)
 		{
-			slidePos.x = (mousePos.x  - startPoint.x);
-		}
-		else
-		{
-			Vector2 endPoint = pos(NoGUI::Align(1, -1));
-			Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
-			Vector2 collisionPoint;
-			if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+			case NoGUI::XAlign::LEFT:
 			{
-				slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
+				if ( angle == 0 )
+				{
+					slidePos.x = (mousePos.x  - startPoint.x);
+				}
+				else
+				{
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+					}
+				}
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::CENTER:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(0, -1));
+				if ( angle == 0 )
+				{
+					slidePos.x = (mousePos.x  - startPoint.x);
+				}
+				else
+				{
+					startPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) - radius.x;
+					}
+				}
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::RIGHT:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(1, -1));
+				if ( angle == 0 )
+				{
+					slidePos.x = (mousePos.x  - startPoint.x);
+				}
+				else
+				{
+					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) * -1;
+					}
+				}
+				
+				break;
 			}
 		}
 		slideTransform.repos((Vector2){slidePos.x, slideTransform.position.y});
