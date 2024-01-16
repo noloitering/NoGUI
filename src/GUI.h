@@ -177,6 +177,20 @@ namespace NoGUI
 		bool isFocus();
 	};
 	
+	class NotchedCursorer : public Cursorer
+	{
+	protected:
+		unsigned int notches = 1;
+	public:
+		NotchedCursorer(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int numNotches=1)
+			: Cursorer(num, style, pos, size, rotation, origin, type, in, c, slideStyle, slideAlign, slideSize) {notches = numNotches;}
+		NotchedCursorer(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int numNotches=1)
+			: Cursorer(num, style, dimensions, type, in, c, slideStyle, slideAlign, slideSize) {notches = numNotches;}
+		bool isFocus();
+		unsigned int getNotches();
+		void setNotches(unsigned int notchNum);
+	};
+	
 	class Page : public CMap // Container for Elements
 	{
 	protected:

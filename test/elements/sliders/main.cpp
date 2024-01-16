@@ -18,33 +18,38 @@ class EventHandler : public NoGUI::Listener
 					slider->setFocus(true);
 				}
 			}
-			else if ( elem == manager.getPage(1)->getElements("Input").back() )
+			else if ( elem == manager.getPage(1)->getElements("Input")[1] )
 			{
 				for ( std::shared_ptr< NoGUI::Element > slider : manager.getPage()->getElements() )
 				{
 					slider->angle = TextToInteger(elem->getInner());
 				}
 			}
+			else if ( elem == manager.getPage(1)->getElements("Input")[2] )
+			{
+				NoGUI::NotchedCursorer* slider = dynamic_cast< NoGUI::NotchedCursorer* >(manager.getPage()->getElements("Slider").back().get());
+				if ( slider )
+				{
+					slider->setNotches((unsigned int)TextToInteger(elem->getInner()));
+				}
+			}
 		}
 		else if ( TextIsEqual(elem->getTag(), "Slider") )
 		{
-//			if ( event == NoGUI::Event::ONFOCUS || event == NoGUI::Event::FOCUSING )
-//			{
-				std::shared_ptr< NoGUI::Element > textBox = manager.getPage()->getElement(elem->getId() + 1);
-				float val = TextToInteger(textBox->getInner());
-				if ( TextIsEqual(elem->getInner(), "Slider") )
-				{
-					NoGUI::Slider* slider = dynamic_cast< NoGUI::Slider* >(elem.get());
-					val = slider->getSlideTransform().radius.x * 2 * multiplier;
-				}
-				else if ( TextIsEqual(elem->getInner(), "Cursorer") )
-				{
-					NoGUI::Cursorer* cursorer = dynamic_cast< NoGUI::Cursorer* >(elem.get());
-					val = cursorer->getSlideTransform().position.x * multiplier;
-				}
-				
-				textBox->setInner(TextFormat("%f", val));
-//			}
+			std::shared_ptr< NoGUI::Element > textBox = manager.getPage()->getElement(elem->getId() + 1);
+			float val = TextToInteger(textBox->getInner());
+			if ( TextIsEqual(elem->getInner(), "Slider") )
+			{
+				NoGUI::Slider* slider = dynamic_cast< NoGUI::Slider* >(elem.get());
+				val = slider->getSlideTransform().radius.x * 2 * multiplier;
+			}
+			else if ( TextIsEqual(elem->getInner(), "Cursorer") )
+			{
+				NoGUI::Cursorer* cursorer = dynamic_cast< NoGUI::Cursorer* >(elem.get());
+				val = cursorer->getSlideTransform().position.x * multiplier;
+			}
+
+			textBox->setInner(TextFormat("%f", val));
 		}
 		else if ( TextIsEqual(elem->getTag(), "DropDown") )
 		{
@@ -101,6 +106,7 @@ int main(int argc, char ** argv)
 	
 	std::shared_ptr< NoGUI::Outline > outline = std::make_shared< NoGUI::Outline >(outlineFill, 3);
 	std::shared_ptr< NoGUI::nShape > bar = std::make_shared< NoGUI::nShape >(4, noFill, outline);
+	std::shared_ptr< NoGUI::nShape > filledBar = std::make_shared< NoGUI::nShape >(4, textFill, outline);
 	std::shared_ptr< NoGUI::nShape > label = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< NoGUI::nShape > box = std::make_shared< NoGUI::nShape >(4, cursorFill);
 	std::shared_ptr< NoGUI::nShape > slide = std::make_shared< NoGUI::nShape >(4, slideFill);
@@ -121,6 +127,8 @@ int main(int argc, char ** argv)
 	NoGUI::Transform inputPos2 = NoGUI::Transform((Vector2){controlCenter.x, labelPos2.position.y}, textSize, NoGUI::Align(-1, -1));
 	NoGUI::Transform labelPos3 = NoGUI::Transform((Vector2){labelPos1.position.x, labelPos2.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
 	NoGUI::Transform inputPos3 = NoGUI::Transform((Vector2){controlCenter.x, labelPos3.position.y}, textSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform labelPos4 = NoGUI::Transform((Vector2){labelPos1.position.x, labelPos3.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
+	NoGUI::Transform inputPos4 = NoGUI::Transform((Vector2){controlCenter.x, labelPos4.position.y}, textSize, NoGUI::Align(-1, -1));
 	
 	std::shared_ptr< NoGUI::CContainer > textBoxComps = std::make_shared< NoGUI::CContainer >();
 	textBoxComps->addComponent< NoGUI::CText >(textFill);
@@ -134,7 +142,7 @@ int main(int argc, char ** argv)
 	manager.getPage()->addElement< NoGUI::Element >(box, textPos1, "Value", "0");
 	manager.getPage()->addElement< NoGUI::Cursorer >(line, centerPos2, "Slider", "Cursorer");
 	manager.getPage()->addElement< NoGUI::Element >(box, textPos2, "Value", "0");
-	manager.getPage()->addElement< NoGUI::Cursorer >(line, centerPos3, "Slider", "Cursorer");
+	manager.getPage()->addElement< NoGUI::NotchedCursorer >(line, centerPos3, "Slider", "Cursorer", nullptr, nullptr, NoGUI::Align(-1, 0), (Vector2){10.0f, 10.0f}, 5);
 	manager.getPage()->addElement< NoGUI::Element >(box, textPos3, "Value", "0");
 	manager.addPage(true);
 	manager.getPage(1)->addComponents("Label", textComps);
@@ -142,19 +150,21 @@ int main(int argc, char ** argv)
 	manager.getPage(1)->addComponents("Value", textBoxComps);
 	manager.getPage(1)->addComponents("Input", inputComps);
 	manager.getPage(1)->addElement< NoGUI::Element >(bar, controlsPos, "Container", "");
-	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos1, "Label", "Multipler:");
-	manager.getPage(1)->addElement< NoGUI::Hoverable >(box, inputPos1, "Input", "1.0");
-	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos3, "Label", "Alignment:");
-	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos2, "Label", "Angle:");
-	manager.getPage(1)->addElement< NoGUI::Hoverable >(box, inputPos2, "Input", "0");
-	std::shared_ptr< NoGUI::Button > alignMenuElem = manager.getPage(1)->addElement< NoGUI::Button >(bar, inputPos3, "DropDown", "LEFT");
+	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos2, "Label", "Multipler:");
+	manager.getPage(1)->addElement< NoGUI::Hoverable >(box, inputPos2, "Input", "1.0");
+	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos3, "Label", "Angle:");
+	manager.getPage(1)->addElement< NoGUI::Hoverable >(box, inputPos3, "Input", "0");
+	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos4, "Label", "Notch Count:");
+	manager.getPage(1)->addElement< NoGUI::Hoverable >(box, inputPos4, "Input", "5");
+	manager.getPage(1)->addElement< NoGUI::Element >(label, labelPos1, "Label", "Alignment:");
+	std::shared_ptr< NoGUI::Button > alignMenuElem = manager.getPage(1)->addElement< NoGUI::Button >(filledBar, inputPos1, "DropDown", "LEFT");
 	std::shared_ptr< NoGUI::ContextPage > alignMenu = std::make_shared< NoGUI::ContextPage >(alignMenuElem, alignMenuElem->pos(NoGUI::Align(0, 1)), false);
 	alignMenu->addComponents("Option", textComps);
-	alignMenu->addElement< NoGUI::Button >(bar, textSize, "Option", "LEFT");
+	alignMenu->addElement< NoGUI::Button >(filledBar, textSize, "Option", "LEFT");
 	alignMenu->update();
-	alignMenu->addElement< NoGUI::Button >(bar, textSize, "Option", "RIGHT");
+	alignMenu->addElement< NoGUI::Button >(filledBar, textSize, "Option", "RIGHT");
 	alignMenu->update();
-	alignMenu->addElement< NoGUI::Button >(bar, textSize, "Option", "CENTER");
+	alignMenu->addElement< NoGUI::Button >(filledBar, textSize, "Option", "CENTER");
 	alignMenu->update();
 	manager.addPage(alignMenu);
 	

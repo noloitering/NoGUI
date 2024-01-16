@@ -3353,6 +3353,120 @@ bool Cursorer::isFocus()
 	return focus;
 }
 
+bool NotchedCursorer::isFocus()
+{
+	Vector2 mousePos = GetMousePosition();
+	focus = Trigger::isFocus();
+	if ( focus )
+	{
+		float notchWidth = width() / (notches);
+		switch (slideTransform.origin.x)
+		{
+			case NoGUI::XAlign::LEFT:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
+				float mouseOffset = mousePos.x  - startPoint.x;
+				if ( angle != 0 )
+				{
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						mouseOffset = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+					}
+				}
+				for (unsigned int i=0; i < notches + 1; i++)
+				{
+					float notchPosition = i * notchWidth;
+					if ( mouseOffset < notchPosition + slideTransform.radius.x && mouseOffset > notchPosition - slideTransform.radius.x )
+					{
+						slideTransform.repos((Vector2){notchPosition, slideTransform.position.y});
+					
+						break;
+					}
+				}
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::CENTER:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(0, -1));
+				notchWidth /= 2;
+				float mouseOffset = mousePos.x  - startPoint.x;
+				if ( angle != 0 )
+				{
+					startPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						mouseOffset = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) - radius.x;
+					}
+				}
+				for (int i=(int)notches*-1; i < (int)notches + 1; i++)
+				{
+					float notchPosition = i * notchWidth;
+					if ( mouseOffset < notchPosition + slideTransform.radius.x && mouseOffset > notchPosition - slideTransform.radius.x )
+					{
+						slideTransform.repos((Vector2){notchPosition, slideTransform.position.y});
+						
+						break;
+					}
+				}
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::RIGHT:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(1, -1));
+				float mouseOffset = mousePos.x  - startPoint.x;
+				if ( angle != 0 )
+				{
+					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						mouseOffset = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) * -1;
+					}
+				}
+				for (unsigned int i=0; i < notches + 1; i++)
+				{
+					float notchPosition = i * notchWidth * -1;
+					if ( mouseOffset < notchPosition + slideTransform.radius.x && mouseOffset > notchPosition - slideTransform.radius.x )
+					{
+						slideTransform.repos((Vector2){notchPosition, slideTransform.position.y});
+						
+						break;
+					}
+				}
+				
+				break;
+			}
+		}
+	}
+	
+	return focus;
+}
+
+unsigned int NotchedCursorer::getNotches()
+{
+	
+	return notches;
+}
+
+void NotchedCursorer::setNotches(unsigned int notchNum)
+{
+	if ( notchNum > 0 )
+	{
+		notches = notchNum;
+	}
+}
+
 void Page::update()
 {
 	std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > new_map;
