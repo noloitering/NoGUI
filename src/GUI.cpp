@@ -2958,7 +2958,10 @@ void NoGUI::Transform::reorient(float degrees, const Vector2& originPoint)
 
 void Element::draw()
 {
-	DrawElement(this);
+	if ( visible )
+	{
+		DrawElement(this);
+	}
 }
 
 std::shared_ptr< nShape > Element::getShape()
@@ -2974,9 +2977,27 @@ std::shared_ptr< nShape > Element::setShape(std::shared_ptr< nShape > set)
 	return shape;
 }
 
+void Element::disable()
+{
+	setVisible(false);
+	setActive(false);
+}
+
+void Element::enable()
+{
+	setVisible(true);
+	setActive(true);
+}
+
 void Element::kill()
 {
 	alive = false;
+}
+
+void Element::setEnabled(bool set)
+{
+	setVisible(set);
+	setActive(set);
 }
 
 bool Element::getAlive()
@@ -3042,6 +3063,12 @@ bool Element::getFocus()
 	return focus;
 }
 
+bool Element::getVisible()
+{
+	
+	return visible;
+}
+
 bool Element::isFocus()
 {
 	
@@ -3055,12 +3082,18 @@ bool Element::setActive(bool set)
 	return active;
 }
 
-
 bool Element::setFocus(bool set)
 {
 	focus = set;
 	
 	return focus;
+}
+
+bool Element::setVisible(bool set)
+{
+	visible = set;
+	
+	return visible;
 }
 
 bool Element::getHover()
@@ -3505,11 +3538,42 @@ bool Page::getActive()
 	return active;
 }
 
+bool Page::getVisible()
+{
+	
+	return visible;
+}
+
 bool Page::setActive(bool set)
 {
 	active = set;
 	
 	return active;
+}
+
+bool Page::setVisible(bool set)
+{
+	visible = set;
+	
+	return visible;
+}
+
+void Page::disable()
+{	
+	setVisible(false);
+	setActive(false);
+}
+
+void Page::enable()
+{
+	setVisible(true);
+	setActive(true);
+}
+
+void Page::setEnabled(bool set)
+{
+	setVisible(set);
+	setActive(set);
 }
 
 size_t Page::size()
@@ -3694,9 +3758,9 @@ std::shared_ptr< Page > Manager::addPage(std::shared_ptr< Page > pg)
 	return pages.back();
 }
 
-std::shared_ptr< Page > Manager::addPage(bool active)
+std::shared_ptr< Page > Manager::addPage(bool enabled)
 {
-	std::shared_ptr< Page > pg = std::shared_ptr< Page >(new Page(active));
+	std::shared_ptr< Page > pg = std::shared_ptr< Page >(new Page(enabled));
 	
 	return addPage(pg);
 }
@@ -3752,50 +3816,66 @@ void Manager::update()
 			std::vector< std::shared_ptr< NoGUI::Element > > elements = page->getElements();
 			for (auto elemIt=elements.rbegin(); elemIt != elements.rend(); elemIt++)
 			{
-				//elem->isHover();
 				std::shared_ptr< Element > elem = *(elemIt);
-//				bool prevHover = elem->getHover();
-				bool prevFocus = elem->getFocus();
-				elem->isHover();
-				elem->isFocus();
-				int event = 0;
-				if ( !prevFocus )
+				if ( elem->getActive() )
 				{
-					if ( elem->getFocus() )
+					bool prevHover = elem->getHover();
+					bool prevFocus = elem->getFocus();
+					elem->isHover();
+					elem->isFocus();
+					int hoverEvent = 0;
+					int focusEvent = 0;
+					if ( !prevHover )
 					{
-						if ( !onFocus )
+						if ( elem->getHover() )
 						{
-							event = ONFOCUS;
-							onFocus = true;
+							hoverEvent = ONHOVER;
 						}
-					}
-				}
-				else
-				{
-					if ( elem->getFocus() )
-					{
-						event = FOCUSING;
 					}
 					else
 					{
-						event = OFFFOCUS;
+						if ( elem->getHover() )
+						{
+							hoverEvent = HOVERING;
+						}
+						else
+						{
+							hoverEvent = OFFHOVER;
+						}
 					}
-				}
-				if ( event )
-				{
-					notify(elem, static_cast<Event>(event));
+					if ( !prevFocus )
+					{
+						if ( elem->getFocus() )
+						{
+							focusEvent = ONFOCUS;
+						}
+					}
+					else
+					{
+						if ( elem->getFocus() )
+						{
+							focusEvent = FOCUSING;
+						}
+						else
+						{
+							focusEvent = OFFFOCUS;
+						}
+					}
+					if ( hoverEvent || focusEvent )
+					{
+						notify(elem, static_cast< HoverEvent >(hoverEvent), static_cast< FocusEvent >(focusEvent));
+					}
 				}
 			}
 		}
 	}
-	onFocus = false;
 }
 
 void Manager::render()
 {
 	for (auto page : pages)
 	{
-		if ( page->getActive() )
+		if ( page->getVisible() )
 		{
 			for (auto elem : page->getElements())
 			{
@@ -3807,177 +3887,192 @@ void Manager::render()
 
 void Manager::setActive(size_t index)
 {
-	for (auto page : pages)
+	for (size_t i=0; i < size(); i++)
 	{
-		page->setActive(false);
+		pages.at(i)->setActive(i == index);
 	}
-	pages.at(index)->setActive(true);
 }
 
-void ManagerGrid::update()
+void Manager::setEnabled(size_t index)
 {
-	for (auto pageIt=pages.rbegin(); pageIt != pages.rend(); pageIt++)
+	for (size_t i=0; i < size(); i++)
 	{
-		std::shared_ptr< Page > page = *(pageIt);
-		page->update();
-		if ( page->getActive() )
-		{
-			std::vector< std::shared_ptr< NoGUI::Element > > elements = page->getElements();
-			for (auto elemIt=elements.rbegin(); elemIt != elements.rend(); elemIt++)
-			{
-				//elem->isHover();
-				std::shared_ptr< Element > elem = *(elemIt);
-				Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
-//				bool prevHover = elem->getHover();
-				bool prevFocus = elem->getFocus();
-//				elem->isHover();
-				Vector2 mousePos = GetMousePosition();
-				elem->hover = CheckCollisionPointShape(mousePos, elem->getShape()->n, transform);
-				if ( elem->components )
-				{
-					CMultiShape& multiShapeComp = elem->components->getComponent< CMultiShape >();
-					NoGUI::CInput& inputComp = elem->components->getComponent< NoGUI::CInput >();
-					if ( !elem->getHover() )
-					{
-						if ( multiShapeComp.active && multiShapeComp.collision )
-						{
-							for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
-							{
-								Vector2 center = elem->pos(shape.second.origin);
-								Vector2 offset = shape.second.pos();
-								float angle = shape.second.angle;
-								if ( elem->rotation() != 0 )
-								{
-									offset = Vector2Rotate(offset, elem->rotation() * DEG2RAD);
-									angle += elem->rotation();
-								}
-								center.x += offset.x;
-								center.y += offset.y;
-								NoGUI::Transform bbox = NoGUI::Transform(Vector2Multiply(center, cellSize), Vector2Multiply(shape.second.radius, cellSize), NoGUI::Align(0, 0), angle);
-								if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
-								{
-									elem->hover = true;
+		pages.at(i)->setActive(i == index);
+	}
+}
+
+void Manager::setVisible(size_t index)
+{
+	for (size_t i=0; i < size(); i++)
+	{
+		pages.at(i)->setActive(i == index);
+	}
+}
+
+// void ManagerGrid::update()
+// {
+	// for (auto pageIt=pages.rbegin(); pageIt != pages.rend(); pageIt++)
+	// {
+		// std::shared_ptr< Page > page = *(pageIt);
+		// page->update();
+		// if ( page->getActive() )
+		// {
+			// std::vector< std::shared_ptr< NoGUI::Element > > elements = page->getElements();
+			// for (auto elemIt=elements.rbegin(); elemIt != elements.rend(); elemIt++)
+			// {
+				// //elem->isHover();
+				// std::shared_ptr< Element > elem = *(elemIt);
+				// Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
+// //				bool prevHover = elem->getHover();
+				// bool prevFocus = elem->getFocus();
+// //				elem->isHover();
+				// Vector2 mousePos = GetMousePosition();
+				// elem->hover = CheckCollisionPointShape(mousePos, elem->getShape()->n, transform);
+				// if ( elem->components )
+				// {
+					// CMultiShape& multiShapeComp = elem->components->getComponent< CMultiShape >();
+					// NoGUI::CInput& inputComp = elem->components->getComponent< NoGUI::CInput >();
+					// if ( !elem->getHover() )
+					// {
+						// if ( multiShapeComp.active && multiShapeComp.collision )
+						// {
+							// for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShapeComp.shapes )
+							// {
+								// Vector2 center = elem->pos(shape.second.origin);
+								// Vector2 offset = shape.second.pos();
+								// float angle = shape.second.angle;
+								// if ( elem->rotation() != 0 )
+								// {
+									// offset = Vector2Rotate(offset, elem->rotation() * DEG2RAD);
+									// angle += elem->rotation();
+								// }
+								// center.x += offset.x;
+								// center.y += offset.y;
+								// NoGUI::Transform bbox = NoGUI::Transform(Vector2Multiply(center, cellSize), Vector2Multiply(shape.second.radius, cellSize), NoGUI::Align(0, 0), angle);
+								// if ( CheckCollisionPointShape(mousePos, shape.first->n, bbox) )
+								// {
+									// elem->hover = true;
 				
-									break;
-								}
-							}
-						}
-					}
-					if ( elem->getHover() && inputComp.active )
-					{
-						collectInput(elem.get());
-					}
-				}
-				elem->isFocus();
-				int event = 0;
-				if ( !prevFocus )
-				{
-					if ( elem->getFocus() )
-					{
-						if ( !onFocus )
-						{
-							event = ONFOCUS;
-							onFocus = true;
-						}
-					}
-				}
-				else
-				{
-					if ( elem->getFocus() )
-					{
-						event = FOCUSING;
-					}
-					else
-					{
-						event = OFFFOCUS;
-					}
-				}
-				if ( event )
-				{
-					notify(elem, static_cast<Event>(event));
-				}
-			}
-		}
-	}
-	onFocus = false;
-}
+									// break;
+								// }
+							// }
+						// }
+					// }
+					// if ( elem->getHover() && inputComp.active )
+					// {
+						// collectInput(elem.get());
+					// }
+				// }
+				// elem->isFocus();
+				// int event = 0;
+				// if ( !prevFocus )
+				// {
+					// if ( elem->getFocus() )
+					// {
+						// if ( !onFocus )
+						// {
+							// event = ONFOCUS;
+							// onFocus = true;
+						// }
+					// }
+				// }
+				// else
+				// {
+					// if ( elem->getFocus() )
+					// {
+						// event = FOCUSING;
+					// }
+					// else
+					// {
+						// event = OFFFOCUS;
+					// }
+				// }
+				// if ( event )
+				// {
+					// notify(elem, static_cast<Event>(event));
+				// }
+			// }
+		// }
+	// }
+	// onFocus = false;
+// }
 
-void ManagerGrid::render()
-{
-	for (auto page : pages)
-	{
-		if ( page->getActive() )
-		{
-			for (auto elem : page->getElements())
-			{
-				Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
-				std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
-				//DrawElement(transform, shape, elem->getInner(), elem->components, elem->getHover());
-				// TODO: the following is a slower but cleaner way of drawing the Element. It can be optimized.
-				DrawShapeFill(shape->n, shape->fill, transform, elem->getHover());
-				if ( elem->components )
-				{
-					// transforms in the multishape component need to follow the grid sizing
-					if ( elem->components->getComponent< CMultiShape >().active )
-					{
-						CMultiShape& multiShape = elem->components->getComponent< CMultiShape >();
-						multiShape.active = false; // manually draw the MultiShape Component
-						DrawComponents(elem->components->getComponents(), elem->getShape(), transform, elem->getInner(), elem->getHover());
-						for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShape.shapes )
-						{
-							Transform shapeTransform = shape.second;
-							shapeTransform.position = Vector2Multiply(shapeTransform.position, cellSize); // grid scaling
-							shapeTransform.radius = Vector2Multiply(shapeTransform.radius, cellSize); // grid scaling
-							Vector2 center = transform.pos(shapeTransform.origin);
-							Vector2 offset = shapeTransform.pos();
-							float angle = shapeTransform.angle;
-							if ( transform.angle != 0 )
-							{
-								offset = Vector2Rotate(offset, transform.angle * DEG2RAD);
-								angle += transform.angle;
-							}
-							center.x += offset.x;
-							center.y += offset.y;
+// void ManagerGrid::render()
+// {
+	// for (auto page : pages)
+	// {
+		// if ( page->getActive() )
+		// {
+			// for (auto elem : page->getElements())
+			// {
+				// Transform transform = Transform(Vector2Multiply(elem->pos(), cellSize), Vector2Multiply(elem->radius, cellSize), elem->origin, elem->angle);
+				// std::shared_ptr< NoGUI::nShape > shape = elem->getShape();
+				// //DrawElement(transform, shape, elem->getInner(), elem->components, elem->getHover());
+				// // TODO: the following is a slower but cleaner way of drawing the Element. It can be optimized.
+				// DrawShapeFill(shape->n, shape->fill, transform, elem->getHover());
+				// if ( elem->components )
+				// {
+					// // transforms in the multishape component need to follow the grid sizing
+					// if ( elem->components->getComponent< CMultiShape >().active )
+					// {
+						// CMultiShape& multiShape = elem->components->getComponent< CMultiShape >();
+						// multiShape.active = false; // manually draw the MultiShape Component
+						// DrawComponents(elem->components->getComponents(), elem->getShape(), transform, elem->getInner(), elem->getHover());
+						// for ( std::pair< std::shared_ptr< nShape >, Transform > shape : multiShape.shapes )
+						// {
+							// Transform shapeTransform = shape.second;
+							// shapeTransform.position = Vector2Multiply(shapeTransform.position, cellSize); // grid scaling
+							// shapeTransform.radius = Vector2Multiply(shapeTransform.radius, cellSize); // grid scaling
+							// Vector2 center = transform.pos(shapeTransform.origin);
+							// Vector2 offset = shapeTransform.pos();
+							// float angle = shapeTransform.angle;
+							// if ( transform.angle != 0 )
+							// {
+								// offset = Vector2Rotate(offset, transform.angle * DEG2RAD);
+								// angle += transform.angle;
+							// }
+							// center.x += offset.x;
+							// center.y += offset.y;
 							
-							DrawShape(*(shape.first), center, shapeTransform.radius, (Vector2){0, 0}, angle, elem->getHover());
-						}
-						multiShape.active = true;
-					}
-					else
-					{
-						DrawComponents(elem->components->getComponents(), elem->getShape(), transform, elem->getInner(), elem->getHover());
-					}
-				}
-				DrawShapeOutline(shape->n, shape->outline, transform, elem->getHover());
-			}
-		}
-	}
-}
+							// DrawShape(*(shape.first), center, shapeTransform.radius, (Vector2){0, 0}, angle, elem->getHover());
+						// }
+						// multiShape.active = true;
+					// }
+					// else
+					// {
+						// DrawComponents(elem->components->getComponents(), elem->getShape(), transform, elem->getInner(), elem->getHover());
+					// }
+				// }
+				// DrawShapeOutline(shape->n, shape->outline, transform, elem->getHover());
+			// }
+		// }
+	// }
+// }
 
-void ManagerGrid::drawCells(const Color& col)
-{
-	for (float x=cellSize.x; x < GetScreenWidth(); x+=cellSize.x)
-	{
-		DrawLine(x, 0, x, GetScreenHeight(), col);
-	}
-	for (float y=cellSize.y; y < GetScreenHeight(); y+=cellSize.y)
-	{
-		DrawLine(0, y, GetScreenWidth(), y, col);
-	}
-}
+// void ManagerGrid::drawCells(const Color& col)
+// {
+	// for (float x=cellSize.x; x < GetScreenWidth(); x+=cellSize.x)
+	// {
+		// DrawLine(x, 0, x, GetScreenHeight(), col);
+	// }
+	// for (float y=cellSize.y; y < GetScreenHeight(); y+=cellSize.y)
+	// {
+		// DrawLine(0, y, GetScreenWidth(), y, col);
+	// }
+// }
 
-Vector2 ManagerGrid::getCellSize()
-{
+// Vector2 ManagerGrid::getCellSize()
+// {
 	
-	return cellSize;
-}
+	// return cellSize;
+// }
 
-void ManagerGrid::setCellSize(float newSize)
-{
-	cellSize = (Vector2){newSize, newSize};
-}
+// void ManagerGrid::setCellSize(float newSize)
+// {
+	// cellSize = (Vector2){newSize, newSize};
+// }
 
-void ManagerGrid::setCellSize(float x, float y)
-{
-	cellSize = (Vector2){x, y};
-}
+// void ManagerGrid::setCellSize(float x, float y)
+// {
+	// cellSize = (Vector2){x, y};
+// }

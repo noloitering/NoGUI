@@ -42,6 +42,7 @@ namespace NoGUI
 		bool alive = true; // to be or not to be
 		bool focus = false; // programmable state
 		bool hover = false; // mouse hover
+		bool visible = true; // render switch
 		std::shared_ptr< nShape > shape;
 	public:
 		Element(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr)
@@ -53,13 +54,18 @@ namespace NoGUI
 		std::shared_ptr< CContainer > components;
 		std::shared_ptr< nShape > getShape();
 		std::shared_ptr< nShape > setShape(std::shared_ptr< nShape > set);
+		void disable();
+		void enable();
+		void setEnabled(bool set);
 		bool getActive();
+		bool getAlive();
 		bool getFocus();
 		bool getHover();
-		bool getAlive();
+		bool getVisible();
 		bool isHover();
 		bool setActive(bool set);
 		bool setFocus(bool set);
+		bool setVisible(bool set);
 		void kill();
 	};
 	
@@ -198,22 +204,28 @@ namespace NoGUI
 		std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > toAdd;
 		size_t total = 0; // total amount of elements ever created
 		bool active = true;
+		bool visible = true;
 	public:
 		Page(bool init=true)
-			: active(init) {}
+			: active(init), visible(init) {}
 		Page(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool init=true)
 			: CMap(comps), active(init) {}
 		std::map< const NoMAD::ObjTag, std::vector< std::shared_ptr< Element > > > getBody();
 		std::shared_ptr< Element > getElement(size_t id);
 		std::vector< std::shared_ptr< Element > > getElements(const char* tag);
 		std::vector< std::shared_ptr< Element > > getElements();
+		void clearElements();
+		void disable();
+		void enable();
+		void setEnabled(bool set);
 		void removeElement(size_t id);
 		void removeElements(const char* tag);
-		void clearElements();
 		void update();
 		size_t size();
 		bool getActive();
+		bool getVisible();
 		bool setActive(bool set);
+		bool setVisible(bool set);
 		
 		template <class C=Element, typename... Args>
 		std::shared_ptr< C > addElement(Args&&... EArgs)
@@ -323,10 +335,9 @@ namespace NoGUI
 	
 	class Manager : public Notifier // Container for Pages
 	{
-	friend class ManagerGrid;
+//	friend class ManagerGrid;
 	private:
 		std::vector< std::shared_ptr< Page > > pages;
-		bool onFocus = false;
 	public:
 		Manager(bool withPg=true)
 		{
@@ -344,7 +355,7 @@ namespace NoGUI
 		virtual void render();
 		virtual void update();
 //		std::shared_ptr< Element > addElement(std::shared_ptr< nShape > style, const Transform& dimensions, const char* tag="Default", const char* inner="", size_t pageIndex=0);
-		std::shared_ptr< Page > addPage(bool active=false);
+		std::shared_ptr< Page > addPage(bool enabled=false);
 		std::shared_ptr< Page > addPage(std::shared_ptr< Page > pg);
 		std::shared_ptr< Page > addPage(std::map< const NoMAD::ObjTag, std::shared_ptr< CContainer > > comps, bool active=false);
 		std::shared_ptr< Page > getPage(size_t pageIndex=0);
@@ -354,26 +365,28 @@ namespace NoGUI
 		void removePage(size_t pageIndex);
 		void clear();
 		void setActive(size_t index);
+		void setEnabled(size_t index);
+		void setVisible(size_t index);
 	};
 	
-	class ManagerGrid : public Manager
-	{
-	private:
-		Vector2 cellSize = {16, 16};
-	public:
-		ManagerGrid(bool withPg=true, float cellX=16, float cellY=16)
-			: Manager(withPg) {cellSize.x = cellX; cellSize.y = cellY;}
-		ManagerGrid(std::shared_ptr< Page > pg, float cellX=16, float cellY=16)
-			: Manager(pg) {cellSize.x = cellX; cellSize.y = cellY;}
-		ManagerGrid(std::vector< std::shared_ptr< Page > > pgs, float cell=16)
-			: Manager(pgs) {cellSize.x = cell; cellSize.y = cell;}
-		void update();
-		void render();
-		void drawCells(const Color& col=GRAY);
-		void setCellSize(float newSize);
-		void setCellSize(float x, float y);
-		Vector2 getCellSize();
-	};
+	// class ManagerGrid : public Manager
+	// {
+	// private:
+		// Vector2 cellSize = {16, 16};
+	// public:
+		// ManagerGrid(bool withPg=true, float cellX=16, float cellY=16)
+			// : Manager(withPg) {cellSize.x = cellX; cellSize.y = cellY;}
+		// ManagerGrid(std::shared_ptr< Page > pg, float cellX=16, float cellY=16)
+			// : Manager(pg) {cellSize.x = cellX; cellSize.y = cellY;}
+		// ManagerGrid(std::vector< std::shared_ptr< Page > > pgs, float cell=16)
+			// : Manager(pgs) {cellSize.x = cell; cellSize.y = cell;}
+		// void update();
+		// void render();
+		// void drawCells(const Color& col=GRAY);
+		// void setCellSize(float newSize);
+		// void setCellSize(float x, float y);
+		// Vector2 getCellSize();
+	// };
 	
 	// helper functions
 	std::vector< std::tuple< const char*, float, unsigned int > > WrapText(const char* txt, const Font& font, float fontSize, float spacing, const NoGUI::Transform& area);

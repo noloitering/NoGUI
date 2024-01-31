@@ -5,7 +5,7 @@ float multiplier = 1.0f;
 
 class EventHandler : public NoGUI::Listener
 {
-	void onNotify(std::shared_ptr< NoGUI::Element > elem, NoGUI::Event event)
+	void onNotify(std::shared_ptr< NoGUI::Element > elem, NoGUI::HoverEvent hevent, NoGUI::FocusEvent fevent)
 	{
 		if ( TextIsEqual(elem->getTag(), "Input") )
 		{
@@ -53,16 +53,33 @@ class EventHandler : public NoGUI::Listener
 		}
 		else if ( TextIsEqual(elem->getTag(), "DropDown") )
 		{
-			if ( event == NoGUI::Event::ONFOCUS )
+			std::shared_ptr< NoGUI::Page > contextMenu = manager.getPage(2);
+			if ( fevent == NoGUI::FocusEvent::ONFOCUS )
 			{
-				manager.getPage(2)->setActive(!manager.getPage(2)->getActive());
+				contextMenu->setEnabled(!contextMenu->getActive());
+			}
+			if ( hevent == NoGUI::HoverEvent::OFFHOVER )
+			{
+				bool enable = false;
+				for (std::shared_ptr< NoGUI::Element > elem : contextMenu->getElements())
+				{
+					if ( elem->isHover() )
+					{
+						enable = true;
+						
+						break;
+					}
+				}
+				manager.getPage(2)->setEnabled(enable);
 			}
 		}
 		else if ( TextIsEqual(elem->getTag(), "Option") )
 		{
-			if ( event == NoGUI::Event::ONFOCUS )
+			NoGUI::ContextPage* options = dynamic_cast< NoGUI::ContextPage* >(manager.getPage(2).get());
+			std::shared_ptr< NoGUI::Element > context = options->getContext();
+			if ( fevent == NoGUI::FocusEvent::ONFOCUS )
 			{
-				manager.getPage(2)->setActive(false);
+				manager.getPage(2)->setEnabled(false);
 				manager.getPage(1)->getElements("DropDown").front()->setInner(elem->getInner());
 				for (std::shared_ptr< NoGUI::Element > slider : manager.getPage()->getElements("Slider"))
 				{
@@ -83,6 +100,27 @@ class EventHandler : public NoGUI::Listener
 					sliderCast->setSlide(nullptr, slideTransform);
 					sliderCast->setFocus(true);
 				}
+			}
+			
+			if ( hevent == NoGUI::HoverEvent::OFFHOVER )
+			{
+				bool enable = context->isHover();
+				if ( enable == false )
+				{
+					std::vector< std::shared_ptr< NoGUI::Element > > optionElems = options->getElements();
+					NoGUI::Transform collisionArea = NoGUI::Transform(*optionElems.front().get());
+					int shapeSides = optionElems.front()->getShape()->n;
+					for (size_t i=1; i < optionElems.size(); i++)
+					{
+						collisionArea.radius.y += (optionElems[i]->getShape()->outline) ? optionElems[i]->radius.y + optionElems[i]->getShape()->outline->thick : optionElems[i]->radius.y;
+					}
+					if ( optionElems.back()->getShape()->outline )
+					{
+						collisionArea.radius.y -= optionElems.back()->getShape()->outline->thick * 2;
+					}
+					enable = CheckCollisionPointShape(GetMousePosition(), shapeSides, collisionArea);
+				}
+				options->setEnabled(enable);
 			}
 		}
 	}

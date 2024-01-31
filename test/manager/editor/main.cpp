@@ -192,7 +192,7 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	if ( coloursButton->getFocus() )
 	{
 		// display user colours
-		colpg->setActive(true);
+		colpg->setEnabled(true);
 		// position buttons
 		if ( shapesButton->getFocus() || elementsButton->getFocus() )
 		{
@@ -205,13 +205,13 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	}
 	else
 	{
-		colpg->setActive(false);
+		colpg->setEnabled(false);
 		shapesButton->position.y = coloursButton->pos(NoGUI::Align(0, 1)).y + coloursButton->getShape()->outline->thick;
 	}
 	if ( shapesButton->getFocus() )
 	{
 		// display user shapes
-		shapepg->setActive(true);
+		shapepg->setEnabled(true);
 		// position info
 		std::vector< std::shared_ptr< NoGUI::Element > > previews = shapepg->getElements("Shape");
 		std::vector< std::shared_ptr< NoGUI::Element > > containers = shapepg->getElements("Container");
@@ -262,7 +262,7 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	}
 	else
 	{
-		shapepg->setActive(false);
+		shapepg->setEnabled(false);
 		if ( !coloursButton->getFocus() || (coloursButton->getFocus() && elementsButton->getFocus()) )
 		{
 			elementsButton->position.y = shapesButton->pos(NoGUI::Align(0, 1)).y + shapesButton->getShape()->outline->thick;
@@ -271,7 +271,7 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	if ( elementsButton->getFocus() )
 	{
 		// display user elements
-		elempg->setActive(true);
+		elempg->setEnabled(true);
 		// position info
 		std::vector< std::shared_ptr< NoGUI::Element > > labels = elempg->getElements("Label");
 		std::vector< std::shared_ptr< NoGUI::Element > > shapes = elempg->getElements("DropDown");
@@ -325,7 +325,7 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 	}
 	else
 	{
-		elempg->setActive(false);
+		elempg->setEnabled(false);
 		if ( shapesButton->getFocus() || coloursButton->getFocus() )
 		{
 			elementsButton->position.y = window.y - (elementsButton->height() + elementsButton->getShape()->outline->thick) * (propertyToggles.size() - (elementsButton->getId() - coloursButton->getId()));
@@ -545,7 +545,7 @@ int main(int argc, char ** argv)
 							size_t pageNum = pageElems.size() - 1;
 							currPage = pageNum;
 							userGUI.addPage();
-							userGUI.setActive(currPage);
+							userGUI.setEnabled(currPage);
 							std::shared_ptr< NoGUI::Element > newPage = pagepg->addElement(pageRectSelect, *(addPage), "Page", TextFormat("%i", pageNum));
 							addPage->translate(0, newPage->height() + pageLabelPos.height());
 							NoGUI::Transform newTransform = NoGUI::Transform(newPage->pos(NoGUI::Align(0, 1)), labelRadius, NoGUI::Align(0, -1));
@@ -556,7 +556,7 @@ int main(int argc, char ** argv)
 							// set active page
 							size_t pageNum = TextToInteger(elem->getInner());
 							currPage = pageNum;
-							userGUI.setActive(currPage);
+							userGUI.setEnabled(currPage);
 							elem->setShape(pageRectSelect);
 						}
 					}
@@ -565,7 +565,7 @@ int main(int argc, char ** argv)
 						// page options/context menu
 						if ( !TextIsEqual("+", elem->getInner()) )
 						{
-							contextMenu->setActive(true);
+							contextMenu->setEnabled(true);
 							std::vector< std::shared_ptr< NoGUI::Element > > menu = contextMenu->getElements();
 							for (size_t i=0; i < menu.size(); i++)
 							{
@@ -641,7 +641,7 @@ int main(int argc, char ** argv)
 										std::vector< std::shared_ptr< NoGUI::Element > > delButtons = colpg->getElements(TextFormat("%i", index));
 										for (auto delButton : delButtons)
 										{
-											delButton->setActive(false); // deactivate delete buttons for a frame to avoid domino effect when deleting
+											delButton->setEnabled(false); // deactivate delete buttons for a frame to avoid domino effect when deleting
 											delButton->translate(0, colours[i]->height() * -1 - 4);
 										}
 										index++;
@@ -684,7 +684,7 @@ int main(int argc, char ** argv)
 						}
 					}
 					// reactivate delete buttons
-					elem->setActive(true);
+					elem->setEnabled(true);
 				}
 				std::vector< std::shared_ptr< NoGUI::Element > > colNames = colpg->getElements("Name");
 				for (size_t i=0; i < colNames.size(); i++)
@@ -812,7 +812,7 @@ int main(int argc, char ** argv)
 					if ( colour->getFocus() )
 					{
 						colIndex = i;
-						colSelector->setActive(true);
+						colSelector->setEnabled(true);
 						makeSelection = true;
 						std::vector< std::shared_ptr< NoGUI::Element > > options = colSelector->getElements();
 						for (size_t option=0; option < options.size(); option++)
@@ -825,7 +825,7 @@ int main(int argc, char ** argv)
 				}
 				if ( !makeSelection )
 				{
-					colSelector->setActive(false);
+					colSelector->setEnabled(false);
 				}
 				for (auto preview : previews)
 				{
@@ -978,7 +978,7 @@ int main(int argc, char ** argv)
 					std::shared_ptr< NoGUI::Element > shape = shapes.at(i);
 					if ( shape->getFocus() )
 					{
-						shapeSelector->setActive(true);
+						shapeSelector->setEnabled(true);
 						makeSelection = true;
 						std::vector< std::shared_ptr< NoGUI::Element > > options = shapeSelector->getElements();
 						for (size_t option=0; option < options.size(); option++)
@@ -991,7 +991,7 @@ int main(int argc, char ** argv)
 				}
 				if ( !makeSelection )
 				{
-					shapeSelector->setActive(false);
+					shapeSelector->setEnabled(false);
 				}
 				for (auto preview : elempg->getElements("Preview"))
 				{
@@ -1099,7 +1099,7 @@ int main(int argc, char ** argv)
 							}
 						}
 					}
-					contextMenu->setActive(false);
+					contextMenu->setEnabled(false);
 				}
 			}
 			for (auto pg : userGUI.getPages())

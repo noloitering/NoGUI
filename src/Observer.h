@@ -6,14 +6,15 @@
 namespace NoGUI
 {
 	class Element;
-	enum Event {ONHOVER=1, HOVERING=2, OFFHOVER=4, ONFOCUS=8, FOCUSING=16, OFFFOCUS=32};
+	enum HoverEvent {ONHOVER=1, HOVERING=2, OFFHOVER=4};
+	enum FocusEvent {ONFOCUS=1, FOCUSING=2, OFFFOCUS=4};
 	
 	class Listener
 	{
 	public:
 		Listener() {}
 		virtual ~Listener() {}
-		virtual void onNotify(std::shared_ptr< Element > elem, Event event) = 0;
+		virtual void onNotify(std::shared_ptr< Element > elem, HoverEvent hevent, FocusEvent fevent) = 0;
 	};
 
 	// TODO: handle dynamic allocation better
@@ -23,11 +24,11 @@ namespace NoGUI
 		std::vector< std::shared_ptr< Listener > > listeners;
 		size_t total;
 	protected:
-		void notify(std::shared_ptr< Element > elem, Event event)
+		void notify(std::shared_ptr< Element > elem,  HoverEvent hevent, FocusEvent fevent)
 		{
 			for (auto l : listeners)
 			{
-				l->onNotify(elem, event);
+				l->onNotify(elem, hevent, fevent);
 			}
 		}
 	public:

@@ -7,22 +7,48 @@ NoGUI::Manager gui;
 
 class EventHandler : public NoGUI::Listener
 {
-	void onNotify(std::shared_ptr< NoGUI::Element > elem, NoGUI::Event event)
+	void onNotify(std::shared_ptr< NoGUI::Element > elem, NoGUI::HoverEvent hevent, NoGUI::FocusEvent fevent)
 	{
 		if ( TextIsEqual("DropDown", elem->getTag()) )
 		{
-			switch (event)
+			switch (fevent)
 			{
-				case NoGUI::Event::ONFOCUS:
+				case NoGUI::FocusEvent::ONFOCUS:
 				{
-					contextMenu.setActive(0);
+					if ( !contextMenu.getPage(0)->getVisible() )
+					{
+						contextMenu.getPage(0)->setEnabled(true);
+					}
+					else
+					{
+						contextMenu.getPage(0)->setEnabled(false);
+					}
 					
 					break;
 				}
 				
-				case NoGUI::Event::OFFFOCUS:
+				default:
 				{
-					contextMenu.getPage(0)->setActive(false);
+					
+					break;
+				}
+			}
+			
+			switch (hevent)
+			{
+				case NoGUI::HoverEvent::OFFHOVER:
+				{
+					bool enable = false;
+					for (std::shared_ptr< NoGUI::Element > elem : contextMenu.getPage()->getElements())
+					{
+						if ( elem->isHover() )
+						{
+							enable = true;
+							
+							break;
+						}
+					}
+					contextMenu.getPage(0)->setEnabled(enable);
 					
 					break;
 				}
@@ -36,15 +62,29 @@ class EventHandler : public NoGUI::Listener
 		}
 		else if ( TextIsEqual("Option", elem->getTag()) )
 		{
-			switch (event)
-			{
-				case NoGUI::Event::ONFOCUS:
+			NoGUI::ContextPage* options = dynamic_cast< NoGUI::ContextPage* >(contextMenu.getPage(0).get());
+			std::shared_ptr< NoGUI::Element > context = options->getContext();
+			bool enable = true;
+			switch (hevent)
+			{	
+				case NoGUI::HoverEvent::OFFHOVER:
 				{
-					NoGUI::ContextPage* options = dynamic_cast< NoGUI::ContextPage* >(contextMenu.getPage(0).get());
-					std::shared_ptr< NoGUI::Element > context = options->getContext();
-					context->setInner(elem->getInner());
-					context->setFocus(false);
-					contextMenu.getPage(0)->setActive(false);
+					enable = context->isHover();
+					if ( enable == false )
+					{
+						std::vector< std::shared_ptr< NoGUI::Element > > optionElems = options->getElements();
+						NoGUI::Transform collisionArea = NoGUI::Transform(*optionElems.front().get());
+						int shapeSides = optionElems.front()->getShape()->n;
+						for (size_t i=1; i < optionElems.size(); i++)
+						{
+							collisionArea.radius.y += (optionElems[i]->getShape()->outline) ? optionElems[i]->radius.y + optionElems[i]->getShape()->outline->thick : optionElems[i]->radius.y;
+						}
+						if ( optionElems.back()->getShape()->outline )
+						{
+							collisionArea.radius.y -= optionElems.back()->getShape()->outline->thick;
+						}
+						enable = CheckCollisionPointShape(GetMousePosition(), shapeSides, collisionArea);
+					}
 					
 					break;
 				}
@@ -55,12 +95,30 @@ class EventHandler : public NoGUI::Listener
 					break;
 				}
 			}
+			switch (fevent)
+			{
+				case NoGUI::FocusEvent::ONFOCUS:
+				{
+					context->setInner(elem->getInner());
+					context->setFocus(false);
+					enable = false;
+					
+					break;
+				}
+				
+				default:
+				{
+					
+					break;
+				}
+			}
+			options->setEnabled(enable);
 		}
 		else if ( TextIsEqual("Add", elem->getTag()) )
 		{
-			switch (event)
+			switch (fevent)
 			{
-				case NoGUI::Event::ONFOCUS:
+				case NoGUI::FocusEvent::ONFOCUS:
 				{
 					NoGUI::ContextPage* options = dynamic_cast< NoGUI::ContextPage* >(contextMenu.getPage(0).get());
 					std::shared_ptr< NoGUI::Element > lastOption = options->getElement(options->size() -1);
@@ -106,7 +164,7 @@ int main(int argc, char ** argv)
 	gui.getPage(0)->addComponents("DropDown", textComps);
 	gui.getPage(0)->addComponents("Add", textComps);
 	gui.getPage(0)->addComponents("Input", inputComps);
-	std::shared_ptr< NoGUI::Element > selector = gui.getPage(0)->addElement< NoGUI::Toggle >(rect, centerPos, "DropDown", "Select Option");
+	std::shared_ptr< NoGUI::Element > selector = gui.getPage(0)->addElement< NoGUI::Button >(rect, centerPos, "DropDown", "Select Option");
 	gui.getPage(0)->addElement(inputBox, inputPos, "Input", "Option 2");
 	gui.getPage(0)->addElement< NoGUI::Button >(rect, addPos, "Add", "+");
 	std::shared_ptr< NoGUI::ContextPage > contextPg = std::make_shared< NoGUI::ContextPage >(selector, selector->pos(NoGUI::Align(0, 1)), false);
