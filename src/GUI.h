@@ -15,18 +15,18 @@ namespace NoGUI
 		Vector2 radius;
 		Align origin;
 		float angle = 0;
+		Vector2 offset() const; // distance from center of transform
 		Vector2 pos() const; // current position
 		Vector2 pos(const Align& originPoint) const; // theoritical position at given unit coordnite
+		Vector2 repos(Vector2 newPos); // move to position
+		Vector2 repos(Vector2 newPos, const Align& originPoint, bool update=false); // move to position
 		Vector2 size() const; // full dimensions (width, height)
+		Vector2 translate(float x, float y); // add to position
+		Vector2 translate(const Vector2 inc); // add to position
 		float width() const; 
 		float height() const;
 		float rotation() const; // current angle of rotation
-		Vector2 offset() const; // distance from center of transform
-		Vector2 translate(float x, float y); // add to position
-		Vector2 translate(const Vector2 inc); // add to position
-		Vector2 repos(Vector2 newPos); // move to position
-		Vector2 repos(Vector2 newPos, const Align& originPoint, bool update=false); // move to position
-		void resize(const Vector2& size);
+		void resize(const Vector2& halfSize);
 		void rotate(float degrees, const Align& originPoint, bool update=false); // rotate around relative point
 		void rotate(float degrees, const Vector2& originPoint); // rotate around absolute point
 		void reorient(float degrees, const Align& originPoint, bool update=false);
@@ -151,50 +151,52 @@ namespace NoGUI
 				}
 				slideTransform = Transform((Vector2){0, 0}, (Vector2){0.0f, dimensions.radius.y}, slideAlign);
 			}
-		void draw();
-		bool isFocus();
+		virtual void shiftSlide(const Align& originPoint);
+		virtual void slideTo(float pos);
 		std::shared_ptr< nShape > getSlide();
 		const Transform& getSlideTransform();
+		void draw();
 		void setSlide(std::shared_ptr< nShape > slideStyle);
-		void setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform);
+		void setSlide(std::shared_ptr< nShape > slideStyle, const Align& originPoint);
+		bool isFocus();
 	};
 	
 	class Cursorer : public Slider
 	{
-	public:
-		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f})
-			: Slider(num, style, pos, size, rotation, origin, type, in, c, slideStyle) 
-			{
-				if ( slideStyle == nullptr )
-				{
-					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
-				}
-				slideTransform = Transform((Vector2){0, 0}, slideSize, slideAlign);
-			}
-		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f})
-			: Slider(num, style, dimensions, type, in, c, slideStyle) 
-			{
-				if ( slideStyle == nullptr )
-				{
-					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
-				}
-				slideTransform = Transform((Vector2){0, 0}, slideSize, slideAlign);
-			}
-		bool isFocus();
-	};
-	
-	class NotchedCursorer : public Cursorer
-	{
 	protected:
-		unsigned int notches = 1;
+		unsigned int notches = 0;
 	public:
-		NotchedCursorer(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int numNotches=1)
-			: Cursorer(num, style, pos, size, rotation, origin, type, in, c, slideStyle, slideAlign, slideSize) {notches = numNotches;}
-		NotchedCursorer(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int numNotches=1)
-			: Cursorer(num, style, dimensions, type, in, c, slideStyle, slideAlign, slideSize) {notches = numNotches;}
+		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Vector2& pos={0.0f, 0.0f}, const Vector2& size={0.0f, 0.0f}, float rotation=0.0f, const Align& origin=Align(), const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int n=0)
+			: Slider(num, style, pos, size, rotation, origin, type, in, c, slideStyle) , notches(n)
+			{
+				if ( slideStyle == nullptr )
+				{
+					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
+				}
+				slideTransform = Transform((Vector2){0, 0}, slideSize, slideAlign);
+			}
+		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int n=0)
+			: Slider(num, style, dimensions, type, in, c, slideStyle), notches(n)
+			{
+				if ( slideStyle == nullptr )
+				{
+					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
+				}
+				slideTransform = Transform((Vector2){0, 0}, slideSize, slideAlign);
+			}
+		Vector2 getNearest(const Vector2& pos, unsigned int n);
+		Vector2 getNotchPos(unsigned int n);
+		Vector2 slideNearest();
+		Vector2 slideToNotch(unsigned int n);
+		void shiftSlide(const Align& originPoint);
+		void slideTo(float pos);
+		void resizeSlide(const Vector2& halfSize);
+		void rotateSlide(float degrees);
+		void setNotches(unsigned int notchNum, bool update=false);
+		void setSlide(std::shared_ptr< nShape > slideStyle, const Align& originPoint, const Vector2& halfSize, float degrees=0.0f);
 		bool isFocus();
+		float getNotchWidth();
 		unsigned int getNotches();
-		void setNotches(unsigned int notchNum);
 	};
 	
 	class Page : public CMap // Container for Elements

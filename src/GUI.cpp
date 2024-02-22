@@ -2902,9 +2902,9 @@ Vector2 NoGUI::Transform::repos(Vector2 newPos, const Align& originPoint, bool u
 	return position;
 }
 	
-void NoGUI::Transform::resize(const Vector2& size)
+void NoGUI::Transform::resize(const Vector2& halfSize)
 {
-	radius = size;
+	radius = halfSize;
 }
 	
 void NoGUI::Transform::rotate(float degrees, const Align& originPoint, bool update)
@@ -3177,6 +3177,25 @@ void CheckBox::draw()
 	}
 }
 
+void Slider::shiftSlide(const Align& originPoint)
+{
+	slideTransform.origin = originPoint;
+	int direction = static_cast< int >(slideTransform.origin.x) * -1;
+	slideTransform.position.x = slideTransform.radius.x * direction;
+}
+
+void Slider::slideTo(float pos)
+{
+	int direction = static_cast< int >(slideTransform.origin.x) * -1;
+	// updating radius requires dividing value by 2, unless center aligned
+	if ( direction != 0 )
+	{
+		pos /= 2;
+	}
+	slideTransform.radius.x = pos;
+	slideTransform.position.x = slideTransform.radius.x * direction; // update position because slide expands from the center
+}
+
 std::shared_ptr< nShape > Slider::getSlide()
 {
 	
@@ -3187,112 +3206,6 @@ const NoGUI::Transform& Slider::getSlideTransform()
 {
 	
 	return slideTransform;
-}
-
-void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
-{
-	if ( slideStyle )
-	{
-		slide = slideStyle;
-	}
-}
-
-void Slider::setSlide(std::shared_ptr< nShape > slideStyle, const Transform& transform)
-{
-	if ( slideStyle )
-	{
-		slide = slideStyle;
-	}
-	slideTransform = transform;
-}
-
-bool Slider::isFocus()
-{
-	Vector2 mousePos = GetMousePosition();
-	focus = Trigger::isFocus();
-	if ( focus )
-	{
-		Vector2 slideRadius = {0, slideTransform.radius.y};
-		switch (slideTransform.origin.x)
-		{
-			case NoGUI::XAlign::LEFT:
-			{
-				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
-				if ( angle == 0 )
-				{
-					slideRadius.x = (mousePos.x  - startPoint.x) / 2;
-				}
-				else
-				{
-					Vector2 endPoint = pos(NoGUI::Align(1, -1));
-					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
-					Vector2 collisionPoint;
-					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
-					{
-						slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) / 2;
-					}
-				}
-				slideTransform.radius = slideRadius;
-				// reposition slider since multishapes have a center origin
-				slideTransform.repos((Vector2){slideRadius.x, slideTransform.position.y});
-				
-				break;
-			}
-			
-			case NoGUI::XAlign::CENTER:
-			{
-				Vector2 startPoint = pos(NoGUI::Align(0, -1));
-				if ( angle == 0 )
-				{
-					slideRadius.x = (mousePos.x  - startPoint.x);
-					if ( slideRadius.x < 0 )
-					{
-						slideRadius.x *= -1;
-					}
-				}
-				else
-				{
-					startPoint = pos(NoGUI::Align(-1, -1));
-					Vector2 endPoint = pos(NoGUI::Align(1, -1));
-					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
-					Vector2 collisionPoint;
-					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
-					{
-						slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, pos(NoGUI::Align(0, -1))));
-					}
-				}
-				slideTransform.radius = slideRadius;
-				
-				break;
-			}
-			
-			case NoGUI::XAlign::RIGHT:
-			{
-				Vector2 startPoint = pos(NoGUI::Align(1, -1));
-				if ( angle == 0 )
-				{
-					slideRadius.x = (startPoint.x - mousePos.x) / 2;
-				}
-				else
-				{
-					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
-					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
-					Vector2 collisionPoint;
-					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
-					{
-						slideRadius.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) / 2;
-					}
-				}
-				slideTransform.radius = slideRadius;
-				// reposition slider since multishapes have a center origin
-				slideTransform.repos((Vector2){-slideRadius.x, slideTransform.position.y});
-				
-				break;
-			}
-		}
-	}
-	
-	return focus;
 }
 
 void Slider::draw()
@@ -3307,6 +3220,246 @@ void Slider::draw()
 	DrawShapeOutline(shape->n, shape->outline, *(this), getHover());
 }
 
+void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
+{
+	if ( slideStyle )
+	{
+		slide = slideStyle;
+	}
+}
+
+void Slider::setSlide(std::shared_ptr< nShape > slideStyle, const Align& originPoint)
+{
+	if ( slideStyle )
+	{
+		slide = slideStyle;
+	}
+	shiftSlide(originPoint);
+}
+
+bool Slider::isFocus()
+{
+	Vector2 mousePos = GetMousePosition();
+	focus = Trigger::isFocus();
+	if ( focus )
+	{
+		float slidePos = 0;
+		switch (slideTransform.origin.x)
+		{
+			case NoGUI::XAlign::LEFT:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
+				if ( angle == 0 )
+				{
+					slidePos = (mousePos.x - startPoint.x);
+				}
+				else
+				{
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slidePos = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+					}
+				}
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::CENTER:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(0, -1));
+				if ( angle == 0 )
+				{
+					slidePos = (mousePos.x  - startPoint.x);
+				}
+				else
+				{
+					startPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 endPoint = pos(NoGUI::Align(1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slidePos = Vector2Length(Vector2Subtract(collisionPoint, pos(NoGUI::Align(0, -1))));
+					}
+				}
+				if ( slidePos < 0.0f )
+				{
+					slidePos *= -1.0f;
+				}
+				
+				break;
+			}
+			
+			case NoGUI::XAlign::RIGHT:
+			{
+				Vector2 startPoint = pos(NoGUI::Align(1, -1));
+				if ( angle == 0 )
+				{
+					slidePos = (startPoint.x - mousePos.x);
+				}
+				else
+				{
+					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
+					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
+					Vector2 collisionPoint;
+					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					{
+						slidePos = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+					}
+				}
+				
+				break;
+			}
+		}
+		slideTo(slidePos);
+	}
+	
+	return focus;
+}
+
+Vector2 Cursorer::getNearest(const Vector2& pos, unsigned int n)
+{
+	Vector2 ret = pos;
+	switch (slideTransform.origin.x)
+	{
+		case NoGUI::XAlign::LEFT:
+		{
+			if ( pos.x <= 0.0f )
+			{
+				ret.x = 0.0f;
+			}
+			else if ( pos.x >= width() )
+			{
+				ret.x = width();
+			}
+			else if ( notches )
+			{
+				float notchWidth = getNotchWidth();
+				float notchPos = slideTransform.position.x / notchWidth;
+				ret.x = (notchPos - (int)notchPos > 0.5f) ? ((int)notchPos + 1) * notchWidth : (int)notchPos * notchWidth;
+			}
+			
+			break;
+		}
+			
+		case NoGUI::XAlign::CENTER:
+		{
+			if ( pos.x <= radius.x * -1 )
+			{
+				ret.x = radius.x * -1;
+			}
+			else if ( pos.x >= radius.x )
+			{
+				ret.x = radius.x;
+			}
+			else if ( notches )
+			{
+				float notchWidth = getNotchWidth();
+				float notchPos = slideTransform.position.x / notchWidth;
+				if ( notchPos >= 0.0f )
+				{
+					ret.x = (notchPos - (int)notchPos > 0.5f) ? ((int)notchPos + 1) * notchWidth : (int)notchPos * notchWidth;
+				}
+				else
+				{
+					ret.x = (notchPos + (int)notchPos < -0.5f) ? ((int)notchPos - 1) * notchWidth : (int)notchPos * notchWidth;
+				}
+			}
+			
+			break;
+		}
+			
+		case NoGUI::XAlign::RIGHT:
+		{
+			if ( pos.x >= 0.0f )
+			{
+				ret.x = 0.0f;
+			}
+			else if ( pos.x <= width() * -1 )
+			{
+				ret.x = width() * -1;
+			}
+			else if ( notches )
+			{
+				float notchWidth = getNotchWidth();
+				float notchPos = slideTransform.position.x / notchWidth;
+				ret.x = (notchPos - (int)notchPos > 0.5f) ? ((int)notchPos + 1) * notchWidth : (int)notchPos * notchWidth;
+			}
+			
+			break;
+		}
+	}
+	
+	return ret;
+}
+
+Vector2 Cursorer::getNotchPos(unsigned int n)
+{
+	if ( n > notches )
+	{
+		
+		return (Vector2){width(), slideTransform.position.y};
+	}
+	else
+	{
+		
+		return (Vector2){getNotchWidth() * n, slideTransform.position.y};
+	}
+}
+
+Vector2 Cursorer::slideNearest()
+{
+	Vector2 beforePos = slideTransform.position;
+	slideTransform.position = getNearest(beforePos, notches);
+	
+	return Vector2Subtract(slideTransform.position, beforePos);
+}
+
+Vector2 Cursorer::slideToNotch(unsigned int n)
+{
+	slideTo(getNotchPos(n));
+}
+
+void Cursorer::shiftSlide(const Align& originPoint)
+{
+	slideTransform.origin = originPoint;
+	// TODO: call slideNearest()?? convert position value according to originPoint?? leave it??
+}
+
+void Cursorer::slideTo(float pos)
+{
+	slideTransform.position.x = pos;
+}
+
+void Cursorer::resizeSlide(const Vector2& halfSize)
+{
+	slideTransform.resize(halfSize);
+}
+
+void Cursorer::rotateSlide(float degrees)
+{
+	slideTransform.angle = degrees;
+}
+
+void Cursorer::setNotches(unsigned int notchNum, bool update)
+{
+	notches = notchNum;
+	if ( update )
+	{
+		slideNearest();
+	}
+}
+
+void Cursorer::setSlide(std::shared_ptr< nShape > slideStyle, const Align& originPoint, const Vector2& halfSize, float degrees)
+{
+	Slider::setSlide(slideStyle, originPoint);
+	resizeSlide(halfSize);
+	rotateSlide(degrees);
+}
+
 bool Cursorer::isFocus()
 {
 	Vector2 mousePos = GetMousePosition();
@@ -3314,6 +3467,7 @@ bool Cursorer::isFocus()
 	if ( focus )
 	{
 		Vector2 slidePos = {0, slideTransform.position.y};
+		float offset = slideTransform.position.x;
 		switch (slideTransform.origin.x)
 		{
 			case NoGUI::XAlign::LEFT:
@@ -3321,7 +3475,7 @@ bool Cursorer::isFocus()
 				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
 				if ( angle == 0 )
 				{
-					slidePos.x = (mousePos.x  - startPoint.x);
+					offset = (mousePos.x - startPoint.x);
 				}
 				else
 				{
@@ -3330,94 +3484,27 @@ bool Cursorer::isFocus()
 					Vector2 collisionPoint;
 					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
 					{
-						slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
+						offset = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
 					}
 				}
-				
-				break;
-			}
-			
-			case NoGUI::XAlign::CENTER:
-			{
-				Vector2 startPoint = pos(NoGUI::Align(0, -1));
-				if ( angle == 0 )
+				if ( notches )
 				{
-					slidePos.x = (mousePos.x  - startPoint.x);
-				}
-				else
-				{
-					startPoint = pos(NoGUI::Align(-1, -1));
-					Vector2 endPoint = pos(NoGUI::Align(1, -1));
-					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
-					Vector2 collisionPoint;
-					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
+					slidePos = slideTransform.position;
+					float notchWidth = width() / (notches);
+					for (unsigned int i=0; i < notches + 1; i++)
 					{
-						slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) - radius.x;
-					}
-				}
-				
-				break;
-			}
-			
-			case NoGUI::XAlign::RIGHT:
-			{
-				Vector2 startPoint = pos(NoGUI::Align(1, -1));
-				if ( angle == 0 )
-				{
-					slidePos.x = (mousePos.x  - startPoint.x);
-				}
-				else
-				{
-					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
-					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
-					Vector2 collisionPoint;
-					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
-					{
-						slidePos.x = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) * -1;
-					}
-				}
-				
-				break;
-			}
-		}
-		slideTransform.repos((Vector2){slidePos.x, slideTransform.position.y});
-	}
-	
-	return focus;
-}
-
-bool NotchedCursorer::isFocus()
-{
-	Vector2 mousePos = GetMousePosition();
-	focus = Trigger::isFocus();
-	if ( focus )
-	{
-		float notchWidth = width() / (notches);
-		switch (slideTransform.origin.x)
-		{
-			case NoGUI::XAlign::LEFT:
-			{
-				Vector2 startPoint = pos(NoGUI::Align(-1, -1));
-				float mouseOffset = mousePos.x  - startPoint.x;
-				if ( angle != 0 )
-				{
-					Vector2 endPoint = pos(NoGUI::Align(1, -1));
-					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(1, 1))), mousePos);
-					Vector2 collisionPoint;
-					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
-					{
-						mouseOffset = Vector2Length(Vector2Subtract(collisionPoint, startPoint));
-					}
-				}
-				for (unsigned int i=0; i < notches + 1; i++)
-				{
-					float notchPosition = i * notchWidth;
-					if ( mouseOffset < notchPosition + slideTransform.radius.x && mouseOffset > notchPosition - slideTransform.radius.x )
-					{
-						slideTransform.repos((Vector2){notchPosition, slideTransform.position.y});
+						float notchPosition = i * notchWidth;
+						if ( offset < notchPosition + slideTransform.radius.x && offset > notchPosition - slideTransform.radius.x )
+						{
+							slidePos.x = notchPosition;
 					
-						break;
+							break;
+						}
 					}
+				}
+				else
+				{
+					slidePos.x = offset;
 				}
 				
 				break;
@@ -3426,9 +3513,11 @@ bool NotchedCursorer::isFocus()
 			case NoGUI::XAlign::CENTER:
 			{
 				Vector2 startPoint = pos(NoGUI::Align(0, -1));
-				notchWidth /= 2;
-				float mouseOffset = mousePos.x  - startPoint.x;
-				if ( angle != 0 )
+				if ( angle == 0 )
+				{
+					offset = (mousePos.x  - startPoint.x);
+				}
+				else
 				{
 					startPoint = pos(NoGUI::Align(-1, -1));
 					Vector2 endPoint = pos(NoGUI::Align(1, -1));
@@ -3436,18 +3525,27 @@ bool NotchedCursorer::isFocus()
 					Vector2 collisionPoint;
 					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
 					{
-						mouseOffset = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) - radius.x;
+						offset = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) - radius.x;
 					}
 				}
-				for (int i=(int)notches*-1; i < (int)notches + 1; i++)
+				if ( notches )
 				{
-					float notchPosition = i * notchWidth;
-					if ( mouseOffset < notchPosition + slideTransform.radius.x && mouseOffset > notchPosition - slideTransform.radius.x )
+					slidePos = slideTransform.position;
+					float notchWidth = width() / (notches) / 2;
+					for (int i=(int)notches*-1; i < (int)notches + 1; i++)
 					{
-						slideTransform.repos((Vector2){notchPosition, slideTransform.position.y});
-						
-						break;
+						float notchPosition = i * notchWidth;
+						if ( offset < notchPosition + slideTransform.radius.x && offset > notchPosition - slideTransform.radius.x )
+						{
+							slidePos.x = notchPosition;
+							
+							break;
+						}
 					}
+				}
+				else
+				{
+					slidePos.x = offset;
 				}
 				
 				break;
@@ -3456,48 +3554,59 @@ bool NotchedCursorer::isFocus()
 			case NoGUI::XAlign::RIGHT:
 			{
 				Vector2 startPoint = pos(NoGUI::Align(1, -1));
-				float mouseOffset = mousePos.x  - startPoint.x;
-				if ( angle != 0 )
+				if ( angle == 0 )
+				{
+					offset = (mousePos.x  - startPoint.x);
+				}
+				else
 				{
 					Vector2 endPoint = pos(NoGUI::Align(-1, -1));
 					Vector2 normalUP = Vector2Add(Vector2Subtract(endPoint, pos(NoGUI::Align(-1, 1))), mousePos);
 					Vector2 collisionPoint;
 					if ( CheckCollisionLines(mousePos, normalUP, startPoint, endPoint, &collisionPoint) )
 					{
-						mouseOffset = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) * -1;
+						offset = Vector2Length(Vector2Subtract(collisionPoint, startPoint)) * -1;
 					}
 				}
-				for (unsigned int i=0; i < notches + 1; i++)
+				if ( notches )
 				{
-					float notchPosition = i * notchWidth * -1;
-					if ( mouseOffset < notchPosition + slideTransform.radius.x && mouseOffset > notchPosition - slideTransform.radius.x )
+					slidePos = slideTransform.position;
+					float notchWidth = width() / (notches);
+					for (unsigned int i=0; i < notches + 1; i++)
 					{
-						slideTransform.repos((Vector2){notchPosition, slideTransform.position.y});
-						
-						break;
+						float notchPosition = i * notchWidth * -1;
+						if ( offset < notchPosition + slideTransform.radius.x && offset > notchPosition - slideTransform.radius.x )
+						{
+							slidePos.x = notchPosition;
+							
+							break;
+						}
 					}
+				}
+				else
+				{
+					slidePos.x = offset;
 				}
 				
 				break;
 			}
 		}
+		slideTo(slidePos.x);
 	}
 	
 	return focus;
 }
 
-unsigned int NotchedCursorer::getNotches()
+float Cursorer::getNotchWidth()
+{
+
+	return radius.x * (2 * static_cast<int>(slideTransform.origin.x)) * notches;
+}
+
+unsigned int Cursorer::getNotches()
 {
 	
 	return notches;
-}
-
-void NotchedCursorer::setNotches(unsigned int notchNum)
-{
-	if ( notchNum > 0 )
-	{
-		notches = notchNum;
-	}
 }
 
 void Page::update()
