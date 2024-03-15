@@ -3365,7 +3365,7 @@ Vector2 Cursorer::getNearest(const Vector2& pos, unsigned int n)
 				}
 				else
 				{
-					ret.x = (notchPos + (int)notchPos < -0.5f) ? ((int)notchPos - 1) * notchWidth : (int)notchPos * notchWidth;
+					ret.x = (notchPos - (int)notchPos < -0.5f) ? ((int)notchPos - 1) * notchWidth : (int)notchPos * notchWidth;
 				}
 			}
 			
@@ -3386,7 +3386,7 @@ Vector2 Cursorer::getNearest(const Vector2& pos, unsigned int n)
 			{
 				float notchWidth = getNotchWidth();
 				float notchPos = slideTransform.position.x / notchWidth;
-				ret.x = (notchPos - (int)notchPos > 0.5f) ? ((int)notchPos + 1) * notchWidth : (int)notchPos * notchWidth;
+				ret.x = (notchPos - (int)notchPos < -0.5f) ? ((int)notchPos - 1) * notchWidth : (int)notchPos * notchWidth;
 			}
 			
 			break;
@@ -3420,7 +3420,10 @@ Vector2 Cursorer::slideNearest()
 
 Vector2 Cursorer::slideToNotch(unsigned int n)
 {
-	slideTo(getNotchPos(n));
+	Vector2 pos = getNotchPos(n);
+	slideTo(pos.x);
+	
+	return pos;
 }
 
 void Cursorer::shiftSlide(const Align& originPoint)
@@ -3599,8 +3602,8 @@ bool Cursorer::isFocus()
 
 float Cursorer::getNotchWidth()
 {
-
-	return radius.x * (2 * static_cast<int>(slideTransform.origin.x)) * notches;
+	
+	return (radius.x + radius.x * static_cast<int>(slideTransform.origin.x) * static_cast<int>(slideTransform.origin.x)) / notches; // always positive for now. Look into making negative when right aligned
 }
 
 unsigned int Cursorer::getNotches()

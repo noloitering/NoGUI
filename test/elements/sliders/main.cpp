@@ -11,6 +11,7 @@ class EventHandler : public NoGUI::Listener
 		{
 			if ( elem == manager.getPage(1)->getElements("Input").front() )
 			{
+				// multipler
 				// TODO: text to float
 				multiplier = TextToInteger(elem->getInner());
 				for (std::shared_ptr< NoGUI::Element > slider : manager.getPage()->getElements("Slider"))
@@ -20,6 +21,7 @@ class EventHandler : public NoGUI::Listener
 			}
 			else if ( elem == manager.getPage(1)->getElements("Input")[1] )
 			{
+				// angle
 				for ( std::shared_ptr< NoGUI::Element > slider : manager.getPage()->getElements() )
 				{
 					slider->angle = TextToInteger(elem->getInner());
@@ -27,6 +29,7 @@ class EventHandler : public NoGUI::Listener
 			}
 			else if ( elem == manager.getPage(1)->getElements("Input")[2] )
 			{
+				// notch count
 				NoGUI::Cursorer* slider = dynamic_cast< NoGUI::Cursorer* >(manager.getPage()->getElements("Slider").back().get());
 				if ( slider )
 				{

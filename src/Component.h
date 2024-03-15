@@ -77,6 +77,7 @@ namespace NoGUI
 		nShape(int sides=4, std::shared_ptr< Fill > col=nullptr, std::shared_ptr< Outline > out=nullptr)
 			: n(sides), fill(col), outline(out)
 			{
+				// TODO: I thought the point of using pointers was that so it could be null?
 				if ( fill == nullptr )
 				{
 					fill = std::make_shared< Fill >();
