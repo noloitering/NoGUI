@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CORE_H
+#define CORE_H
 
 #include <cstring>
 //#include <string.h>
@@ -72,3 +73,5 @@ namespace NoMAD
 		}
 	};
 }
+
+#endif
