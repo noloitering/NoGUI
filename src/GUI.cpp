@@ -4009,7 +4009,7 @@ void Manager::setEnabled(size_t index)
 {
 	for (size_t i=0; i < size(); i++)
 	{
-		pages.at(i)->setActive(i == index);
+		pages.at(i)->setEnabled(i == index);
 	}
 }
 
@@ -4017,7 +4017,7 @@ void Manager::setVisible(size_t index)
 {
 	for (size_t i=0; i < size(); i++)
 	{
-		pages.at(i)->setActive(i == index);
+		pages.at(i)->setVisible(i == index);
 	}
 }
 
