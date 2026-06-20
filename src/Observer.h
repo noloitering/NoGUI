@@ -43,5 +43,11 @@ namespace NoGUI
 		{
 			listeners.erase(listeners.begin() + pos - 1);
 		}
+		
+		std::vector< std::shared_ptr< Listener > > getListeners()
+		{
+			
+			return listeners;
+		}
 	};
 }
