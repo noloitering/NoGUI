@@ -3167,13 +3167,16 @@ bool Trigger::isFocus()
 
 void CheckBox::draw()
 {
-	if ( getFocus() )
+	if ( visible )
 	{
-		DrawElement(this);
-	}
-	else
-	{
-		DrawShape(*(shape), *(this), hover);
+		if ( getFocus() )
+		{
+			DrawElement(this);
+		}
+		else
+		{
+			DrawShape(*(shape), *(this), hover);
+		}
 	}
 }
 
@@ -3210,14 +3213,17 @@ const NoGUI::Transform& Slider::getSlideTransform()
 
 void Slider::draw()
 {
-	// TODO: ineffiecent but cleaner way of doing things
-	DrawShapeFill(shape->n, shape->fill, *(this), getHover());
-	DrawShapeAnchored(*(slide), slideTransform, *(this), getHover());
-	if ( components )
+	if ( visible )
 	{
-		DrawComponents(this);
+		// TODO: ineffiecent but cleaner way of doing things
+		DrawShapeFill(shape->n, shape->fill, *(this), getHover());
+		DrawShapeAnchored(*(slide), slideTransform, *(this), getHover());
+		if ( components )
+		{
+			DrawComponents(this);
+		}
+		DrawShapeOutline(shape->n, shape->outline, *(this), getHover());
 	}
-	DrawShapeOutline(shape->n, shape->outline, *(this), getHover());
 }
 
 void Slider::setSlide(std::shared_ptr< nShape > slideStyle)
