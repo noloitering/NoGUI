@@ -3106,13 +3106,17 @@ bool Button::isFocus()
 {
 	if ( active )
 	{
-		if ( GetGestureDetected() == GESTURE_TAP )
+		if ( getHover() )
+		{
+			focus = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+		}
+		else if ( GetGestureDetected() == GESTURE_TAP )
 		{
 			focus = CheckCollisionPointShape(GetTouchPosition(0), shape->n, *(this));
 		}
 		else
 		{
-			focus = getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+			focus = false;
 		}
 
 		return focus;
@@ -3143,16 +3147,19 @@ bool Toggle::isFocus()
 {
 	if ( active )
 	{
-		if ( GetGestureDetected() == GESTURE_TAP )
+		if ( getHover() )
+		{
+			if ( IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
+			{
+				focus = !focus;
+			}
+		}
+		else if ( GetGestureDetected() == GESTURE_TAP )
 		{
 			if ( CheckCollisionPointShape(GetTouchPosition(0), shape->n, *(this)) )
 			{
 				focus = !focus;
 			}
-		}
-		else if ( getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
-		{
-			focus = !focus;
 		}
 		
 		return focus;
@@ -3168,13 +3175,17 @@ bool Trigger::isFocus()
 {
 	if ( active )
 	{
-		if ( GetGestureDetected() == GESTURE_TAP || GetGestureDetected() == GESTURE_HOLD )
+		if ( getHover() )
+		{
+			focus = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+		}
+		else if ( GetGestureDetected() == GESTURE_TAP || GetGestureDetected() == GESTURE_HOLD )
 		{
 			focus = CheckCollisionPointShape(GetTouchPosition(0), shape->n, *(this));
 		}
 		else
 		{
-			focus = getHover() && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+			focus = false;
 		}
 
 		return focus;
