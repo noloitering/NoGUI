@@ -6,10 +6,11 @@
 
 namespace NoGUI
 {
+	inline constexpr int MAX_VERTICES = 73;
 	class Transform
 	{
 	public:
-		Transform(const Vector2& p=(Vector2){0, 0}, const Vector2& radi=(Vector2){0, 0}, const Align& a=Align(), float r=0)
+		Transform(const Vector2& p={0, 0}, const Vector2& radi={0, 0}, const Align& a=Align(), float r=0)
 			: position(p), radius(radi), origin(a), angle(r) {}
 		Vector2 position;
 		Vector2 radius;
@@ -136,7 +137,7 @@ namespace NoGUI
 				{
 					slide = std::make_shared< nShape >(style->n, std::make_shared< Fill >(style->fill->col, style->fill->hoverCol), style->outline);
 				}
-				slideTransform = Transform((Vector2){0, 0}, (Vector2){0.0f, size.y}, slideAlign);
+				slideTransform = Transform(Vector2{0, 0}, Vector2{0.0f, size.y}, slideAlign);
 			}
 		Slider(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0))
 			: Trigger(num, style, dimensions, type, in, c)
@@ -149,7 +150,7 @@ namespace NoGUI
 				{
 					slide = std::make_shared< nShape >(style->n, std::make_shared< Fill >(style->fill->col, style->fill->hoverCol), style->outline); 
 				}
-				slideTransform = Transform((Vector2){0, 0}, (Vector2){0.0f, dimensions.radius.y}, slideAlign);
+				slideTransform = Transform(Vector2{0, 0}, Vector2{0.0f, dimensions.radius.y}, slideAlign);
 			}
 		virtual void shiftSlide(const Align& originPoint);
 		virtual void slideTo(float pos);
@@ -173,7 +174,7 @@ namespace NoGUI
 				{
 					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
 				}
-				slideTransform = Transform((Vector2){0, 0}, slideSize, slideAlign);
+				slideTransform = Transform(Vector2{0, 0}, slideSize, slideAlign);
 			}
 		Cursorer(const size_t& num, std::shared_ptr< nShape > style, const Transform& dimensions, const char* type="Default", const char* in="", std::shared_ptr< CContainer > c=nullptr, std::shared_ptr< nShape > slideStyle=nullptr, const Align& slideAlign=Align(-1, 0), const Vector2& slideSize={10.0f, 10.0f}, unsigned int n=0)
 			: Slider(num, style, dimensions, type, in, c, slideStyle), notches(n)
@@ -182,7 +183,7 @@ namespace NoGUI
 				{
 					slide.reset(new nShape(0, std::make_shared< Fill >(BLUE), std::make_shared< Outline >(std::make_shared< Fill >(BLACK), 1)));
 				}
-				slideTransform = Transform((Vector2){0, 0}, slideSize, slideAlign);
+				slideTransform = Transform(Vector2{0, 0}, slideSize, slideAlign);
 			}
 		Vector2 getNearest(const Vector2& pos, unsigned int n);
 		Vector2 getNotchPos(unsigned int n);

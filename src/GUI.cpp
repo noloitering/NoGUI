@@ -689,7 +689,7 @@ void NoGUI::DrawShapeAnchored(const nShape& shape, const NoGUI::Transform& trans
 	center.x += offset.x;
 	center.y += offset.y;
 	
-	DrawShape(shape, center, transform.radius, (Vector2){0, 0}, angle, hovered);
+	DrawShape(shape, center, transform.radius, Vector2{0, 0}, angle, hovered);
 }
 
 void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShape > cursor, const Transform& transform, const Vector2& scrollPos, const Vector2& percentShown, float size)
@@ -748,8 +748,8 @@ void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShap
 		scrollCursorPos.y += scrollLength * cos;
 		float scrollCursorSize = percentShown.y * transform.size().y;
 		
-		DrawShape(*(bar), scrollBarPos, (Vector2){size, transform.radius.y}, (Vector2){0, 0}, transform.angle);
-		DrawShape(*(cursor), scrollCursorPos, (Vector2){size, scrollCursorSize / 2}, (Vector2){0, 0}, transform.angle);
+		DrawShape(*(bar), scrollBarPos, Vector2{size, transform.radius.y}, Vector2{0, 0}, transform.angle);
+		DrawShape(*(cursor), scrollCursorPos, Vector2{size, scrollCursorSize / 2}, Vector2{0, 0}, transform.angle);
 	}
 	if ( percentShown.x < 1.0f )
 	{
@@ -763,8 +763,8 @@ void NoGUI::DrawScrollBars(std::shared_ptr< nShape > bar, std::shared_ptr< nShap
 		scrollCursorPos.y += scrollLength * sin;
 		float scrollCursorSize = percentShown.x * transform.size().x;
 		
-		DrawShape(*(bar), scrollBarPos, (Vector2){transform.radius.x, size}, (Vector2){0, 0}, transform.angle);
-		DrawShape(*(cursor), scrollCursorPos, (Vector2){scrollCursorSize / 2, size}, (Vector2){0, 0}, transform.angle);
+		DrawShape(*(bar), scrollBarPos, Vector2{transform.radius.x, size}, Vector2{0, 0}, transform.angle);
+		DrawShape(*(cursor), scrollCursorPos, Vector2{scrollCursorSize / 2, size}, Vector2{0, 0}, transform.angle);
 	}
 }
 
@@ -970,7 +970,11 @@ Vector2 NoGUI::AlignText(const NoGUI::CText& fmt, Vector2 lineSize, int lineNum,
 void NoGUI::collectInput(Element* elem)
 {
 	CInput& input = elem->components->getComponent< CInput >();
-	char buffer[input.cap];
+	if ( input.cap >= NoMAD::INBUFF )
+	{
+		input.cap = NoMAD::INBUFF - 1;
+	}
+	static char buffer[NoMAD::INBUFF] = { 0 };
 	TextCopy(buffer, elem->getInner());
 	input.i = TextLength(buffer);
 	if ( input.i < input.cap )
@@ -1182,7 +1186,7 @@ void NoGUI::DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Tra
 	unsigned int lineIndex = 0; // current line to draw
 	int lineNum = 0; // number of lines drawn
 	Vector2 charPos = transform.pos(fmt.align); // keep track of character positioning
-	Vector2 charAlign = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.front()), fmt.size}, lineNum, (int)lines.size(), fmt.spacing.y); // for aligning text
+	Vector2 charAlign = AlignText(fmt.align, NoGUI::Wrap::DOWN, Vector2{std::get< float >(lines.front()), fmt.size}, lineNum, (int)lines.size(), fmt.spacing.y); // for aligning text
 	charPos.x -= charAlign.x;
 	if ( scrollBars ) // find which line to start on
 	{
@@ -1225,7 +1229,7 @@ void NoGUI::DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Tra
 		unsigned int lineLength = std::get< unsigned int >(lines.at(lineIndex)); 
 		// align text
 		charPos.x = transform.pos(fmt.align).x;
-		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
+		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, Vector2{std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
 		// draw text
 		for (unsigned int i=0; i < lineLength; i++)
 		{
@@ -1262,7 +1266,7 @@ void NoGUI::DrawCTextBoxWrapped(const char* txt, CTextBox& fmt, const NoGUI::Tra
 					srcRec.height += lineOffset;
 				}
 				// Draw the character texture on the screen
-				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
+				DrawTexturePro(font.texture, srcRec, dstRec, Vector2{ 0, 0 }, 0.0f, col);
 			}
 			charPos.x += glyphWidth + fmt.spacing.x; // move to next character
 		}
@@ -1375,7 +1379,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 	int lineNum = 0;
 	Vector2 maxScroll = {maxWidth - transform.width(), totalHeight - transform.height()};
 	Vector2 charPos = transform.pos(fmt.align);
-	Vector2 charAlign = AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size());
+	Vector2 charAlign = AlignText(fmt.align, NoGUI::Wrap::DOWN, Vector2{std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size());
 	charPos.x -= charAlign.x;
 	bool scrollBars = maxWidth > transform.width() || totalHeight > transform.height();
 	if ( maxWidth > transform.width() )
@@ -1432,7 +1436,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 		float scroll = fmt.scrollAmount.x;
 		// align text
 		charPos.x = transform.pos(fmt.align).x;
-		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, (Vector2){std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
+		charPos.x -= AlignText(fmt.align, NoGUI::Wrap::DOWN, Vector2{std::get< float >(lines.at(lineIndex)), fmt.size}, lineNum, (int)lines.size()).x;
 		for (unsigned int i=0; i < lineLength; i++)
 		{
 			int codepointByteCount = 0;
@@ -1507,7 +1511,7 @@ void NoGUI::DrawCTextBox(const char* txt, CTextBox& fmt, const NoGUI::Transform&
 					srcRec.height += lineOffset;
 				}
 				
-				DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, col);
+				DrawTexturePro(font.texture, srcRec, dstRec, Vector2{ 0, 0 }, 0.0f, col);
 				charOffset = 0;
 			}
 			charPos.x += glyphWidth + fmt.spacing.x; // move to next character
@@ -1671,7 +1675,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 	{
 		case 0:
 		{
-			int max = 37;
+			const int max = 37;
 			float centralAngle = 0;
 			Vector2 midPoint = {0.5f, 0.5f};
 			if ( img.scrollable )
@@ -1690,7 +1694,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				points[i].x = sin * 0.5f * maxSize.x;
 				points[i].y = cos * 0.5f * maxSize.y;
 				// calculate texture coordnites
-				texcoords[i] = (Vector2){midPoint.x + sin * (0.5f - umod), midPoint.y + cos * (0.5f - vmod)};
+				texcoords[i] = Vector2{midPoint.x + sin * (0.5f - umod), midPoint.y + cos * (0.5f - vmod)};
 						
 				centralAngle += 10;
 			}
@@ -1725,7 +1729,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 		
 		case 3:
 		{
-			int max = 4;
+			const int max = 4;
 			float left = 0.0f + umod;
 			float right = 1.0f - umod;
 			float top = 0.0f + vmod;
@@ -1743,17 +1747,17 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 			}
 			Vector2 texcoords[max] =
 			{ 
-				(Vector2){midPoint.x, top},
-				(Vector2){left, bottom},
-				(Vector2){right, bottom},
-				(Vector2){midPoint.x, top},
+				{midPoint.x, top},
+				{left, bottom},
+				{right, bottom},
+				{midPoint.x, top},
 			};
 			Vector2 points[max] = 
 			{
-				(Vector2){0.0f, displace.y * -1},
-				(Vector2){displace.x * -1, displace.y},
-				(Vector2){displace.x, displace.y},
-				(Vector2){0.0f, displace.y * -1},
+				{0.0f, displace.y * -1},
+				{displace.x * -1, displace.y},
+				{displace.x, displace.y},
+				{0.0f, displace.y * -1},
 			};
 			Vector2 positions[max] = { 0 };
 			for (int i = 0; i < max; i++)
@@ -1773,7 +1777,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 		
 		case 4:
 		{	
-			int max = 5;
+			const int max = 5;
 			float left = 0.0f + umod;
 			float right = 1.0f - umod;
 			float top = 0.0f + vmod;
@@ -1791,19 +1795,19 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 			}
 			Vector2 texcoords[max] =
 			{ 
-				(Vector2){left, top},
-				(Vector2){left, bottom},
-				(Vector2){right, bottom},
-				(Vector2){right, top},
-				(Vector2){left, top}
+				{left, top},
+				{left, bottom},
+				{right, bottom},
+				{right, top},
+				{left, top}
 			};
 			Vector2 points[max] = 
 			{
-				(Vector2){displace.x * -1, displace.y * -1},
-				(Vector2){displace.x * -1, displace.y},
-				(Vector2){displace.x, displace.y},
-				(Vector2){displace.x, displace.y * -1},
-				(Vector2){displace.x * -1, displace.y * -1}
+				{displace.x * -1, displace.y * -1},
+				{displace.x * -1, displace.y},
+				{displace.x, displace.y},
+				{displace.x, displace.y * -1},
+				{displace.x * -1, displace.y * -1}
 			};
 			Vector2 positions[max] = { 0 };
 			for (int i = 0; i < max; i++)
@@ -1823,7 +1827,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 		
 		default:
 		{
-			int max = shape->n + 1;
+			const int max = shape->n + 1 < MAX_VERTICES ? shape->n + 1 : MAX_VERTICES;
 			float centralAngle = 0;
 			Vector2 midPoint = {0.5f, 0.5f};
 			if ( img.scrollable )
@@ -1832,8 +1836,8 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				midPoint.x += translate.x;
 				midPoint.y += translate.y;
 			}
-			Vector2 texcoords[max] = { 0 };
-			Vector2 points[max] = { 0 };
+			Vector2 texcoords[MAX_VERTICES] = { 0 };
+			Vector2 points[MAX_VERTICES] = { 0 };
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -1842,12 +1846,12 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				points[i].x = sin * 0.5f * maxSize.x;
 				points[i].y = cos * 0.5f * maxSize.y;
 				// calculate texture coordnites
-				texcoords[i] = (Vector2){midPoint.x + sin * (0.5f - umod), midPoint.y + cos * (0.5f - vmod)};
+				texcoords[i] = Vector2{midPoint.x + sin * (0.5f - umod), midPoint.y + cos * (0.5f - vmod)};
 						
 				centralAngle += 360.0f / (float)shape->n;
 			}
 			// create copy to rotate coordnites
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[MAX_VERTICES] = { 0 };
 			for (int i=0; i < max; i++) 
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -1888,7 +1892,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 	{
 		case 0:
 		{
-			int max = 37;
+			const int max = 37;
 			Vector2 midPoint = {0.5f, 0.5f}; // midPoint of texture
 			Vector2 rate = {0, 0}; // texture scaling factor
 			Vector2 displace = transform.radius; // length of points
@@ -1948,7 +1952,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				float cos = cosf(centralAngle * DEG2RAD);
 				points[i].x = sin * displace.x;
 				points[i].y = cos * displace.y;
-				texcoords[i] = (Vector2){midPoint.x + sin * (0.5f - rate.x / 2), midPoint.y + cos * (0.5f - rate.y / 2)};
+				texcoords[i] = Vector2{midPoint.x + sin * (0.5f - rate.x / 2), midPoint.y + cos * (0.5f - rate.y / 2)};
 				centralAngle += 10;
 			}
 			Vector2 positions[max] = { 0 };
@@ -1992,7 +1996,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 
 		case 3:
 		{
-			int max = 4;
+			const int max = 4;
 			float left = 0.0f;
 			float right = 1.0f;
 			float top = 0.0f;
@@ -2064,17 +2068,17 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 			}
 			Vector2 texcoords[max] =
 			{ 
-				(Vector2){(left + right) / 2, top},
-				(Vector2){left, bottom},
-				(Vector2){right, bottom},
-				(Vector2){(left + right) / 2, top}
+				{(left + right) / 2, top},
+				{left, bottom},
+				{right, bottom},
+				{(left + right) / 2, top}
 			};
 			Vector2 points[max] =
 			{ 
-				(Vector2){0, displace.y * -1},
-				(Vector2){displace.x * -1, displace.y},
-				(Vector2){displace.x, displace.y},
-				(Vector2){0, displace.y * -1}
+				{0, displace.y * -1},
+				{displace.x * -1, displace.y},
+				{displace.x, displace.y},
+				{0, displace.y * -1}
 			};
 					
 			Vector2 positions[max] = { 0 };
@@ -2098,7 +2102,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 		
 		case 4:
 		{
-			int max = 5;
+			const int max = 5;
 			float left = 0.0f;
 			float right = 1.0f;
 			float top = 0.0f;
@@ -2170,19 +2174,19 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 			}
 			Vector2 texcoords[max] =
 			{ 
-				(Vector2){left, top},
-				(Vector2){left, bottom},
-				(Vector2){right, bottom},
-				(Vector2){right, top},
-				(Vector2){left, top}
+				{left, top},
+				{left, bottom},
+				{right, bottom},
+				{right, top},
+				{left, top}
 			};
 			Vector2 points[max] = 
 			{
-				(Vector2){displace.x * -1, displace.y * -1},
-				(Vector2){displace.x * -1, displace.y},
-				(Vector2){displace.x, displace.y},
-				(Vector2){displace.x, displace.y * -1},
-				(Vector2){displace.x * -1, displace.y * -1}
+				{displace.x * -1, displace.y * -1},
+				{displace.x * -1, displace.y},
+				{displace.x, displace.y},
+				{displace.x, displace.y * -1},
+				{displace.x * -1, displace.y * -1}
 			};
 			Vector2 positions[max] = { 0 };
 			for (int i = 0; i < max; i++)
@@ -2206,7 +2210,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 		
 		default:
 		{
-			int max = shape->n + 1;
+			const int max = shape->n + 1 < MAX_VERTICES ? shape->n + 1 : MAX_VERTICES;
 			Vector2 midPoint = {0.5f, 0.5f}; // midPoint of texture
 			Vector2 rate = {0, 0}; // texture scaling factor
 			Vector2 displace = transform.radius; // length of points
@@ -2258,18 +2262,18 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				}
 			}
 			float centralAngle = 0;
-			Vector2 texcoords[max] = { 0 };
-			Vector2 points[max] = { 0 };
+			Vector2 texcoords[MAX_VERTICES] = { 0 };
+			Vector2 points[MAX_VERTICES] = { 0 };
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
 				float cos = cosf(centralAngle * DEG2RAD);
 				points[i].x = sin * displace.x;
 				points[i].y = cos * displace.y;
-				texcoords[i] = (Vector2){midPoint.x + sin * (0.5f - rate.x / 2), midPoint.y + cos * (0.5f - rate.y / 2)};
+				texcoords[i] = Vector2{midPoint.x + sin * (0.5f - rate.x / 2), midPoint.y + cos * (0.5f - rate.y / 2)};
 				centralAngle += 360.0f / (float)shape->n;
 			}
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[MAX_VERTICES] = { 0 };
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2306,7 +2310,7 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 	{
 		case 0:
 		{
-			int max = 37;
+			const int max = 37;
 			int centralAngle = 0;
 			Vector2 texcoords[max] = { 0 };
 			Vector2 points[max] = { 0 };
@@ -2314,8 +2318,8 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
 				float cos = cosf(centralAngle * DEG2RAD);
-				points[i] = (Vector2){sin * imgSize.x / 2, cos * imgSize.y / 2};
-				texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
+				points[i] = Vector2{sin * imgSize.x / 2, cos * imgSize.y / 2};
+				texcoords[i] = Vector2{0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
 				centralAngle += 10;
 			}
 			Vector2 positions[max] = { 0 };
@@ -2324,7 +2328,7 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 			}
 			
-			DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, shape->fill->col);
+			DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), Vector2{0.5f, 0.5f}, positions, texcoords, max, shape->fill->col);
 			
 			break;
 		}
@@ -2343,20 +2347,20 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 		
 		case 3:
 		{
-			int max = 4;
+			const int max = 4;
 			Vector2 texcoords[max] =
 			{ 
-				(Vector2){0.5f, 0.0f},
-				(Vector2){0.0f, 1.0f},
-				(Vector2){1.0f, 1.0f},
-				(Vector2){0.5f, 0.0f}
+				{0.5f, 0.0f},
+				{0.0f, 1.0f},
+				{1.0f, 1.0f},
+				{0.5f, 0.0f}
 			};
 			Vector2 points[max] =
 			{ 
-				(Vector2){0, imgSize.y * -0.5f},
-				(Vector2){imgSize.x * -0.5f, imgSize.y * 0.5f},
-				(Vector2){imgSize.x * 0.5f, imgSize.y * 0.5f},
-				(Vector2){0, imgSize.y * -0.5f}
+				{0, imgSize.y * -0.5f},
+				{imgSize.x * -0.5f, imgSize.y * 0.5f},
+				{imgSize.x * 0.5f, imgSize.y * 0.5f},
+				{0, imgSize.y * -0.5f}
 			};
 			Vector2 positions[max] = { 0 };
 			for (int i = 0; i < max; i++)
@@ -2364,7 +2368,7 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 			}
 			
-			DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, shape->fill->col);
+			DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), Vector2{0.5f, 0.5f}, positions, texcoords, max, shape->fill->col);
 			
 			break;
 		}
@@ -2384,25 +2388,25 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 		
 		default:
 		{
-			int max = shape->n + 1;
+			const int max = shape->n + 1 < MAX_VERTICES ? shape->n + 1 : MAX_VERTICES;
 			int centralAngle = 0;
-			Vector2 texcoords[max] = { 0 };
-			Vector2 points[max] = { 0 };
+			Vector2 texcoords[MAX_VERTICES] = { 0 };
+			Vector2 points[MAX_VERTICES] = { 0 };
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
 				float cos = cosf(centralAngle * DEG2RAD);
-				points[i] = (Vector2){sin * imgSize.x / 2, cos * imgSize.y / 2};
-				texcoords[i] = (Vector2){0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
+				points[i] = Vector2{sin * imgSize.x / 2, cos * imgSize.y / 2};
+				texcoords[i] = Vector2{0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
 				centralAngle += 360.0f / (float)shape->n;
 			}
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[MAX_VERTICES] = { 0 };
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
 			}
 			
-			DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), (Vector2){0.5f, 0.5f}, positions, texcoords, max, shape->fill->col);
+			DrawTexturePoly((*img.img), transform.pos(NoGUI::Align(0, 0)), Vector2{0.5f, 0.5f}, positions, texcoords, max, shape->fill->col);
 			
 			break;
 		}
@@ -3439,12 +3443,12 @@ Vector2 Cursorer::getNotchPos(unsigned int n)
 	if ( n > notches )
 	{
 		
-		return (Vector2){width(), slideTransform.position.y};
+		return Vector2{width(), slideTransform.position.y};
 	}
 	else
 	{
 		
-		return (Vector2){getNotchWidth() * n, slideTransform.position.y};
+		return Vector2{getNotchWidth() * n, slideTransform.position.y};
 	}
 }
 
