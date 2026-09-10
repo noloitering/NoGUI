@@ -30,7 +30,7 @@ OBJS = $(patsubst %.c, %.o, $(SRC))
 
 # compiler
 CC = g++
-CFLAGS += -Wall -Werror -std=c++17
+CFLAGS += -Wall -Wpedantic -Werror -std=c++17
 MAKE = make
 PLATFORM ?= PLATFORM_DESKTOP
 # DEBUG or RELEASE

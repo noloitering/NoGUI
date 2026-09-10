@@ -43,17 +43,17 @@ int main(int argc, char ** argv)
 	NoGUI::Align bottom = NoGUI::Align(0, 1);
 	NoGUI::Align bottomRight = NoGUI::Align(1, 1);
 	
-	NoGUI::Transform dataT = NoGUI::Transform((Vector2){(elemSize.x + window.x / 2) / 2, window.y / 2}, elemSize, center);
-	NoGUI::Transform toggleT = NoGUI::Transform((Vector2){(elemSize.x * 2 + window.x / 2), window.y / 2}, elemSize, center);
-	NoGUI::Transform leftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, left);
-	NoGUI::Transform topPos = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, top);
-	NoGUI::Transform rightPos = NoGUI::Transform((Vector2){window.x, 0}, elemSize, right);
-	NoGUI::Transform centerLeftPos = NoGUI::Transform((Vector2){0, window.y / 2}, elemSize, centerLeft);
-	NoGUI::Transform centerRightPos = NoGUI::Transform((Vector2){window.x, window.y / 2}, elemSize, centerRight);
-	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, center);
-	NoGUI::Transform bottomLeftPos = NoGUI::Transform((Vector2){0, window.y}, elemSize, bottomLeft);
-	NoGUI::Transform bottomPos = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, bottom);
-	NoGUI::Transform bottomRightPos = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, bottomRight);
+	NoGUI::Transform dataT = NoGUI::Transform(Vector2{(elemSize.x + window.x / 2) / 2, window.y / 2}, elemSize, center);
+	NoGUI::Transform toggleT = NoGUI::Transform(Vector2{(elemSize.x * 2 + window.x / 2), window.y / 2}, elemSize, center);
+	NoGUI::Transform leftPos = NoGUI::Transform(Vector2{0, 0}, elemSize, left);
+	NoGUI::Transform topPos = NoGUI::Transform(Vector2{window.x / 2, 0}, elemSize, top);
+	NoGUI::Transform rightPos = NoGUI::Transform(Vector2{window.x, 0}, elemSize, right);
+	NoGUI::Transform centerLeftPos = NoGUI::Transform(Vector2{0, window.y / 2}, elemSize, centerLeft);
+	NoGUI::Transform centerRightPos = NoGUI::Transform(Vector2{window.x, window.y / 2}, elemSize, centerRight);
+	NoGUI::Transform centerPos = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, elemSize, center);
+	NoGUI::Transform bottomLeftPos = NoGUI::Transform(Vector2{0, window.y}, elemSize, bottomLeft);
+	NoGUI::Transform bottomPos = NoGUI::Transform(Vector2{window.x / 2, window.y}, elemSize, bottom);
+	NoGUI::Transform bottomRightPos = NoGUI::Transform(Vector2{window.x, window.y}, elemSize, bottomRight);
 
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, dataT, "Tip", "", std::make_shared< NoGUI::CContainer >());
 	std::shared_ptr< NoGUI::Element > toggleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, toggleT, "Tip", "Wrap DOWN", std::make_shared< NoGUI::CContainer >());

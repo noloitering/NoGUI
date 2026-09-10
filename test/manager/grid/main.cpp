@@ -25,7 +25,7 @@ class EventHandler : public NoGUI::Listener
 					// add slider components
 					newElem->components = std::make_shared< NoGUI::CContainer >();
 					NoGUI::CMultiShape& slide = newElem->components->addComponent< NoGUI::CMultiShape >();
-					NoGUI::Transform newSlidePos = NoGUI::Transform((Vector2){0, 0}, (Vector2){0, newElem->radius.y}, NoGUI::Align(-1, 0));
+					NoGUI::Transform newSlidePos = NoGUI::Transform(Vector2{0, 0}, Vector2{0, newElem->radius.y}, NoGUI::Align(-1, 0));
 					slide.shapes.push_back(std::make_pair(elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().first, newSlidePos));
 					// dont trigger slider while positioning
 					newElem->setActive(false);
@@ -39,7 +39,7 @@ class EventHandler : public NoGUI::Listener
 					Vector2 mousePos = GetMousePosition();
 					Vector2 cellSize = gui.getCellSize();
 					std::shared_ptr< NoGUI::Element > elemToAdd = gui.getPage(0)->getElements("SliderX").back();
-					elemToAdd->repos((Vector2){mousePos.x / cellSize.x, mousePos.y / cellSize.y});
+					elemToAdd->repos(Vector2{mousePos.x / cellSize.x, mousePos.y / cellSize.y});
 					if ( IsMouseButtonReleased(MOUSE_LEFT_BUTTON) )
 					{
 						// drop and activate element
@@ -83,7 +83,7 @@ class EventHandler : public NoGUI::Listener
 					// add slider components
 					newElem->components = std::make_shared< NoGUI::CContainer >();
 					NoGUI::CMultiShape& slide = newElem->components->addComponent< NoGUI::CMultiShape >();
-					NoGUI::Transform newSlidePos = NoGUI::Transform((Vector2){0, 0}, (Vector2){newElem->radius.x, 0}, NoGUI::Align(0, 1));
+					NoGUI::Transform newSlidePos = NoGUI::Transform(Vector2{0, 0}, Vector2{newElem->radius.x, 0}, NoGUI::Align(0, 1));
 					slide.shapes.push_back(std::make_pair(elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().first, newSlidePos));
 					// dont trigger slider while positioning
 					newElem->setActive(false);
@@ -97,7 +97,7 @@ class EventHandler : public NoGUI::Listener
 					Vector2 mousePos = GetMousePosition();
 					Vector2 cellSize = gui.getCellSize();
 					std::shared_ptr< NoGUI::Element > elemToAdd = gui.getPage(0)->getElements("SliderY").back();
-					elemToAdd->repos((Vector2){mousePos.x / cellSize.x, mousePos.y / cellSize.y});
+					elemToAdd->repos(Vector2{mousePos.x / cellSize.x, mousePos.y / cellSize.y});
 					if ( IsMouseButtonReleased(MOUSE_LEFT_BUTTON) )
 					{
 						// drop and activate element
@@ -143,7 +143,7 @@ class EventHandler : public NoGUI::Listener
 					NoGUI::CMultiShape& cursor = newElem->components->addComponent< NoGUI::CMultiShape >(true);
 					Vector2 cursorRadius = elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().second.radius;
 					float cursorY = elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().second.position.y;
-					NoGUI::Transform newSlidePos = NoGUI::Transform((Vector2){0, cursorY}, (Vector2){cursorRadius}, NoGUI::Align(-1, 0));
+					NoGUI::Transform newSlidePos = NoGUI::Transform(Vector2{0, cursorY}, Vector2{cursorRadius}, NoGUI::Align(-1, 0));
 					cursor.shapes.push_back(std::make_pair(elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().first, newSlidePos));
 					// dont trigger slider while positioning
 					newElem->setActive(false);
@@ -157,7 +157,7 @@ class EventHandler : public NoGUI::Listener
 					Vector2 mousePos = GetMousePosition();
 					Vector2 cellSize = gui.getCellSize();
 					std::shared_ptr< NoGUI::Element > elemToAdd = gui.getPage(0)->getElements("CSliderX").back();
-					elemToAdd->repos((Vector2){mousePos.x / cellSize.x, mousePos.y / cellSize.y});
+					elemToAdd->repos(Vector2{mousePos.x / cellSize.x, mousePos.y / cellSize.y});
 					if ( IsMouseButtonReleased(MOUSE_LEFT_BUTTON) )
 					{
 						// drop and activate element
@@ -203,7 +203,7 @@ class EventHandler : public NoGUI::Listener
 					NoGUI::CMultiShape& cursor = newElem->components->addComponent< NoGUI::CMultiShape >(true);
 					Vector2 cursorRadius = elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().second.radius;
 //					float cursorY = elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().second.position.y;
-					NoGUI::Transform newSlidePos = NoGUI::Transform((Vector2){0, -0.05}, (Vector2){cursorRadius}, NoGUI::Align(1, 0));
+					NoGUI::Transform newSlidePos = NoGUI::Transform(Vector2{0, -0.05}, Vector2{cursorRadius}, NoGUI::Align(1, 0));
 					cursor.shapes.push_back(std::make_pair(elem->components->getComponent< NoGUI::CMultiShape >().shapes.front().first, newSlidePos));
 					// dont trigger slider while positioning
 					newElem->setActive(false);
@@ -217,7 +217,7 @@ class EventHandler : public NoGUI::Listener
 					Vector2 mousePos = GetMousePosition();
 					Vector2 cellSize = gui.getCellSize();
 					std::shared_ptr< NoGUI::Element > elemToAdd = gui.getPage(0)->getElements("CSliderY").back();
-					elemToAdd->repos((Vector2){mousePos.x / cellSize.x, mousePos.y / cellSize.y});
+					elemToAdd->repos(Vector2{mousePos.x / cellSize.x, mousePos.y / cellSize.y});
 					if ( IsMouseButtonReleased(MOUSE_LEFT_BUTTON) )
 					{
 						// drop and activate element
@@ -256,7 +256,7 @@ class EventHandler : public NoGUI::Listener
 				Vector2 slideRadius = {(mousePos.x / cellSize.x - elem->pos(NoGUI::Align(-1, 0)).x) / 2, sliderShapes.shapes.front().second.radius.y};
 				sliderShapes.shapes.front().second.resize(slideRadius);
 				// reposition slider since multishapes have a center origin
-				sliderShapes.shapes.front().second.repos((Vector2){slideRadius.x, sliderShapes.shapes.front().second.position.y});
+				sliderShapes.shapes.front().second.repos(Vector2{slideRadius.x, sliderShapes.shapes.front().second.position.y});
 			}
 		}
 		else if ( TextIsEqual("SliderY", elem->getTag()) )
@@ -270,7 +270,7 @@ class EventHandler : public NoGUI::Listener
 				Vector2 slideRadius = {sliderShapes.shapes.front().second.radius.x, (elem->pos(NoGUI::Align(0, 1)).y - mousePos.y / cellSize.y) / 2};
 				sliderShapes.shapes.front().second.resize(slideRadius);
 				// reposition slider since multishapes have a center origin
-				sliderShapes.shapes.front().second.repos((Vector2){sliderShapes.shapes.front().second.position.x, slideRadius.y * -1});
+				sliderShapes.shapes.front().second.repos(Vector2{sliderShapes.shapes.front().second.position.x, slideRadius.y * -1});
 			}
 		}
 		else if ( TextIsEqual("CSliderX", elem->getTag()) )
@@ -341,18 +341,18 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > line = std::make_shared< NoGUI::nShape >(2, outlineFill);
 	std::shared_ptr< NoGUI::nShape > triangle = std::make_shared< NoGUI::nShape >(3, cursorFill);
 	
-	NoGUI::Transform leftPos = NoGUI::Transform((Vector2){0, 5}, (Vector2){1, 6}, NoGUI::Align(-1, 0));
-	NoGUI::Transform topLeftPos = NoGUI::Transform((Vector2){2, 0}, (Vector2){1, 0.5}, NoGUI::Align(-1, -1));
-	NoGUI::Transform xSliderPos = NoGUI::Transform((Vector2){0.25, 1}, (Vector2){0.75, 0.5}, NoGUI::Align(-1, -1));
-	NoGUI::Transform xSlidePos = NoGUI::Transform((Vector2){0.1, 0}, (Vector2){0.1, 0.5}, NoGUI::Align(-1, 0));
-	NoGUI::Transform ySliderPos = NoGUI::Transform((Vector2){1, 3}, (Vector2){0.3, 1.3}, NoGUI::Align(0, -1));
-//	NoGUI::Transform ySliderPos = NoGUI::Transform((Vector2){1.25, 3}, (Vector2){0.75, 0.5}, NoGUI::Align(-1, -1), 90);
-	NoGUI::Transform ySlidePos = NoGUI::Transform((Vector2){0, -0.2}, (Vector2){0.3, 0.2}, NoGUI::Align(0, 1));
-	NoGUI::Transform xCursorerPos = NoGUI::Transform((Vector2){0.25, 7}, (Vector2){0.75, 0.1}, NoGUI::Align(-1, -1));
-	NoGUI::Transform xCursorPos = NoGUI::Transform((Vector2){0, -0.05}, (Vector2){0.1, 0.2});
-	NoGUI::Transform yCursorerPos = NoGUI::Transform((Vector2){1, 8}, (Vector2){0.75, 0.1}, NoGUI::Align(-1, -1), 90);
-//	NoGUI::Transform yCursorerPos = NoGUI::Transform((Vector2){1, 8}, (Vector2){1, 0.06}, NoGUI::Align(-1, -1), 90);
-	NoGUI::Transform yCursorPos = NoGUI::Transform((Vector2){0, -0.1}, (Vector2){0.1, 0.2});
+	NoGUI::Transform leftPos = NoGUI::Transform(Vector2{0, 5}, Vector2{1, 6}, NoGUI::Align(-1, 0));
+	NoGUI::Transform topLeftPos = NoGUI::Transform(Vector2{2, 0}, Vector2{1, 0.5}, NoGUI::Align(-1, -1));
+	NoGUI::Transform xSliderPos = NoGUI::Transform(Vector2{0.25, 1}, Vector2{0.75, 0.5}, NoGUI::Align(-1, -1));
+	NoGUI::Transform xSlidePos = NoGUI::Transform(Vector2{0.1, 0}, Vector2{0.1, 0.5}, NoGUI::Align(-1, 0));
+	NoGUI::Transform ySliderPos = NoGUI::Transform(Vector2{1, 3}, Vector2{0.3, 1.3}, NoGUI::Align(0, -1));
+//	NoGUI::Transform ySliderPos = NoGUI::Transform(Vector2{1.25, 3}, Vector2{0.75, 0.5}, NoGUI::Align(-1, -1), 90);
+	NoGUI::Transform ySlidePos = NoGUI::Transform(Vector2{0, -0.2}, Vector2{0.3, 0.2}, NoGUI::Align(0, 1));
+	NoGUI::Transform xCursorerPos = NoGUI::Transform(Vector2{0.25, 7}, Vector2{0.75, 0.1}, NoGUI::Align(-1, -1));
+	NoGUI::Transform xCursorPos = NoGUI::Transform(Vector2{0, -0.05}, Vector2{0.1, 0.2});
+	NoGUI::Transform yCursorerPos = NoGUI::Transform(Vector2{1, 8}, Vector2{0.75, 0.1}, NoGUI::Align(-1, -1), 90);
+//	NoGUI::Transform yCursorerPos = NoGUI::Transform(Vector2{1, 8}, Vector2{1, 0.06}, NoGUI::Align(-1, -1), 90);
+	NoGUI::Transform yCursorPos = NoGUI::Transform(Vector2{0, -0.1}, Vector2{0.1, 0.2});
 	
 	std::shared_ptr< NoGUI::CContainer > labelCContainer = gui.getPage(0)->addComponents("Label");
 	labelCContainer->addComponent< NoGUI::CText >(textFill, nullptr, 32, NoGUI::Align(-1, -1));

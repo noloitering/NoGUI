@@ -24,15 +24,15 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > septagon = std::make_shared< NoGUI::nShape >(7, fill, outline);
 	std::shared_ptr< NoGUI::nShape > octagon = std::make_shared< NoGUI::nShape >(8, fill, outline);
 	
-	NoGUI::Transform rightBaseT = NoGUI::Transform((Vector2){window.x / 8, window.y / 2}, baseSize, NoGUI::Align(0, 0));
-	NoGUI::Transform leftBaseT = NoGUI::Transform((Vector2){window.x - window.x / 8, window.y / 2}, baseSize, NoGUI::Align(0, 0));
-	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, polySize, NoGUI::Align(0, 0));
-	NoGUI::Transform rightArrowT = NoGUI::Transform((Vector2){arrowSize.x, 0}, arrowSize, NoGUI::Align(1, 0), 90);
-	NoGUI::Transform leftArrowT = NoGUI::Transform((Vector2){arrowSize.x * -1, 0}, arrowSize, NoGUI::Align(-1, 0), -90);
-	NoGUI::Transform topT = NoGUI::Transform((Vector2){0, -1 * polySize.y}, polySize, NoGUI::Align(0, -1));
-	NoGUI::Transform bottomT = NoGUI::Transform((Vector2){0, polySize.y}, polySize, NoGUI::Align(0, 1));
-	NoGUI::Transform leftT = NoGUI::Transform((Vector2){polySize.x * -1, 0}, polySize, NoGUI::Align(-1, 0));
-	NoGUI::Transform rightT = NoGUI::Transform((Vector2){polySize.x, 0}, polySize, NoGUI::Align(1, 0));
+	NoGUI::Transform rightBaseT = NoGUI::Transform(Vector2{window.x / 8, window.y / 2}, baseSize, NoGUI::Align(0, 0));
+	NoGUI::Transform leftBaseT = NoGUI::Transform(Vector2{window.x - window.x / 8, window.y / 2}, baseSize, NoGUI::Align(0, 0));
+	NoGUI::Transform centerT = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, polySize, NoGUI::Align(0, 0));
+	NoGUI::Transform rightArrowT = NoGUI::Transform(Vector2{arrowSize.x, 0}, arrowSize, NoGUI::Align(1, 0), 90);
+	NoGUI::Transform leftArrowT = NoGUI::Transform(Vector2{arrowSize.x * -1, 0}, arrowSize, NoGUI::Align(-1, 0), -90);
+	NoGUI::Transform topT = NoGUI::Transform(Vector2{0, -1 * polySize.y}, polySize, NoGUI::Align(0, -1));
+	NoGUI::Transform bottomT = NoGUI::Transform(Vector2{0, polySize.y}, polySize, NoGUI::Align(0, 1));
+	NoGUI::Transform leftT = NoGUI::Transform(Vector2{polySize.x * -1, 0}, polySize, NoGUI::Align(-1, 0));
+	NoGUI::Transform rightT = NoGUI::Transform(Vector2{polySize.x, 0}, polySize, NoGUI::Align(1, 0));
 	
 	std::shared_ptr< NoGUI::CContainer > rightArrowComps = std::make_shared< NoGUI::CContainer >();
 	std::shared_ptr< NoGUI::CContainer > leftArrowComps = std::make_shared< NoGUI::CContainer >();

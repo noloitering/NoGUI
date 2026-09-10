@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
 	if ( image.img == nullptr )
 	{
 		image.img = std::make_shared< Texture2D >(LoadTexture("testimg.gif"));
-		image.scale = (Vector2){0.5f, 0.5f};
+		image.scale = Vector2{0.5f, 0.5f};
 		image.scrollable = true;
 		image.crop = NoGUI::Crop::NONE;
 	}
@@ -44,22 +44,22 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > sevengon = std::make_shared< NoGUI::nShape >(5, fill, outline);
 	std::shared_ptr< NoGUI::nShape > octagon = std::make_shared< NoGUI::nShape >(8, fill, outline);
 	
-	NoGUI::Transform leftT = NoGUI::Transform((Vector2){0, 0}, elemSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform topT = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
-	NoGUI::Transform rightT = NoGUI::Transform((Vector2){window.x, 0}, elemSize, NoGUI::Align(1, -1));
-	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
-	NoGUI::Transform centerLeftT = NoGUI::Transform((Vector2){0, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(-1, 0));
-	NoGUI::Transform centerRightT = NoGUI::Transform((Vector2){window.x, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(1, 0));
-	NoGUI::Transform bottomLT = NoGUI::Transform((Vector2){0, window.y}, elemSize, NoGUI::Align(-1, 1));
-	NoGUI::Transform bottomT = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
-	NoGUI::Transform bottomRT = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, NoGUI::Align(1, 1));
+	NoGUI::Transform leftT = NoGUI::Transform(Vector2{0, 0}, elemSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform topT = NoGUI::Transform(Vector2{window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
+	NoGUI::Transform rightT = NoGUI::Transform(Vector2{window.x, 0}, elemSize, NoGUI::Align(1, -1));
+	NoGUI::Transform centerT = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
+	NoGUI::Transform centerLeftT = NoGUI::Transform(Vector2{0, window.y / 2}, Vector2{200, 100}, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerRightT = NoGUI::Transform(Vector2{window.x, window.y / 2}, Vector2{200, 100}, NoGUI::Align(1, 0));
+	NoGUI::Transform bottomLT = NoGUI::Transform(Vector2{0, window.y}, elemSize, NoGUI::Align(-1, 1));
+	NoGUI::Transform bottomT = NoGUI::Transform(Vector2{window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
+	NoGUI::Transform bottomRT = NoGUI::Transform(Vector2{window.x, window.y}, elemSize, NoGUI::Align(1, 1));
 	
 	std::shared_ptr< NoGUI::Element > styleElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, "Tip", "NONE", std::make_shared< NoGUI::CContainer >());
 	std::shared_ptr< NoGUI::Element > scrollElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerLeftT, "Tip", "\nscrolling ENABLED", std::make_shared< NoGUI::CContainer >());
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, centerRightT, "Tip", "", std::make_shared< NoGUI::CContainer >());
 	styleElem->components->addComponent< NoGUI::CText >();
 	dataElem->components->addComponent< NoGUI::CText >();
-	scrollElem->components->addComponent< NoGUI::CText >(toggleFill, nullptr, 20.0f, NoGUI::Align(), NoGUI::Wrap::DOWN, 0.0f, (Vector2){2, 24});
+	scrollElem->components->addComponent< NoGUI::CText >(toggleFill, nullptr, 20.0f, NoGUI::Align(), NoGUI::Wrap::DOWN, 0.0f, Vector2{2, 24});
 	std::shared_ptr< NoGUI::CContainer > comps = std::make_shared< NoGUI::CContainer >();
 	comps->addComponent< NoGUI::CImage >(image);
 	std::shared_ptr< NoGUI::Element > leftElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, ellipse, leftT, "", "", comps);

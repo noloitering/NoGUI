@@ -9,7 +9,7 @@ int main(int argc, char ** argv)
 	size_t addTagID;
 	size_t toDel;
 	std::shared_ptr< NoGUI::Fill > baseFill = std::make_shared< NoGUI::Fill >(GRAY);
-	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >((Color){1, 1, 1, 1});
+	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(Color{1, 1, 1, 1});
 	std::shared_ptr< NoGUI::Fill > elemFill = std::make_shared< NoGUI::Fill >(GRAY, DARKGRAY);
 	std::shared_ptr< NoGUI::Fill > buttonFill = std::make_shared< NoGUI::Fill >(DARKGRAY, BLACK);
 	std::shared_ptr< NoGUI::Fill > outFill = std::make_shared< NoGUI::Fill >(WHITE);
@@ -24,22 +24,22 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > buttonShape = std::make_shared< NoGUI::nShape >(4, buttonFill, outline);
 	std::shared_ptr< NoGUI::nShape > inputShape = std::make_shared< NoGUI::nShape >(4, buttonFill, outline);
 	
-	NoGUI::Transform startPos = NoGUI::Transform((Vector2){20, 20}, elemSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform tagButtonPos = NoGUI::Transform((Vector2){startPos.position.x, startPos.position.y + startPos.height() + 20}, elemSize, startPos.origin);
-	NoGUI::Transform elemButtonPos = NoGUI::Transform((Vector2){startPos.position.x + startPos.width() + 20, startPos.position.y}, elemSize, startPos.origin);
-	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, (Vector2){300, 150}, NoGUI::Align());
-	NoGUI::Transform textPos = NoGUI::Transform((Vector2){centerPos.position.x, centerPos.position.y - 40}, (Vector2){centerPos.radius.x, 20}, NoGUI::Align());
+	NoGUI::Transform startPos = NoGUI::Transform(Vector2{20, 20}, elemSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform tagButtonPos = NoGUI::Transform(Vector2{startPos.position.x, startPos.position.y + startPos.height() + 20}, elemSize, startPos.origin);
+	NoGUI::Transform elemButtonPos = NoGUI::Transform(Vector2{startPos.position.x + startPos.width() + 20, startPos.position.y}, elemSize, startPos.origin);
+	NoGUI::Transform centerPos = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, Vector2{300, 150}, NoGUI::Align());
+	NoGUI::Transform textPos = NoGUI::Transform(Vector2{centerPos.position.x, centerPos.position.y - 40}, Vector2{centerPos.radius.x, 20}, NoGUI::Align());
 	Vector2 centerBottom = centerPos.pos(NoGUI::Align(0, 1));
-	NoGUI::Transform inputPos = NoGUI::Transform((Vector2){centerBottom.x, centerBottom.y - 8}, (Vector2){150, 50}, NoGUI::Align(0, 1));
-	NoGUI::Transform clearPos = NoGUI::Transform(inputPos.position, (Vector2){60, inputPos.radius.y}, inputPos.origin);
+	NoGUI::Transform inputPos = NoGUI::Transform(Vector2{centerBottom.x, centerBottom.y - 8}, Vector2{150, 50}, NoGUI::Align(0, 1));
+	NoGUI::Transform clearPos = NoGUI::Transform(inputPos.position, Vector2{60, inputPos.radius.y}, inputPos.origin);
 	Vector2 centerBottomRight = centerPos.pos(NoGUI::Align(1, 1));
-	NoGUI::Transform submitPos = NoGUI::Transform((Vector2){centerBottomRight.x - 8, centerBottomRight.y - 8}, (Vector2){50, 50}, NoGUI::Align(1, 1));
-	NoGUI::Transform delPos = NoGUI::Transform(submitPos.position, (Vector2){submitPos.width(), submitPos.radius.y}, submitPos.origin);
+	NoGUI::Transform submitPos = NoGUI::Transform(Vector2{centerBottomRight.x - 8, centerBottomRight.y - 8}, Vector2{50, 50}, NoGUI::Align(1, 1));
+	NoGUI::Transform delPos = NoGUI::Transform(submitPos.position, Vector2{submitPos.width(), submitPos.radius.y}, submitPos.origin);
 	Vector2 centerTopRight = centerPos.pos(NoGUI::Align(1, -1));
-	NoGUI::Transform closePos = NoGUI::Transform(centerTopRight, (Vector2){15, 15}, NoGUI::Align(1, -1));
+	NoGUI::Transform closePos = NoGUI::Transform(centerTopRight, Vector2{15, 15}, NoGUI::Align(1, -1));
 	Vector2 centerBottomLeft = centerPos.pos(NoGUI::Align(-1, 1));
-	NoGUI::Transform cancelPos = NoGUI::Transform((Vector2){centerBottomLeft.x + 8, centerBottomLeft.y - 8}, (Vector2){submitPos.radius.x * 2, submitPos.radius.y}, NoGUI::Align(-1, 1));
-	NoGUI::Transform cancelPosSmall = NoGUI::Transform((Vector2){centerBottomLeft.x + 8, centerBottomLeft.y - 8}, submitPos.radius, NoGUI::Align(-1, 1));
+	NoGUI::Transform cancelPos = NoGUI::Transform(Vector2{centerBottomLeft.x + 8, centerBottomLeft.y - 8}, Vector2{submitPos.radius.x * 2, submitPos.radius.y}, NoGUI::Align(-1, 1));
+	NoGUI::Transform cancelPosSmall = NoGUI::Transform(Vector2{centerBottomLeft.x + 8, centerBottomLeft.y - 8}, submitPos.radius, NoGUI::Align(-1, 1));
 	
 	std::shared_ptr< NoGUI::CContainer > components = std::make_shared< NoGUI::CContainer >();
 	components->addComponent< NoGUI::CText >(outFill);
@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
 	inputField->addComponent< NoGUI::CText >(outFill);
 	inputField->addComponent< NoGUI::CInput >(NoMAD::TAGBUFF);
 	std::shared_ptr< NoGUI::CContainer > limitText = std::make_shared< NoGUI::CContainer >();
-	limitText->addComponent< NoGUI::CText >(outFill, nullptr, 30.0f, NoGUI::Align(), NoGUI::Wrap::DOWN, 0.0f, (Vector2){10, 0});
+	limitText->addComponent< NoGUI::CText >(outFill, nullptr, 30.0f, NoGUI::Align(), NoGUI::Wrap::DOWN, 0.0f, Vector2{10, 0});
 	NoGUI::Page inputPg = NoGUI::Page(false);
 	inputPg.addComponents("TextBox", components);
 	inputPg.addComponents("CharLimit", limitText);

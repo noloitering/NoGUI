@@ -159,22 +159,22 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > line = std::make_shared< NoGUI::nShape >(2, lineFill);
 	std::shared_ptr< NoGUI::nShape > cursor = std::make_shared< NoGUI::nShape >(0, cursorFill, outline);
 	
-	NoGUI::Transform centerPos1 = NoGUI::Transform((Vector2){window.x / 2.0f - textSize.x - margin, window.y / 2.0f - (elemSize.y * 2.0f + margin) * 1.5f}, elemSize, NoGUI::Align(0, 0));
-	NoGUI::Transform textPos1 = NoGUI::Transform((Vector2){centerPos1.position.x + elemSize.x + margin, centerPos1.position.y}, textSize, NoGUI::Align(-1, 0));
-	NoGUI::Transform centerPos3 = NoGUI::Transform((Vector2){centerPos1.position.x, window.y - centerPos1.position.y}, elemSize, NoGUI::Align(0, 0));
-//	NoGUI::Transform textPos3 = NoGUI::Transform((Vector2){textPos1.position.x, centerPos3.position.y}, textSize, NoGUI::Align(-1, 0));
-	NoGUI::Transform centerPos2 = NoGUI::Transform((Vector2){centerPos1.position.x, (centerPos1.position.y + centerPos3.position.y) / 2.0f}, elemSize, NoGUI::Align(0, 0));
-	NoGUI::Transform textPos2 = NoGUI::Transform((Vector2){textPos1.position.x, centerPos2.position.y}, textSize, NoGUI::Align(-1, 0));
-	NoGUI::Transform controlsPos = NoGUI::Transform((Vector2){window.x, window.y / 2}, (Vector2){(window.x / 2 - elemSize.x - textSize.x * 3 - margin * 2.5f), window.y / 2}, NoGUI::Align(1, 0));
+	NoGUI::Transform centerPos1 = NoGUI::Transform(Vector2{window.x / 2.0f - textSize.x - margin, window.y / 2.0f - (elemSize.y * 2.0f + margin) * 1.5f}, elemSize, NoGUI::Align(0, 0));
+	NoGUI::Transform textPos1 = NoGUI::Transform(Vector2{centerPos1.position.x + elemSize.x + margin, centerPos1.position.y}, textSize, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerPos3 = NoGUI::Transform(Vector2{centerPos1.position.x, window.y - centerPos1.position.y}, elemSize, NoGUI::Align(0, 0));
+//	NoGUI::Transform textPos3 = NoGUI::Transform(Vector2{textPos1.position.x, centerPos3.position.y}, textSize, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerPos2 = NoGUI::Transform(Vector2{centerPos1.position.x, (centerPos1.position.y + centerPos3.position.y) / 2.0f}, elemSize, NoGUI::Align(0, 0));
+	NoGUI::Transform textPos2 = NoGUI::Transform(Vector2{textPos1.position.x, centerPos2.position.y}, textSize, NoGUI::Align(-1, 0));
+	NoGUI::Transform controlsPos = NoGUI::Transform(Vector2{window.x, window.y / 2}, Vector2{(window.x / 2 - elemSize.x - textSize.x * 3 - margin * 2.5f), window.y / 2}, NoGUI::Align(1, 0));
 	Vector2 controlCenter = controlsPos.pos(NoGUI::Align(0, -1));
-	NoGUI::Transform labelPos1 = NoGUI::Transform((Vector2){controlCenter.x - textSize.x, controlCenter.y + margin}, textSize, NoGUI::Align(0, -1));
-	NoGUI::Transform inputPos1 = NoGUI::Transform((Vector2){controlCenter.x, labelPos1.position.y}, textSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform labelPos2 = NoGUI::Transform((Vector2){labelPos1.position.x, labelPos1.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
-	NoGUI::Transform inputPos2 = NoGUI::Transform((Vector2){controlCenter.x, labelPos2.position.y}, textSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform labelPos3 = NoGUI::Transform((Vector2){labelPos1.position.x, labelPos2.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
-	NoGUI::Transform inputPos3 = NoGUI::Transform((Vector2){controlCenter.x, labelPos3.position.y}, textSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform labelPos4 = NoGUI::Transform((Vector2){labelPos1.position.x, labelPos3.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
-	NoGUI::Transform inputPos4 = NoGUI::Transform((Vector2){controlCenter.x, labelPos4.position.y}, textSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform labelPos1 = NoGUI::Transform(Vector2{controlCenter.x - textSize.x, controlCenter.y + margin}, textSize, NoGUI::Align(0, -1));
+	NoGUI::Transform inputPos1 = NoGUI::Transform(Vector2{controlCenter.x, labelPos1.position.y}, textSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform labelPos2 = NoGUI::Transform(Vector2{labelPos1.position.x, labelPos1.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
+	NoGUI::Transform inputPos2 = NoGUI::Transform(Vector2{controlCenter.x, labelPos2.position.y}, textSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform labelPos3 = NoGUI::Transform(Vector2{labelPos1.position.x, labelPos2.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
+	NoGUI::Transform inputPos3 = NoGUI::Transform(Vector2{controlCenter.x, labelPos3.position.y}, textSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform labelPos4 = NoGUI::Transform(Vector2{labelPos1.position.x, labelPos3.pos(NoGUI::Align(0, 1)).y + margin}, textSize, NoGUI::Align(0, -1));
+	NoGUI::Transform inputPos4 = NoGUI::Transform(Vector2{controlCenter.x, labelPos4.position.y}, textSize, NoGUI::Align(-1, -1));
 	
 	std::shared_ptr< NoGUI::CContainer > textBoxComps = std::make_shared< NoGUI::CContainer >();
 	textBoxComps->addComponent< NoGUI::CText >(textFill);
@@ -188,7 +188,7 @@ int main(int argc, char ** argv)
 	manager.getPage()->addElement< NoGUI::Element >(box, textPos1, "Value", "0");
 	manager.getPage()->addElement< NoGUI::Cursorer >(line, centerPos2, "Slider", "Cursorer");
 	manager.getPage()->addElement< NoGUI::Element >(box, textPos2, "Value", "0");
-//	manager.getPage()->addElement< NoGUI::Cursorer >(line, centerPos3, "Slider", "Cursorer", nullptr, nullptr, NoGUI::Align(-1, 0), (Vector2){10.0f, 10.0f}, 5);
+//	manager.getPage()->addElement< NoGUI::Cursorer >(line, centerPos3, "Slider", "Cursorer", nullptr, nullptr, NoGUI::Align(-1, 0), Vector2{10.0f, 10.0f}, 5);
 //	manager.getPage()->addElement< NoGUI::Element >(box, textPos3, "Value", "0");
 	manager.addPage(true);
 	manager.getPage(1)->addComponents("Label", textComps);

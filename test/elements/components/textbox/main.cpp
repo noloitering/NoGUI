@@ -33,9 +33,9 @@ int main(int argc, char ** argv)
 	NoGUI::Align center = NoGUI::Align(0, 0);
 	NoGUI::Align topLeft = NoGUI::Align(-1, -1);
 	
-	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, center);
-	NoGUI::Transform topLeftPos = NoGUI::Transform((Vector2){0, 0}, elemSize, topLeft);
-	NoGUI::Transform togglePos = NoGUI::Transform((Vector2){0, elemSize.y - 20.0f}, elemSize, topLeft);
+	NoGUI::Transform centerPos = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, elemSize, center);
+	NoGUI::Transform topLeftPos = NoGUI::Transform(Vector2{0, 0}, elemSize, topLeft);
+	NoGUI::Transform togglePos = NoGUI::Transform(Vector2{0, elemSize.y - 20.0f}, elemSize, topLeft);
 
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, "Test", msg, std::make_shared< NoGUI::CContainer >());
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, dataRect, topLeftPos, "Tip", "", std::make_shared< NoGUI::CContainer >());

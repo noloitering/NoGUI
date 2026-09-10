@@ -12,8 +12,8 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::nShape > tipShape = std::make_shared< NoGUI::nShape >(4, noFill);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill);
-	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
-	NoGUI::Transform leftT = NoGUI::Transform((Vector2){0, 0}, (Vector2){125, 200}, NoGUI::Align(-1, -1));
+	NoGUI::Transform centerT = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
+	NoGUI::Transform leftT = NoGUI::Transform(Vector2{0, 0}, Vector2{125, 200}, NoGUI::Align(-1, -1));
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerT);
 	std::shared_ptr< NoGUI::Element > dataElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, tipShape, leftT, "Tip", "", std::make_shared< NoGUI::CContainer >());
 	dataElem->components->addComponent< NoGUI::CText >(nullptr, nullptr, 20, NoGUI::Align(0, -1));
@@ -114,7 +114,7 @@ int main(int argc, char ** argv)
 		}
 		else if ( IsKeyPressed(KEY_R) ) // reset
 		{
-			centerElem->repos((Vector2){window.x / 2, window.y / 2}, NoGUI::Align(), true);
+			centerElem->repos(Vector2{window.x / 2, window.y / 2}, NoGUI::Align(), true);
 			centerElem->angle = 0;
 			originText = "Origin: CENTER\n";
 		}

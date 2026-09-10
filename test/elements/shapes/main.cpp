@@ -19,15 +19,15 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, fill, nullptr);
 	std::shared_ptr< NoGUI::nShape > octagon = std::make_shared< NoGUI::nShape >(8, fill, nullptr);
 	
-	NoGUI::Transform leftT = NoGUI::Transform((Vector2){0, 0}, elemSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform topT = NoGUI::Transform((Vector2){window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
-	NoGUI::Transform rightT = NoGUI::Transform((Vector2){window.x, 0}, elemSize, NoGUI::Align(1, -1));
-	NoGUI::Transform centerT = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
-	NoGUI::Transform centerLeftT = NoGUI::Transform((Vector2){0, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(-1, 0));
-	NoGUI::Transform centerRightT = NoGUI::Transform((Vector2){window.x, window.y / 2}, (Vector2){200, 100}, NoGUI::Align(1, 0));
-	NoGUI::Transform bottomLT = NoGUI::Transform((Vector2){0, window.y}, elemSize, NoGUI::Align(-1, 1));
-	NoGUI::Transform bottomT = NoGUI::Transform((Vector2){window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
-	NoGUI::Transform bottomRT = NoGUI::Transform((Vector2){window.x, window.y}, elemSize, NoGUI::Align(1, 1));
+	NoGUI::Transform leftT = NoGUI::Transform(Vector2{0, 0}, elemSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform topT = NoGUI::Transform(Vector2{window.x / 2, 0}, elemSize, NoGUI::Align(0, -1));
+	NoGUI::Transform rightT = NoGUI::Transform(Vector2{window.x, 0}, elemSize, NoGUI::Align(1, -1));
+	NoGUI::Transform centerT = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, elemSize, NoGUI::Align());
+	NoGUI::Transform centerLeftT = NoGUI::Transform(Vector2{0, window.y / 2}, Vector2{200, 100}, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerRightT = NoGUI::Transform(Vector2{window.x, window.y / 2}, Vector2{200, 100}, NoGUI::Align(1, 0));
+	NoGUI::Transform bottomLT = NoGUI::Transform(Vector2{0, window.y}, elemSize, NoGUI::Align(-1, 1));
+	NoGUI::Transform bottomT = NoGUI::Transform(Vector2{window.x / 2, window.y}, elemSize, NoGUI::Align(0, 1));
+	NoGUI::Transform bottomRT = NoGUI::Transform(Vector2{window.x, window.y}, elemSize, NoGUI::Align(1, 1));
 	
 	bottomT.radius.x = elemSize.y;
 	bottomLT.radius.x = elemSize.y;

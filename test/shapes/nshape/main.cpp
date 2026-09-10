@@ -28,32 +28,32 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Outline > testOutline = std::make_shared< NoGUI::Outline >(outlineFill, 10);
 	NoGUI::nShape shapeArray[shapeAmount];
 	NoGUI::nShape tipShape = NoGUI::nShape(4, noFill, testOutline);
-	NoGUI::nShape ellipse = (NoGUI::nShape){0, testFill, testOutline};
-	NoGUI::nShape line = (NoGUI::nShape){2, testFill, testOutline};
-	NoGUI::nShape triangle = (NoGUI::nShape){3, testFill, testOutline};
-	NoGUI::nShape rectangle = (NoGUI::nShape){4, testFill, testOutline};
-	NoGUI::nShape octagon = (NoGUI::nShape){8, testFill, testOutline};
-	NoGUI::Transform dataT = NoGUI::Transform((Vector2){0, 360}, (Vector2){elemSize.x * 2, elemSize.x}, NoGUI::Align(-1, 0));
-	NoGUI::Transform shapeT = NoGUI::Transform((Vector2){1280, 360}, (Vector2){elemSize.x * 2, elemSize.x}, NoGUI::Align(1, 0));
+	NoGUI::nShape ellipse = NoGUI::nShape(0, testFill, testOutline);
+	NoGUI::nShape line = NoGUI::nShape(2, testFill, testOutline);
+	NoGUI::nShape triangle = NoGUI::nShape(3, testFill, testOutline);
+	NoGUI::nShape rectangle = NoGUI::nShape(4, testFill, testOutline);
+	NoGUI::nShape octagon = NoGUI::nShape(8, testFill, testOutline);
+	NoGUI::Transform dataT = NoGUI::Transform(Vector2{0, 360}, Vector2{elemSize.x * 2, elemSize.x}, NoGUI::Align(-1, 0));
+	NoGUI::Transform shapeT = NoGUI::Transform(Vector2{1280, 360}, Vector2{elemSize.x * 2, elemSize.x}, NoGUI::Align(1, 0));
 	NoGUI::CText dataText = NoGUI::CText();
 	const char* shapeMsg = "";
 	NoGUI::CText shapeText = NoGUI::CText();
 	Vector2 posArray[shapeAmount];
 	Vector2 originArray[shapeAmount];
-	posArray[0] = (Vector2){0, 0};
-	posArray[1] = (Vector2){640, 0};
-	posArray[2] = (Vector2){1280, 0};
-	posArray[3] = (Vector2){640, 360};
-	posArray[4] = (Vector2){0, 720};
-	posArray[5] = (Vector2){640, 720};
-	posArray[6] = (Vector2){1280, 720};
+	posArray[0] = Vector2{0, 0};
+	posArray[1] = Vector2{640, 0};
+	posArray[2] = Vector2{1280, 0};
+	posArray[3] = Vector2{640, 360};
+	posArray[4] = Vector2{0, 720};
+	posArray[5] = Vector2{640, 720};
+	posArray[6] = Vector2{1280, 720};
 	
 	if ( argc > 1 )
 	{
 		if ( strcasecmp(argv[1], "circle") == 0 )
 		{
 			shapeMsg = "circle";
-			elemSize = (Vector2){100, 100};
+			elemSize = Vector2{100, 100};
 			for (int i=0; i < shapeAmount; i++)
 			{
 				shapeArray[i] = ellipse;
@@ -78,7 +78,7 @@ int main(int argc, char ** argv)
 		else if ( strcasecmp(argv[1], "tri") == 0 )
 		{
 			shapeMsg = "tri";
-			elemSize = (Vector2){100, 100};
+			elemSize = Vector2{100, 100};
 			for (int i=0; i < shapeAmount; i++)
 			{
 				shapeArray[i] = triangle;
@@ -95,7 +95,7 @@ int main(int argc, char ** argv)
 		else if ( strcasecmp(argv[1], "square") == 0 )
 		{
 			shapeMsg = "square";
-			elemSize = (Vector2){100, 100};
+			elemSize = Vector2{100, 100};
 			for (int i=0; i < shapeAmount; i++)
 			{
 				shapeArray[i] = rectangle;
@@ -112,12 +112,12 @@ int main(int argc, char ** argv)
 		else if ( strcasecmp(argv[1], "poly") == 0 )
 		{
 			shapeMsg = "poly";
-			NoGUI::nShape fivegon = (NoGUI::nShape){5, testFill, testOutline};
-			NoGUI::nShape sixgon = (NoGUI::nShape){6, testFill, testOutline};
-			NoGUI::nShape sevengon = (NoGUI::nShape){7, testFill, testOutline};
-			NoGUI::nShape ninegon = (NoGUI::nShape){9, testFill, testOutline};
-			NoGUI::nShape tengon = (NoGUI::nShape){10, testFill, testOutline};
-			NoGUI::nShape elevengon = (NoGUI::nShape){11, testFill, testOutline};
+			NoGUI::nShape fivegon = NoGUI::nShape(5, testFill, testOutline);
+			NoGUI::nShape sixgon = NoGUI::nShape(6, testFill, testOutline);
+			NoGUI::nShape sevengon = NoGUI::nShape(7, testFill, testOutline);
+			NoGUI::nShape ninegon = NoGUI::nShape(9, testFill, testOutline);
+			NoGUI::nShape tengon = NoGUI::nShape(10, testFill, testOutline);
+			NoGUI::nShape elevengon = NoGUI::nShape(11, testFill, testOutline);
 			shapeArray[0] = fivegon;
 			shapeArray[1] = sixgon;
 			shapeArray[2] = sevengon;
@@ -129,12 +129,12 @@ int main(int argc, char ** argv)
 		else if ( strcasecmp(argv[1], "polygon") == 0 )
 		{
 			shapeMsg = "polygon";
-			NoGUI::nShape fivegon = (NoGUI::nShape){5, testFill, testOutline};
-			NoGUI::nShape sixgon = (NoGUI::nShape){6, testFill, testOutline};
-			NoGUI::nShape sevengon = (NoGUI::nShape){7, testFill, testOutline};
-			NoGUI::nShape ninegon = (NoGUI::nShape){9, testFill, testOutline};
-			NoGUI::nShape tengon = (NoGUI::nShape){10, testFill, testOutline};
-			NoGUI::nShape elevengon = (NoGUI::nShape){11, testFill, testOutline};
+			NoGUI::nShape fivegon = NoGUI::nShape(5, testFill, testOutline);
+			NoGUI::nShape sixgon = NoGUI::nShape(6, testFill, testOutline);
+			NoGUI::nShape sevengon = NoGUI::nShape(7, testFill, testOutline);
+			NoGUI::nShape ninegon = NoGUI::nShape(9, testFill, testOutline);
+			NoGUI::nShape tengon = NoGUI::nShape(10, testFill, testOutline);
+			NoGUI::nShape elevengon = NoGUI::nShape(11, testFill, testOutline);
 			shapeArray[0] = octagon;
 			shapeArray[1] = fivegon;
 			shapeArray[2] = sevengon;
@@ -161,13 +161,13 @@ int main(int argc, char ** argv)
 		shapeArray[6] = ellipse;
 	}
 	
-	originArray[0] = (Vector2){-1 * elemSize.x, -1 * elemSize.y};
-	originArray[1] = (Vector2){0, -1 * elemSize.y};
-	originArray[2] = (Vector2){elemSize.x, -1 * elemSize.y};
-	originArray[3] = (Vector2){0, 0}; 
-	originArray[4] = (Vector2){-1 * elemSize.x, elemSize.y}; 
-	originArray[5] = (Vector2){0, elemSize.y};
-	originArray[6] = (Vector2){elemSize.x, elemSize.y};
+	originArray[0] = Vector2{-1 * elemSize.x, -1 * elemSize.y};
+	originArray[1] = Vector2{0, -1 * elemSize.y};
+	originArray[2] = Vector2{elemSize.x, -1 * elemSize.y};
+	originArray[3] = Vector2{0, 0}; 
+	originArray[4] = Vector2{-1 * elemSize.x, elemSize.y}; 
+	originArray[5] = Vector2{0, elemSize.y};
+	originArray[6] = Vector2{elemSize.x, elemSize.y};
 	
 	InitWindow(1280, 720, "test");
 	SetTargetFPS(60);

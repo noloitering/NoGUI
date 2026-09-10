@@ -150,9 +150,9 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::Outline > lines = std::make_shared< NoGUI::Outline >(lineFill, 2);
 	std::shared_ptr< NoGUI::nShape > rect = std::make_shared< NoGUI::nShape >(4, elemFill, lines);
 	std::shared_ptr< NoGUI::nShape > inputBox = std::make_shared< NoGUI::nShape >(4, noFill, lines);
-	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2 - elemSize.y * 2}, elemSize);
-	NoGUI::Transform addPos = NoGUI::Transform((Vector2){window.x - elemSize.x, centerPos.position.y}, (Vector2){elemSize.y, elemSize.y}, NoGUI::Align(1, 0));
-	NoGUI::Transform inputPos = NoGUI::Transform((Vector2){centerPos.pos(NoGUI::Align(1, 0)).x + 10, centerPos.position.y}, (Vector2){(addPos.pos(NoGUI::Align(-1, 0)).x - centerPos.pos(NoGUI::Align(1, 0)).x) / 2 - 10, elemSize.y}, NoGUI::Align(-1, 0));
+	NoGUI::Transform centerPos = NoGUI::Transform(Vector2{window.x / 2, window.y / 2 - elemSize.y * 2}, elemSize);
+	NoGUI::Transform addPos = NoGUI::Transform(Vector2{window.x - elemSize.x, centerPos.position.y}, Vector2{elemSize.y, elemSize.y}, NoGUI::Align(1, 0));
+	NoGUI::Transform inputPos = NoGUI::Transform(Vector2{centerPos.pos(NoGUI::Align(1, 0)).x + 10, centerPos.position.y}, Vector2{(addPos.pos(NoGUI::Align(-1, 0)).x - centerPos.pos(NoGUI::Align(1, 0)).x) / 2 - 10, elemSize.y}, NoGUI::Align(-1, 0));
 	
 	std::shared_ptr< EventHandler > listener = std::make_shared< EventHandler >();
 	gui.addListener(listener);

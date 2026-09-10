@@ -26,12 +26,12 @@ int main(int argc, char ** argv)
 		font = std::make_shared< Font >(GetFontDefault()); 
 	}
 	
-	NoGUI::Transform centerPos = NoGUI::Transform((Vector2){window.x / 2, window.y / 2}, elemSize, NoGUI::Align(0, 0));
-	NoGUI::Transform val1Pos = NoGUI::Transform((Vector2){8, 8}, elemSize, NoGUI::Align(-1, -1));
-	NoGUI::Transform val2Pos = NoGUI::Transform((Vector2){8, 116}, (Vector2){50, 50}, NoGUI::Align(-1, -1));
-	NoGUI::Transform button1Pos = NoGUI::Transform((Vector2){416, 8}, (Vector2){50, 50}, NoGUI::Align(-1, -1));
-	NoGUI::Transform button2Pos = NoGUI::Transform((Vector2){116, 116}, (Vector2){50, 50}, NoGUI::Align(-1, -1));
-	NoGUI::Transform dataPos = NoGUI::Transform((Vector2){window.x - 8, 8}, elemSize, NoGUI::Align(1, -1));
+	NoGUI::Transform centerPos = NoGUI::Transform(Vector2{window.x / 2, window.y / 2}, elemSize, NoGUI::Align(0, 0));
+	NoGUI::Transform val1Pos = NoGUI::Transform(Vector2{8, 8}, elemSize, NoGUI::Align(-1, -1));
+	NoGUI::Transform val2Pos = NoGUI::Transform(Vector2{8, 116}, Vector2{50, 50}, NoGUI::Align(-1, -1));
+	NoGUI::Transform button1Pos = NoGUI::Transform(Vector2{416, 8}, Vector2{50, 50}, NoGUI::Align(-1, -1));
+	NoGUI::Transform button2Pos = NoGUI::Transform(Vector2{116, 116}, Vector2{50, 50}, NoGUI::Align(-1, -1));
+	NoGUI::Transform dataPos = NoGUI::Transform(Vector2{window.x - 8, 8}, elemSize, NoGUI::Align(1, -1));
 	std::shared_ptr< NoGUI::Element > centerElem = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, centerPos, "Test", "", std::make_shared< NoGUI::CContainer >());
 	std::shared_ptr< NoGUI::Element > textSetting = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, val1Pos, "TextData", "", std::make_shared< NoGUI::CContainer >());
 	std::shared_ptr< NoGUI::Element > capSetting = std::make_shared< NoGUI::Element >(NoMAD::OBJCOUNT, rect, val2Pos, "CapData", "", std::make_shared< NoGUI::CContainer >());

@@ -107,46 +107,46 @@ Vector2 GetHandlesCollision(Vector2 point, const NoGUI::Transform& transform)
 	if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(-1, -1)), circRadius) )
 	{
 		
-		return (Vector2){-transform.radius.x, -transform.radius.y};
+		return Vector2{-transform.radius.x, -transform.radius.y};
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(-1, 0)), circRadius) )
 	{
 		
-		return (Vector2){-transform.radius.x, 0.0f};
+		return Vector2{-transform.radius.x, 0.0f};
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(-1, 1)), circRadius) )
 	{
 		
-		return (Vector2){-transform.radius.x, transform.radius.y};;
+		return Vector2{-transform.radius.x, transform.radius.y};;
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(0, 1)), circRadius) )
 	{
 		
-		return (Vector2){0, transform.radius.y};
+		return Vector2{0, transform.radius.y};
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(1, 1)), circRadius) )
 	{
 		
-		return (Vector2){transform.radius.x, transform.radius.y};
+		return Vector2{transform.radius.x, transform.radius.y};
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(1, 0)), circRadius) )
 	{
 		
-		return (Vector2){transform.radius.x, 0.0f};
+		return Vector2{transform.radius.x, 0.0f};
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(1, -1)), circRadius) )
 	{
 		
-		return (Vector2){transform.radius.x, -transform.radius.y};;
+		return Vector2{transform.radius.x, -transform.radius.y};;
 	}
 	else if ( CheckCollisionPointCircle(point, transform.pos(NoGUI::Align(0, -1)), circRadius) )
 	{
 		
-		return (Vector2){0.0f, -transform.radius.y};
+		return Vector2{0.0f, -transform.radius.y};
 	}
 	
 	
-	return (Vector2){0.0f, 0.0f};
+	return Vector2{0.0f, 0.0f};
 }
 
 bool CheckCollisionPointRotationCircle(Vector2 point, const NoGUI::Transform& transform)
@@ -220,10 +220,10 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 		std::vector< std::shared_ptr< NoGUI::Element > > colours = shapepg->getElements("DropDown");
 		std::vector< std::shared_ptr< NoGUI::Element > > names = shapepg->getElements("Name");
 		Vector2 startPos = {addCol->pos(NoGUI::Align(-1, 0)).x, shapesButton->pos(NoGUI::Align(0, 1)).y + 8 };
-		addShape->repos((Vector2){startPos.x, startPos.y + containers.size() * (addShape->height() + 4)});
+		addShape->repos(Vector2{startPos.x, startPos.y + containers.size() * (addShape->height() + 4)});
 		for (size_t i=0; i < previews.size(); i++)
 		{
-			containers.at(i)->repos((Vector2){startPos.x, startPos.y + (containers.at(i)->height() + 4) *i});
+			containers.at(i)->repos(Vector2{startPos.x, startPos.y + (containers.at(i)->height() + 4) *i});
 			previews.at(i)->repos(containers.at(i)->pos(NoGUI::Align(0, 0)));		
 		}
 		for (auto name : names)
@@ -233,7 +233,7 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 			{
 				if ( TextToInteger(container->getInner()) == (int)name->getId() )
 				{
-					name->repos((Vector2){name->position.x, container->pos(NoGUI::Align(0, 0)).y});
+					name->repos(Vector2{name->position.x, container->pos(NoGUI::Align(0, 0)).y});
 				}
 			}
 		}
@@ -251,9 +251,9 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 			{
 				container = shapepg->getElement(label->getId() + 3);
 			}
-			label->repos((Vector2){label->position.x, container->pos(label->origin).y});
-			input->repos((Vector2){label->pos(NoGUI::Align(1, -1)).x, label->pos(input->origin).y});
-			colour->repos((Vector2){colours.at(i)->position.x, input->pos(colour->origin).y});
+			label->repos(Vector2{label->position.x, container->pos(label->origin).y});
+			input->repos(Vector2{label->pos(NoGUI::Align(1, -1)).x, label->pos(input->origin).y});
+			colour->repos(Vector2{colours.at(i)->position.x, input->pos(colour->origin).y});
 		}
 		if ( elementsButton->getFocus() )
 		{
@@ -284,13 +284,13 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 		
 		for (size_t i=0; i < values.size(); i++)
 		{
-			values.at(i)->repos((Vector2){values.at(i)->position.x, containerY + values.at(i)->height() + 2});
+			values.at(i)->repos(Vector2{values.at(i)->position.x, containerY + values.at(i)->height() + 2});
 			if ( i % 2 == 0 )
 			{
 				std::shared_ptr< NoGUI::Element > container = containers.at(i / 2);
 				std::shared_ptr< NoGUI::Element > preview = previews.at(i / 2);
-				container->repos((Vector2){container->position.x, containerY});
-				preview->repos((Vector2){preview->position.x, container->pos(NoGUI::Align(0, 0)).y});
+				container->repos(Vector2{container->position.x, containerY});
+				preview->repos(Vector2{preview->position.x, container->pos(NoGUI::Align(0, 0)).y});
 			}
 			else
 			{
@@ -305,11 +305,11 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 			{
 				labelY += labels.at(i)->height() * 2;
 			}
-			labels.at(i)->repos((Vector2){labels.at(i)->position.x, labelY});
+			labels.at(i)->repos(Vector2{labels.at(i)->position.x, labelY});
 		}
 		for (size_t i=0; i < shapes.size(); i++)
 		{
-			shapes.at(i)->repos((Vector2){inputPos.x, inputPos.y + shapes.at(i)->height() * (i + 2)});
+			shapes.at(i)->repos(Vector2{inputPos.x, inputPos.y + shapes.at(i)->height() * (i + 2)});
 		}
 		for (size_t i=0; i < inputs.size(); i++)
 		{
@@ -321,7 +321,7 @@ void onPropertyPress(std::shared_ptr< NoGUI::Page > properties, std::shared_ptr<
 			inputs.at(i)->repos(inputPos);
 			inputPos.x += inputs.at(i)->width();
 		}
-		addElem->repos((Vector2){window.x - 150, inputPos.y + labels.front()->height() + 8});
+		addElem->repos(Vector2{window.x - 150, inputPos.y + labels.front()->height() + 8});
 	}
 	else
 	{
@@ -356,7 +356,7 @@ int main(int argc, char ** argv)
 	// UI Colours
 	std::shared_ptr< NoGUI::Fill > noFill = std::make_shared< NoGUI::Fill >(BLANK);
 	std::shared_ptr< NoGUI::Fill > textFill = std::make_shared< NoGUI::Fill >(WHITE);
-	std::shared_ptr< NoGUI::Fill > containerGray = std::make_shared< NoGUI::Fill >((Color){100, 100, 100, 200});
+	std::shared_ptr< NoGUI::Fill > containerGray = std::make_shared< NoGUI::Fill >(Color{100, 100, 100, 200});
 	std::shared_ptr< NoGUI::Fill > innerGray = std::make_shared< NoGUI::Fill >(GRAY, DARKGRAY);
 	std::shared_ptr< NoGUI::Fill > outlineRed = std::make_shared< NoGUI::Fill >(MAROON);
 	std::shared_ptr< NoGUI::Fill > outlineBlack = std::make_shared< NoGUI::Fill >(BLACK);
@@ -381,29 +381,29 @@ int main(int argc, char ** argv)
 	std::shared_ptr< NoGUI::nShape > elementShape = std::make_shared< NoGUI::nShape >(4, containerGray, elementOutline);
 	std::shared_ptr< NoGUI::nShape > propertyRect = std::make_shared< NoGUI::nShape >(4, containerGray, propertyOutline);
 	// UI Transforms
-	NoGUI::Transform pagesPos = NoGUI::Transform((Vector2){-200, 0}, (Vector2){100, window.y / 2}, NoGUI::Align(-1, -1));
-	NoGUI::Transform pagesTogglePos = NoGUI::Transform((Vector2){pagesPos.pos(NoGUI::Align(1, 0)).x, pagesPos.pos(NoGUI::Align(1, 0)).y}, (Vector2){25, 50}, NoGUI::Align(-1, 0));
-	NoGUI::Transform initialPagePos = NoGUI::Transform((Vector2){pagesPos.pos(NoGUI::Align(0, 0)).x, 20}, (Vector2){64, 64}, NoGUI::Align(0, -1));
+	NoGUI::Transform pagesPos = NoGUI::Transform(Vector2{-200, 0}, Vector2{100, window.y / 2}, NoGUI::Align(-1, -1));
+	NoGUI::Transform pagesTogglePos = NoGUI::Transform(Vector2{pagesPos.pos(NoGUI::Align(1, 0)).x, pagesPos.pos(NoGUI::Align(1, 0)).y}, Vector2{25, 50}, NoGUI::Align(-1, 0));
+	NoGUI::Transform initialPagePos = NoGUI::Transform(Vector2{pagesPos.pos(NoGUI::Align(0, 0)).x, 20}, Vector2{64, 64}, NoGUI::Align(0, -1));
 	NoGUI::Transform pageLabelPos = NoGUI::Transform(initialPagePos.pos(NoGUI::Align(0, 1)), labelRadius, NoGUI::Align(0, -1));
-	NoGUI::Transform addPagePos = NoGUI::Transform((Vector2){pageLabelPos.pos().x, pageLabelPos.pos(NoGUI::Align(0, 1)).y}, (Vector2){64, 64}, NoGUI::Align(0, -1));
-	NoGUI::Transform colourButtonPos = NoGUI::Transform((Vector2){window.x, 0}, propertyButtonRadius, NoGUI::Align(1, -1));
-	NoGUI::Transform shapeButtonPos = NoGUI::Transform((Vector2){window.x, colourButtonPos.height() + colourOutline->thick}, propertyButtonRadius, NoGUI::Align(1, -1));
+	NoGUI::Transform addPagePos = NoGUI::Transform(Vector2{pageLabelPos.pos().x, pageLabelPos.pos(NoGUI::Align(0, 1)).y}, Vector2{64, 64}, NoGUI::Align(0, -1));
+	NoGUI::Transform colourButtonPos = NoGUI::Transform(Vector2{window.x, 0}, propertyButtonRadius, NoGUI::Align(1, -1));
+	NoGUI::Transform shapeButtonPos = NoGUI::Transform(Vector2{window.x, colourButtonPos.height() + colourOutline->thick}, propertyButtonRadius, NoGUI::Align(1, -1));
 	NoGUI::Transform elementButtonPos = NoGUI::Transform(shapeButtonPos.pos(NoGUI::Align(1, 1)), propertyButtonRadius, NoGUI::Align(1, -1));
 	elementButtonPos.translate(0, shapeOutline->thick); // wrap functionality not implemented yet
-	NoGUI::Transform propertyPos = NoGUI::Transform((Vector2){window.x, 0}, (Vector2){propertyButtonRadius.x, window.y}, NoGUI::Align(1, 1));
-	NoGUI::Transform colPos = NoGUI::Transform((Vector2){colourButtonPos.position.x - 8, colourButtonPos.pos(NoGUI::Align(0, 1)).y + 24 + propertyButtonRadius.y * 2}, (Vector2){propertyButtonRadius.x * 1.5f - 8, propertyButtonRadius.y + 4}, NoGUI::Align(1, -1));
-	NoGUI::Transform colRLabelPos = NoGUI::Transform((Vector2){propertyPos.pos(NoGUI::Align(-1, 0)).x - propertyButtonRadius.x + 20, colourButtonPos.pos(NoGUI::Align(0, 1)).y + 8}, (Vector2){12, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colRPos = NoGUI::Transform((Vector2){colRLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){20, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colGLabelPos = NoGUI::Transform((Vector2){colRPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){12, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colGPos = NoGUI::Transform((Vector2){colGLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){20, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colBLabelPos = NoGUI::Transform((Vector2){colGPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){12, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colBPos = NoGUI::Transform((Vector2){colBLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){20, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colALabelPos = NoGUI::Transform((Vector2){colBPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){12, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform colAPos = NoGUI::Transform((Vector2){colALabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, (Vector2){20, colPos.radius.y}, NoGUI::Align(-1, -1));
-	NoGUI::Transform shapePos = NoGUI::Transform((Vector2){colRLabelPos.position.x - 12, colPos.pos(NoGUI::Align(0, 1)).y + shapeButtonPos.height()}, (Vector2){30, colPos.radius.y * 2}, NoGUI::Align(-1, -1));
-	NoGUI::Transform elemShapePos = NoGUI::Transform((Vector2){colRLabelPos.position.x, shapePos.pos(NoGUI::Align(0, 1)).y + elementButtonPos.height()}, shapeLabelRadius, NoGUI::Align(-1, -1));
-	NoGUI::Transform elemTagPos = NoGUI::Transform((Vector2){elemShapePos.position.x + elemShapePos.width(), elemShapePos.position.y}, elemShapePos.radius, elemShapePos.origin);
-	NoGUI::Transform elemInnerPos = NoGUI::Transform((Vector2){elemTagPos.position.x + elemTagPos.width(), elemTagPos.position.y}, elemTagPos.radius, elemTagPos.origin);
+	NoGUI::Transform propertyPos = NoGUI::Transform(Vector2{window.x, 0}, Vector2{propertyButtonRadius.x, window.y}, NoGUI::Align(1, 1));
+	NoGUI::Transform colPos = NoGUI::Transform(Vector2{colourButtonPos.position.x - 8, colourButtonPos.pos(NoGUI::Align(0, 1)).y + 24 + propertyButtonRadius.y * 2}, Vector2{propertyButtonRadius.x * 1.5f - 8, propertyButtonRadius.y + 4}, NoGUI::Align(1, -1));
+	NoGUI::Transform colRLabelPos = NoGUI::Transform(Vector2{propertyPos.pos(NoGUI::Align(-1, 0)).x - propertyButtonRadius.x + 20, colourButtonPos.pos(NoGUI::Align(0, 1)).y + 8}, Vector2{12, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colRPos = NoGUI::Transform(Vector2{colRLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{20, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colGLabelPos = NoGUI::Transform(Vector2{colRPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{12, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colGPos = NoGUI::Transform(Vector2{colGLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{20, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colBLabelPos = NoGUI::Transform(Vector2{colGPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{12, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colBPos = NoGUI::Transform(Vector2{colBLabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{20, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colALabelPos = NoGUI::Transform(Vector2{colBPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{12, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform colAPos = NoGUI::Transform(Vector2{colALabelPos.pos(NoGUI::Align(1, 0)).x, colRLabelPos.pos().y}, Vector2{20, colPos.radius.y}, NoGUI::Align(-1, -1));
+	NoGUI::Transform shapePos = NoGUI::Transform(Vector2{colRLabelPos.position.x - 12, colPos.pos(NoGUI::Align(0, 1)).y + shapeButtonPos.height()}, Vector2{30, colPos.radius.y * 2}, NoGUI::Align(-1, -1));
+	NoGUI::Transform elemShapePos = NoGUI::Transform(Vector2{colRLabelPos.position.x, shapePos.pos(NoGUI::Align(0, 1)).y + elementButtonPos.height()}, shapeLabelRadius, NoGUI::Align(-1, -1));
+	NoGUI::Transform elemTagPos = NoGUI::Transform(Vector2{elemShapePos.position.x + elemShapePos.width(), elemShapePos.position.y}, elemShapePos.radius, elemShapePos.origin);
+	NoGUI::Transform elemInnerPos = NoGUI::Transform(Vector2{elemTagPos.position.x + elemTagPos.width(), elemTagPos.position.y}, elemTagPos.radius, elemTagPos.origin);
 	NoGUI::Transform addElemPos = NoGUI::Transform(colPos.position, shapePos.radius, NoGUI::Align(0, -1));
 	
 	NoGUI::Manager gui = NoGUI::Manager(false);
@@ -569,7 +569,7 @@ int main(int argc, char ** argv)
 							std::vector< std::shared_ptr< NoGUI::Element > > menu = contextMenu->getElements();
 							for (size_t i=0; i < menu.size(); i++)
 							{
-								menu[i]->repos((Vector2){(float)GetMouseX(), GetMouseY() + menu[i]->height() * i});
+								menu[i]->repos(Vector2{(float)GetMouseX(), GetMouseY() + menu[i]->height() * i});
 							}
 						}
 					}
@@ -599,7 +599,7 @@ int main(int argc, char ** argv)
 				coloursContainer->position.y = window.y;
 				for (auto elem : builderpg->getElements())
 				{
-					elem->resize((Vector2){propertyButtonRadius.x * 1.5f, elem->radius.y});
+					elem->resize(Vector2{propertyButtonRadius.x * 1.5f, elem->radius.y});
 				}
 			}
 			else
@@ -608,7 +608,7 @@ int main(int argc, char ** argv)
 				coloursContainer->position.y = 0;
 				for (auto elem : builderpg->getElements())
 				{
-					elem->resize((Vector2){propertyButtonRadius.x, elem->radius.y});
+					elem->resize(Vector2{propertyButtonRadius.x, elem->radius.y});
 				}
 			}
 			if ( colpg->getActive() )
@@ -703,7 +703,7 @@ int main(int argc, char ** argv)
 					unsigned char green = TextToInteger(gInput->getInner());
 					unsigned char blue = TextToInteger(bInput->getInner());
 					unsigned char alpha = TextToInteger(aInput->getInner());
-					userCols.push_back(std::make_shared< NoGUI::Fill >((Color){red, green, blue, alpha}));
+					userCols.push_back(std::make_shared< NoGUI::Fill >(Color{red, green, blue, alpha}));
 					std::shared_ptr< NoGUI::nShape > colShape = std::make_shared< NoGUI::nShape >(4, userCols.back());
 					NoGUI::Transform newColPos = *(bInput);
 					NoGUI::Transform namePos = *(rInput);
@@ -817,7 +817,7 @@ int main(int argc, char ** argv)
 						std::vector< std::shared_ptr< NoGUI::Element > > options = colSelector->getElements();
 						for (size_t option=0; option < options.size(); option++)
 						{
-							options.at(option)->repos((Vector2){colour->position.x, colour->pos(NoGUI::Align(0, -1)).y + colour->height() * (option + 1)});
+							options.at(option)->repos(Vector2{colour->position.x, colour->pos(NoGUI::Align(0, -1)).y + colour->height() * (option + 1)});
 						}
 					
 						break;
@@ -843,7 +843,7 @@ int main(int argc, char ** argv)
 								// add shape
 								preview->setFocus(true);
 								std::shared_ptr< NoGUI::Element > container = shapepg->getElement(preview->getId() - 1);
-								NoGUI::Transform namePos = NoGUI::Transform((Vector2){shapesButton->pos(NoGUI::Align()).x + container->radius.x + 16, preview->position.y}, (Vector2){shapesButton->radius.x - container->radius.x - 8, shapesButton->radius.y}, NoGUI::Align(0, 0));
+								NoGUI::Transform namePos = NoGUI::Transform(Vector2{shapesButton->pos(NoGUI::Align()).x + container->radius.x + 16, preview->position.y}, Vector2{shapesButton->radius.x - container->radius.x - 8, shapesButton->radius.y}, NoGUI::Align(0, 0));
 								std::shared_ptr< NoGUI::Element > newName = shapepg->addElement(labelShape, namePos, "Name", TextFormat("Shape%i", shapeCounter));
 								container->setInner(TextFormat("%i", newName->getId()));
 								userShapes.push_back(preview->getShape());
@@ -899,12 +899,12 @@ int main(int argc, char ** argv)
 				}
 				if ( addShape->getHover() && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) )
 				{
-					NoGUI::Transform nLabelPos = NoGUI::Transform((Vector2){addShape->pos(NoGUI::Align(1, 0)).x + 4, addShape->pos(NoGUI::Align(0, -1)).y}, shapeLabelRadius, NoGUI::Align(-1, -1));
-					NoGUI::Transform nInputPos = NoGUI::Transform((Vector2){nLabelPos.pos(NoGUI::Align(1, 0)).x, addShape->pos(NoGUI::Align(0, -1)).y}, (Vector2){12, shapeLabelRadius.y}, NoGUI::Align(-1, -1));
-					NoGUI::Transform shapeColPos = NoGUI::Transform((Vector2){nInputPos.pos(NoGUI::Align(1, 0)).x + 4, addShape->pos(NoGUI::Align(0, -1)).y}, shapeLabelRadius, NoGUI::Align(-1, -1));
-					NoGUI::Transform thickLabelPos = NoGUI::Transform((Vector2){nLabelPos.position.x, addShape->pos(NoGUI::Align(0, 1)).y}, shapeLabelRadius, NoGUI::Align(-1, 1));
-					NoGUI::Transform thickInputPos = NoGUI::Transform((Vector2){nLabelPos.pos(NoGUI::Align(1, 0)).x, addShape->pos(NoGUI::Align(0, 1)).y}, (Vector2){12, shapeLabelRadius.y}, NoGUI::Align(-1, 1));
-					NoGUI::Transform outlineColPos = NoGUI::Transform((Vector2){nInputPos.pos(NoGUI::Align(1, 0)).x + 4, addShape->pos(NoGUI::Align(0, 1)).y}, shapeLabelRadius, NoGUI::Align(-1, 1));
+					NoGUI::Transform nLabelPos = NoGUI::Transform(Vector2{addShape->pos(NoGUI::Align(1, 0)).x + 4, addShape->pos(NoGUI::Align(0, -1)).y}, shapeLabelRadius, NoGUI::Align(-1, -1));
+					NoGUI::Transform nInputPos = NoGUI::Transform(Vector2{nLabelPos.pos(NoGUI::Align(1, 0)).x, addShape->pos(NoGUI::Align(0, -1)).y}, Vector2{12, shapeLabelRadius.y}, NoGUI::Align(-1, -1));
+					NoGUI::Transform shapeColPos = NoGUI::Transform(Vector2{nInputPos.pos(NoGUI::Align(1, 0)).x + 4, addShape->pos(NoGUI::Align(0, -1)).y}, shapeLabelRadius, NoGUI::Align(-1, -1));
+					NoGUI::Transform thickLabelPos = NoGUI::Transform(Vector2{nLabelPos.position.x, addShape->pos(NoGUI::Align(0, 1)).y}, shapeLabelRadius, NoGUI::Align(-1, 1));
+					NoGUI::Transform thickInputPos = NoGUI::Transform(Vector2{nLabelPos.pos(NoGUI::Align(1, 0)).x, addShape->pos(NoGUI::Align(0, 1)).y}, Vector2{12, shapeLabelRadius.y}, NoGUI::Align(-1, 1));
+					NoGUI::Transform outlineColPos = NoGUI::Transform(Vector2{nInputPos.pos(NoGUI::Align(1, 0)).x + 4, addShape->pos(NoGUI::Align(0, 1)).y}, shapeLabelRadius, NoGUI::Align(-1, 1));
 					shapepg->addElement(labelShape, nLabelPos, "Label", "sides:");
 					std::shared_ptr< NoGUI::Element > nInput = shapepg->addElement(pageRect, nInputPos, "Input", "4");
 					shapepg->addElement(pageRect, shapeColPos, "DropDown", "Colour");
@@ -924,7 +924,7 @@ int main(int argc, char ** argv)
 						previewLines = std::make_shared< NoGUI::Outline >(noFill, TextToInteger(thicknessInput->getInner()));
 						shapePreview = std::make_shared< NoGUI::nShape >(TextToInteger(nInput->getInner()), noFill, previewLines);
 					}
-					NoGUI::Transform previewPos = NoGUI::Transform(addShape->pos(NoGUI::Align(0, 0)), (Vector2){addShape->radius.x / 1.5f, addShape->radius.x / 1.5f}, NoGUI::Align(0, 0));
+					NoGUI::Transform previewPos = NoGUI::Transform(addShape->pos(NoGUI::Align(0, 0)), Vector2{addShape->radius.x / 1.5f, addShape->radius.x / 1.5f}, NoGUI::Align(0, 0));
 					shapepg->addElement(shapePreview, previewPos, "Shape");
 					addShape->translate(0, addShape->height() + 4);
 					if ( elempg->getActive() )
@@ -983,7 +983,7 @@ int main(int argc, char ** argv)
 						std::vector< std::shared_ptr< NoGUI::Element > > options = shapeSelector->getElements();
 						for (size_t option=0; option < options.size(); option++)
 						{
-							options.at(option)->repos((Vector2){shape->position.x, shape->pos(NoGUI::Align(0, -1)).y + shape->height() * (option + 1)});
+							options.at(option)->repos(Vector2{shape->position.x, shape->pos(NoGUI::Align(0, -1)).y + shape->height() * (option + 1)});
 						}
 					
 						break;
@@ -1000,7 +1000,7 @@ int main(int argc, char ** argv)
 						// add to userGUI
 						if ( userGUI.size() > currPage )
 						{
-							NoGUI::Transform newPos = NoGUI::Transform(GetMousePosition(), (Vector2){cellSize * 2.0f, cellSize * 2.0f}, NoGUI::Align(0, 0));
+							NoGUI::Transform newPos = NoGUI::Transform(GetMousePosition(), Vector2{cellSize * 2.0f, cellSize * 2.0f}, NoGUI::Align(0, 0));
 							std::shared_ptr< NoGUI::Page > activePage = userGUI.getPage(currPage);
 							for (auto pageElem : activePage->getElements())
 							{
@@ -1032,7 +1032,7 @@ int main(int argc, char ** argv)
 						input->translate(0, containerSize.y * 2 + 4);
 					}
 					elempg->addElement(pageRect, containerPos, "Container", TextFormat("%i", shapeIndex));
-					NoGUI::Transform previewPos = NoGUI::Transform(containerPos.pos(NoGUI::Align(0, 0)), (Vector2){containerPos.radius.x / 1.5f, containerPos.radius.x / 1.5f}, NoGUI::Align(0, 0));
+					NoGUI::Transform previewPos = NoGUI::Transform(containerPos.pos(NoGUI::Align(0, 0)), Vector2{containerPos.radius.x / 1.5f, containerPos.radius.x / 1.5f}, NoGUI::Align(0, 0));
 					elempg->addElement(userShapes.at(shapeIndex), previewPos, "Preview", TextFormat("%i", shapeIndex));
 					addElem->translate(0, containerSize.y * 2 + 4);
 				}
