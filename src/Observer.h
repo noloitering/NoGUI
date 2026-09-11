@@ -35,6 +35,7 @@ namespace NoGUI
 		size_t addListener(std::shared_ptr< Listener > listener)
 		{
 			listeners.push_back(listener);
+			total++;
 		
 			return listeners.size() - 1;
 		}
@@ -42,6 +43,7 @@ namespace NoGUI
 		void removeListener(size_t pos)
 		{
 			listeners.erase(listeners.begin() + pos - 1);
+			total--;
 		}
 		
 		std::vector< std::shared_ptr< Listener > > getListeners()

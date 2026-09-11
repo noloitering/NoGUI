@@ -1684,8 +1684,8 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				midPoint.x += translate.x;
 				midPoint.y += translate.y;
 			}
-			Vector2 texcoords[max] = { 0 };
-			Vector2 points[max] = { 0 };
+			Vector2 texcoords[max];
+			Vector2 points[max];
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -1699,7 +1699,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				centralAngle += 10;
 			}
 			// create copy to rotate coordnites
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i=0; i < max; i++) 
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -1759,7 +1759,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				{displace.x, displace.y},
 				{0.0f, displace.y * -1},
 			};
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -1809,7 +1809,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				{displace.x, displace.y * -1},
 				{displace.x * -1, displace.y * -1}
 			};
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -1836,8 +1836,8 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				midPoint.x += translate.x;
 				midPoint.y += translate.y;
 			}
-			Vector2 texcoords[MAX_VERTICES] = { 0 };
-			Vector2 points[MAX_VERTICES] = { 0 };
+			Vector2 texcoords[MAX_VERTICES];
+			Vector2 points[MAX_VERTICES];
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -1851,7 +1851,7 @@ void NoGUI::DrawCImageCropped(CImage& img, std::shared_ptr< nShape > shape, cons
 				centralAngle += 360.0f / (float)shape->n;
 			}
 			// create copy to rotate coordnites
-			Vector2 positions[MAX_VERTICES] = { 0 };
+			Vector2 positions[MAX_VERTICES];
 			for (int i=0; i < max; i++) 
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -1944,8 +1944,8 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				}
 			}
 			float centralAngle = transform.angle;
-			Vector2 texcoords[max] = { 0 };
-			Vector2 points[max] = { 0 };
+			Vector2 texcoords[max];
+			Vector2 points[max];
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -1955,7 +1955,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				texcoords[i] = Vector2{midPoint.x + sin * (0.5f - rate.x / 2), midPoint.y + cos * (0.5f - rate.y / 2)};
 				centralAngle += 10;
 			}
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i=0; i < max; i++) 
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2081,7 +2081,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				{0, displace.y * -1}
 			};
 					
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2188,7 +2188,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				{displace.x, displace.y * -1},
 				{displace.x * -1, displace.y * -1}
 			};
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2262,8 +2262,8 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				}
 			}
 			float centralAngle = 0;
-			Vector2 texcoords[MAX_VERTICES] = { 0 };
-			Vector2 points[MAX_VERTICES] = { 0 };
+			Vector2 texcoords[MAX_VERTICES];
+			Vector2 points[MAX_VERTICES];
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -2273,7 +2273,7 @@ void NoGUI::DrawCImageFitted(CImage& img, std::shared_ptr< nShape > shape, const
 				texcoords[i] = Vector2{midPoint.x + sin * (0.5f - rate.x / 2), midPoint.y + cos * (0.5f - rate.y / 2)};
 				centralAngle += 360.0f / (float)shape->n;
 			}
-			Vector2 positions[MAX_VERTICES] = { 0 };
+			Vector2 positions[MAX_VERTICES];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2312,8 +2312,8 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 		{
 			const int max = 37;
 			int centralAngle = 0;
-			Vector2 texcoords[max] = { 0 };
-			Vector2 points[max] = { 0 };
+			Vector2 texcoords[max];
+			Vector2 points[max];
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -2322,7 +2322,7 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 				texcoords[i] = Vector2{0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
 				centralAngle += 10;
 			}
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i=0; i < max; i++) 
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2362,7 +2362,7 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 				{imgSize.x * 0.5f, imgSize.y * 0.5f},
 				{0, imgSize.y * -0.5f}
 			};
-			Vector2 positions[max] = { 0 };
+			Vector2 positions[max];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
@@ -2390,8 +2390,8 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 		{
 			const int max = shape->n + 1 < MAX_VERTICES ? shape->n + 1 : MAX_VERTICES;
 			int centralAngle = 0;
-			Vector2 texcoords[MAX_VERTICES] = { 0 };
-			Vector2 points[MAX_VERTICES] = { 0 };
+			Vector2 texcoords[MAX_VERTICES];
+			Vector2 points[MAX_VERTICES];
 			for (int i=0; i < max; i++)
 			{
 				float sin = sinf(centralAngle * DEG2RAD);
@@ -2400,7 +2400,7 @@ void NoGUI::DrawCImageShaped(CImage& img, const NoGUI::Transform& transform, std
 				texcoords[i] = Vector2{0.5f + sin * 0.5f, 0.5f + cos * 0.5f};
 				centralAngle += 360.0f / (float)shape->n;
 			}
-			Vector2 positions[MAX_VERTICES] = { 0 };
+			Vector2 positions[MAX_VERTICES];
 			for (int i = 0; i < max; i++)
 			{	
 				positions[i] = Vector2Rotate(points[i], transform.angle*DEG2RAD);
